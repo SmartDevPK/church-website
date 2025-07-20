@@ -898,12 +898,14 @@
     </style>
 </head>
 
+
+
 <body>
     <!-- Header with Admin Button -->
     <header id="header">
         <div class="container">
             <nav>
-                <a href="index.html" class="logo-container">
+                <a href="index.php" class="logo-container">
                     <img src="the anch logo.png" alt="The Anchor Logo" class="logo-img">
                     <div class="logo-text">
                         <span class="logo-main">The Anchor</span>
@@ -916,12 +918,12 @@
                 </button>
 
                 <ul class="nav-links">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="todays-devotion.html">Devotions</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="family.html">Family</a></li>
+                    <li><a href="index.php">Home</a></li>
+                    <li><a href="todays-devotion.php">Devotions</a></li>
+                    <li><a href="about.php">About</a></li>
+                    <li><a href="family.php">Family</a></li>
                     <li><a href="#subscribe">Subscribe</a></li>
-                    <li><a href="dashboad.html" class="btn-admin"><i class="fas fa-lock"></i> Admin</a></li>
+                    <li><a href="login.php" class="btn-admin"><i class="fas fa-lock"></i> Admin</a></li>
                 </ul>
             </nav>
         </div>
@@ -929,12 +931,12 @@
         <!-- Mobile Menu -->
         <div class="mobile-menu" id="mobileMenu">
             <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="todays-devotion.html">Devotions</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="family.html">Family</a></li>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="todays-devotion.php">Devotions</a></li>
+                <li><a href="about.php">About</a></li>
+                <li><a href="family.php">Family</a></li>
                 <li><a href="#subscribe">Subscribe</a></li>
-                <li><a href="dashboad.html" class="btn-admin"><i class="fas fa-lock"></i> Admin Login</a></li>
+                <li><a href="login.php" class="btn-admin"><i class="fas fa-lock"></i> Admin Login</a></li>
             </ul>
         </div>
     </header>
@@ -951,7 +953,7 @@
             <p>Anchor your soul in God's Word with our daily devotionals. Each day brings fresh insight, biblical
                 wisdom, and practical application for your spiritual journey.</p>
             <div class="cta-buttons">
-                <a href="todays-devotion.html" class="btn btn-white">Today's Devotion</a>
+                <a href="todays-devotion.php" class="btn btn-white">Today's Devotion</a>
                 <a href="#subscribe" class="btn btn-secondary">Subscribe Daily</a>
             </div>
         </div>
@@ -1063,7 +1065,7 @@
                     </div>
 
                     <div class="see-more-devotions">
-                        <a href="past-devotions.html" class="btn btn-primary">
+                        <a href="past-devotions.php" class="btn btn-primary">
                             <i class="fas fa-book-open"></i> See More Devotions
                         </a>
                     </div>

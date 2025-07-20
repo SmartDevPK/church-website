@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -104,6 +105,40 @@
         }
     </style>
 </head>
+
+<?php
+session_start();
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
+
+$errorMessage = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $validEmail = "emmanuelmichaelpk3@gmail.com";
+    $validPassword = "Pk123456789@";
+
+    $email = $_POST['email'] ?? '';
+    $password = $_POST['password'] ?? '';
+
+    if ($email === $validEmail && $password === $validPassword) {
+        $_SESSION['user_email'] = $email;
+        header("Location: dashboad.php");
+        exit();
+    } else {
+        $errorMessage = "Invalid email or password.";
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login - The Anchor Devotional</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link your CSS if needed -->
+</head>
+
 <body>
     <div class="login-container">
         <div class="logo">
@@ -111,45 +146,34 @@
             <p>Admin Login</p>
         </div>
 
-        <form id="adminLoginForm">
+        <?php if (!empty($errorMessage)): ?>
+            <div class="error-message" style="color: red; margin-bottom: 15px;">
+                <?= htmlspecialchars($errorMessage) ?>
+            </div>
+        <?php endif; ?>
+
+        <form id="adminLoginForm" method="POST" action="">
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                <input type="email" name="email" class="form-control" id="email" placeholder="Enter your email"
+                    required>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+                <input type="password" name="password" class="form-control" id="password"
+                    placeholder="Enter your password" required>
             </div>
 
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Login</button>
             </div>
-
-            <div class="text-center">
-                <a href="#" class="btn-link">Forgot Password?</a>
-            </div>
         </form>
 
         <div class="footer-links">
-            <a href="/" class="text-muted"><i class="fas fa-arrow-left"></i> Return to Website</a>
+            <a href="index.php" class="text-muted"><i class="fas fa-arrow-left"></i> Return to Website</a>
         </div>
     </div>
-
-    <script>
-        // Form submission (would be connected to backend in production)
-        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            // Here you would typically send the credentials to your server
-            console.log('Login attempt with:', email, password);
-            
-            // For demo purposes, we'll just redirect to the admin dashboard
-            // In a real application, you would verify credentials first
-            window.location.href = "admin-dashboard.html";
-        });
-    </script>
 </body>
+
 </html>
