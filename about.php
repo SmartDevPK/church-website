@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,9 +10,12 @@
     <style>
         /* Global Variables and Reset */
         :root {
-            --primary: #ad3128; /* Maroon as primary */
-            --secondary: #2c3e50; /* Blue for buttons */
-            --accent: #2c3e50; /* Blue as accent */
+            --primary: #ad3128;
+            /* Maroon as primary */
+            --secondary: #2c3e50;
+            /* Blue for buttons */
+            --accent: #2c3e50;
+            /* Blue as accent */
             --light: #f8f9fa;
             --dark: #212529;
             --text: #333;
@@ -42,16 +46,22 @@
 
         /* Animations */
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @keyframes slideUp {
-            from { 
+            from {
                 opacity: 0;
                 transform: translateY(30px);
             }
-            to { 
+
+            to {
                 opacity: 1;
                 transform: translateY(0);
             }
@@ -257,8 +267,8 @@
             position: relative;
             height: 60vh;
             min-height: 400px;
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-                       url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
             background-size: cover;
             background-position: center;
             display: flex;
@@ -518,16 +528,16 @@
             .section {
                 padding: 80px 0;
             }
-            
+
             .about-hero h1 {
                 font-size: 2.5rem;
             }
-            
+
             .family-content {
                 grid-template-columns: 1fr;
                 gap: 30px;
             }
-            
+
             .family-image {
                 order: -1;
             }
@@ -568,15 +578,15 @@
                 height: 50vh;
                 min-height: 350px;
             }
-            
+
             .about-hero h1 {
                 font-size: 2rem;
             }
-            
+
             .about-hero p {
                 font-size: 1rem;
             }
-            
+
             .section-title {
                 font-size: 2rem;
             }
@@ -586,13 +596,14 @@
             .about-hero h1 {
                 font-size: 1.8rem;
             }
-            
+
             .team-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- Header with Logo Image -->
     <header id="header">
@@ -609,10 +620,10 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <ul class="nav-links" id="navLinks">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="todays-devotion.html">Devotions</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="prayer.html">Prayer</a></li>
+                    <li><a href="index.php">Home</a></li>
+                    <li><a href="todays-devotion.php">Devotions</a></li>
+                    <li><a href="about.php">About</a></li>
+                    <li><a href="prayer.php">Prayer</a></li>
                     <li><a href="#subscribe">Subscribe</a></li>
                 </ul>
             </nav>
@@ -623,7 +634,8 @@
     <section class="about-hero">
         <div class="about-hero-content" data-aos="fade-up">
             <h1>About The Anchor Devotional</h1>
-            <p>Discover the story behind our ministry and the team dedicated to bringing you daily spiritual nourishment.</p>
+            <p>Discover the story behind our ministry and the team dedicated to bringing you daily spiritual
+                nourishment.</p>
             <a href="#mission" class="btn btn-white">Our Mission</a>
         </div>
     </section>
@@ -633,13 +645,18 @@
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">Our Mission & Vision</h2>
             <div class="mission-content" data-aos="fade-up" data-aos-delay="100">
-                <p> The Anchor Devotional is a daily devotional inspired by Gods Word, Finding the need for daily connection, and intimacy with God on daily. 
-Here we read, pray and meditate on the
-Holy Spirit - inspired word of God. We will be focusing on personal growth by
-continuous devotion each day with God.</p>
-                <p>Our vision is to see Christians around the world develop a consistent, meaningful devotional life that transforms their relationship with God and impacts their families, workplaces, and communities. We strive to make biblical truth accessible, practical, and applicable to everyday life.</p>
-                
-                <p>Every devotional is carefully crafted to combine sound biblical teaching with real-world application. We don't just want to inform minds—we want to transform hearts and lives through the power of God's Word.</p>
+                <p> The Anchor Devotional is a daily devotional inspired by Gods Word, Finding the need for daily
+                    connection, and intimacy with God on daily.
+                    Here we read, pray and meditate on the
+                    Holy Spirit - inspired word of God. We will be focusing on personal growth by
+                    continuous devotion each day with God.</p>
+                <p>Our vision is to see Christians around the world develop a consistent, meaningful devotional life
+                    that transforms their relationship with God and impacts their families, workplaces, and communities.
+                    We strive to make biblical truth accessible, practical, and applicable to everyday life.</p>
+
+                <p>Every devotional is carefully crafted to combine sound biblical teaching with real-world application.
+                    We don't just want to inform minds—we want to transform hearts and lives through the power of God's
+                    Word.</p>
             </div>
         </div>
     </section>
@@ -648,8 +665,9 @@ continuous devotion each day with God.</p>
     <section class="section team-section" id="team">
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">Meet Our Team</h2>
-            <p style="text-align: center; max-width: 800px; margin: 0 auto 50px;" data-aos="fade-up">Our dedicated team of pastors, writers, and editors work tirelessly to bring you fresh, biblical insights every day.</p>
-            
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 50px;" data-aos="fade-up">Our dedicated team
+                of pastors, writers, and editors work tirelessly to bring you fresh, biblical insights every day.</p>
+
             <div class="team-grid">
                 <!-- Team Member 1 -->
                 <div class="team-card" data-aos="fade-up" data-aos-delay="100">
@@ -657,7 +675,9 @@ continuous devotion each day with God.</p>
                     <div class="team-info">
                         <h3 class="team-name">Maj Gen (Dr) Ezra Jahadi Jakko</h3>
                         <span class="team-position">Founder & Lead Writer</span>
-                        <p class="team-bio">With over 40 years of pastoral experience, Pastor Ezra brings deep biblical insight and practical wisdom to each devotional. He holds a Doctorate in Theology and is passionate about making Scripture accessible to all believers.</p>
+                        <p class="team-bio">With over 40 years of pastoral experience, Pastor Ezra brings deep biblical
+                            insight and practical wisdom to each devotional. He holds a Doctorate in Theology and is
+                            passionate about making Scripture accessible to all believers.</p>
                         <div class="team-social">
                             <a href="#"><i class="fab fa-twitter"></i></a>
                             <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -665,14 +685,16 @@ continuous devotion each day with God.</p>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Team Member 2 -->
                 <div class="team-card" data-aos="fade-up" data-aos-delay="200">
                     <img src="avarta.jpg" alt="Sarah Johnson" class="team-image">
                     <div class="team-info">
                         <h3 class="team-name">Sarah Johnson</h3>
                         <span class="team-position">Editorial Director</span>
-                        <p class="team-bio">Sarah oversees the editorial process, ensuring each devotional maintains theological accuracy while being engaging and practical. She holds a Master's in Biblical Studies and has 15 years of publishing experience.</p>
+                        <p class="team-bio">Sarah oversees the editorial process, ensuring each devotional maintains
+                            theological accuracy while being engaging and practical. She holds a Master's in Biblical
+                            Studies and has 15 years of publishing experience.</p>
                         <div class="team-social">
                             <a href="#"><i class="fab fa-twitter"></i></a>
                             <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -680,14 +702,16 @@ continuous devotion each day with God.</p>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Team Member 3 -->
                 <div class="team-card" data-aos="fade-up" data-aos-delay="300">
                     <img src="avarta.jpg" alt="Michael Adebayo" class="team-image">
                     <div class="team-info">
                         <h3 class="team-name">Michael Adebayo</h3>
                         <span class="team-position">Digital Director</span>
-                        <p class="team-bio">Michael manages our digital platforms, ensuring the devotional reaches readers through our website, app, and email. With a background in both theology and technology, he bridges the gap between faith and digital media.</p>
+                        <p class="team-bio">Michael manages our digital platforms, ensuring the devotional reaches
+                            readers through our website, app, and email. With a background in both theology and
+                            technology, he bridges the gap between faith and digital media.</p>
                         <div class="team-social">
                             <a href="#"><i class="fab fa-twitter"></i></a>
                             <a href="#"><i class="fab fa-linkedin-in"></i></a>
@@ -704,11 +728,19 @@ continuous devotion each day with God.</p>
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">Our Devotional Approach</h2>
             <div class="devotional-content" data-aos="fade-up" data-aos-delay="100">
-                <p>Each devotional begins with prayerful study of Scripture. We believe the Bible is God's living Word, relevant to every generation and culture. Our writers spend time meditating on passages, seeking to understand both the original context and contemporary application.</p>
-                
-                <p>We emphasize the importance of connecting biblical truth to daily life. Our devotionals aren't just theological treatises—they're practical guides for living out your faith in the workplace, at home, and in your community. Each entry includes reflection questions to help you apply what you've read.</p>
-                
-                <p>The Anchor Devotional covers the full breadth of Scripture, from Genesis to Revelation. We follow the church calendar, addressing seasonal themes while maintaining a balanced diet of biblical teaching. Whether you're a new believer or a mature Christian, our devotionals meet you where you are and challenge you to grow deeper in your faith.</p>
+                <p>Each devotional begins with prayerful study of Scripture. We believe the Bible is God's living Word,
+                    relevant to every generation and culture. Our writers spend time meditating on passages, seeking to
+                    understand both the original context and contemporary application.</p>
+
+                <p>We emphasize the importance of connecting biblical truth to daily life. Our devotionals aren't just
+                    theological treatises—they're practical guides for living out your faith in the workplace, at home,
+                    and in your community. Each entry includes reflection questions to help you apply what you've read.
+                </p>
+
+                <p>The Anchor Devotional covers the full breadth of Scripture, from Genesis to Revelation. We follow the
+                    church calendar, addressing seasonal themes while maintaining a balanced diet of biblical teaching.
+                    Whether you're a new believer or a mature Christian, our devotionals meet you where you are and
+                    challenge you to grow deeper in your faith.</p>
             </div>
         </div>
     </section>
@@ -719,13 +751,20 @@ continuous devotion each day with God.</p>
             <div class="family-content">
                 <div class="family-text" data-aos="fade-right">
                     <h3>A Ministry for the Whole Family</h3>
-                    <p>The Anchor Devotional isn't just for individuals—it's designed to strengthen families in their faith journey. Many of our readers use the devotionals as discussion starters during family meals or bedtime routines.</p>
-                    <p>We offer special family editions during holidays and school breaks, with age-appropriate questions and activities that help children engage with Scripture. Our goal is to equip parents to be the primary spiritual influencers in their children's lives.</p>
-                    <p>Looking ahead, we're developing resources specifically for couples, parents, and multi-generational households. Because faith isn't meant to be lived in isolation—it flourishes in community, especially within the family.</p>
+                    <p>The Anchor Devotional isn't just for individuals—it's designed to strengthen families in their
+                        faith journey. Many of our readers use the devotionals as discussion starters during family
+                        meals or bedtime routines.</p>
+                    <p>We offer special family editions during holidays and school breaks, with age-appropriate
+                        questions and activities that help children engage with Scripture. Our goal is to equip parents
+                        to be the primary spiritual influencers in their children's lives.</p>
+                    <p>Looking ahead, we're developing resources specifically for couples, parents, and
+                        multi-generational households. Because faith isn't meant to be lived in isolation—it flourishes
+                        in community, especially within the family.</p>
                     <a href="#" class="btn btn-primary">Family Resources</a>
                 </div>
                 <div class="family-image" data-aos="fade-left" data-aos-delay="100">
-                    <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Family reading Bible together">
+                    <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                        alt="Family reading Bible together">
                 </div>
             </div>
         </div>
@@ -735,8 +774,10 @@ continuous devotion each day with God.</p>
     <section class="section subscribe" id="subscribe">
         <div class="container">
             <h2 class="section-title" style="color: white;" data-aos="fade-up">Stay Connected</h2>
-            <p style="text-align: center; margin-bottom: 30px; max-width: 700px; margin-left: auto; margin-right: auto;" data-aos="fade-up">
-                Receive daily devotionals directly in your inbox. Join our community of believers growing together in faith.
+            <p style="text-align: center; margin-bottom: 30px; max-width: 700px; margin-left: auto; margin-right: auto;"
+                data-aos="fade-up">
+                Receive daily devotionals directly in your inbox. Join our community of believers growing together in
+                faith.
             </p>
             <form class="subscribe-form" id="subscribeForm" data-aos="fade-up" data-aos-delay="100">
                 <input type="email" class="subscribe-input" placeholder="Your email address" required>
@@ -751,7 +792,8 @@ continuous devotion each day with God.</p>
             <div class="footer-content">
                 <div class="footer-column" data-aos="fade-up">
                     <h3>The Anchor</h3>
-                    <p>A daily devotional ministry committed to helping believers anchor their faith in God's Word through daily spiritual nourishment.</p>
+                    <p>A daily devotional ministry committed to helping believers anchor their faith in God's Word
+                        through daily spiritual nourishment.</p>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -759,18 +801,18 @@ continuous devotion each day with God.</p>
                         <a href="#"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
-                
+
                 <div class="footer-column" data-aos="fade-up" data-aos-delay="100">
                     <h3>Quick Links</h3>
                     <ul class="footer-links">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="todays-devotion.html">Today's Devotion</a></li>
-                        <li><a href="past-devotions.html">Past Devotions</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="prayer.html">Prayer Requests</a></li>
+                        <li><a href="index.php">Home</a></li>
+                        <li><a href="todays-devotion.php">Today's Devotion</a></li>
+                        <li><a href="past-devotions.php">Past Devotions</a></li>
+                        <li><a href="about.php">About Us</a></li>
+                        <li><a href="prayer.php">Prayer Requests</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="footer-column" data-aos="fade-up" data-aos-delay="200">
                     <h3>Resources</h3>
                     <ul class="footer-links">
@@ -781,7 +823,7 @@ continuous devotion each day with God.</p>
                         <li><a href="faq.html">FAQs</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="footer-column" data-aos="fade-up" data-aos-delay="300">
                     <h3>Contact Us</h3>
                     <ul class="footer-links">
@@ -791,9 +833,11 @@ continuous devotion each day with God.</p>
                     </ul>
                 </div>
             </div>
-            
+
             <div class="copyright" data-aos="fade-up">
-                <p>&copy; 2023 The Anchor Devotional. All Rights Reserved. | <a href="privacy.html" style="color: #bbb;">Privacy Policy</a> | <a href="terms.html" style="color: #bbb;">Terms of Use</a></p>
+                <p>&copy; 2023 The Anchor Devotional. All Rights Reserved. | <a href="privacy.html"
+                        style="color: #bbb;">Privacy Policy</a> | <a href="terms.html" style="color: #bbb;">Terms of
+                        Use</a></p>
             </div>
         </div>
     </footer>
@@ -807,17 +851,17 @@ continuous devotion each day with God.</p>
             easing: 'ease-in-out',
             once: true
         });
-        
+
         // Mobile Menu Toggle
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const navLinks = document.getElementById('navLinks');
-        
+
         mobileMenuBtn.addEventListener('click', () => {
             navLinks.classList.toggle('active');
-            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') ? 
+            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') ?
                 '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
         });
-        
+
         // Header Scroll Effect
         window.addEventListener('scroll', () => {
             const header = document.getElementById('header');
@@ -827,13 +871,14 @@ continuous devotion each day with God.</p>
                 header.classList.remove('header-scrolled');
             }
         });
-        
+
         // Form Submissions (would be connected to backend in production)
-        document.getElementById('subscribeForm').addEventListener('submit', function(e) {
+        document.getElementById('subscribeForm').addEventListener('submit', function (e) {
             e.preventDefault();
             alert('Thank you for subscribing to The Anchor Devotional! You will receive your first devotional tomorrow morning.');
             this.reset();
         });
     </script>
 </body>
+
 </html>

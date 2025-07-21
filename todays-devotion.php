@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,9 +10,12 @@
     <style>
         /* Global Variables and Reset */
         :root {
-            --primary: #ad3128; /* Maroon as primary */
-            --secondary: #2c3e50; /* Blue for buttons */
-            --accent: #2c3e50; /* Blue as accent */
+            --primary: #ad3128;
+            /* Maroon as primary */
+            --secondary: #2c3e50;
+            /* Blue for buttons */
+            --accent: #2c3e50;
+            /* Blue as accent */
             --light: #f8f9fa;
             --dark: #212529;
             --text: #333;
@@ -439,11 +443,11 @@
             .devotion-header {
                 height: 60vh;
             }
-            
+
             .devotion-header-title {
                 font-size: 2.5rem;
             }
-            
+
             .devotion-content {
                 padding: 40px;
             }
@@ -480,26 +484,26 @@
                 height: 50vh;
                 min-height: 400px;
             }
-            
+
             .devotion-header-title {
                 font-size: 2rem;
             }
-            
+
             .devotion-header-content {
                 padding: 30px;
             }
-            
+
             .devotion-content {
                 padding: 30px 20px;
                 top: -30px;
                 margin-bottom: -30px;
             }
-            
+
             .devotion-verse {
                 font-size: 1.2rem;
                 padding-left: 20px;
             }
-            
+
             .devotion-actions {
                 flex-direction: column;
                 align-items: flex-start;
@@ -511,52 +515,75 @@
                 height: 40vh;
                 min-height: 300px;
             }
-            
+
             .devotion-header-title {
                 font-size: 1.8rem;
             }
-            
+
             .devotion-header-date {
                 font-size: 1rem;
             }
-            
+
             .devotion-content {
                 padding: 25px 15px;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- Header -->
     <header id="header">
         <div class="container">
             <nav>
-                <a href="index.html" class="logo">The <span>Anchor Devotional</span></a>
+                <a href="index.php" class="logo">The <span>Anchor Devotional</span></a>
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
                     <i class="fas fa-bars"></i>
                 </button>
                 <ul class="nav-links" id="navLinks">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="devotions.html">Devotions</a></li>
-                    <li><a href="prayer.html">Prayer</a></li>
-                    <li><a href="testimonies.html">Testimonies</a></li>
-                    <li><a href="about.html">About</a></li>
+                    <li><a href="index.php">Home</a></li>
+                    <li><a href="devotions.php">Devotions</a></li>
+                    <li><a href="prayer.php">Prayer</a></li>
+                    <li><a href="testimonies.php">Testimonies</a></li>
+                    <li><a href="about.php">About</a></li>
                     <li><a href="#subscribe">Subscribe</a></li>
                 </ul>
             </nav>
         </div>
     </header>
+    <?php
+    $host = "localhost";
+    $port = 3307;
+    $username = "root";
+    $password = "";
+    $database = "prayer_db";
 
-    <!-- Devotion Header -->
+    $conn = new mysqli($host, $username, $password, $database, $port);
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    // Fetch the latest devotion
+    $result = $conn->query("SELECT * FROM devotion ORDER BY id DESC LIMIT 1");
+    $devotion = $result->fetch_assoc();
+    $conn->close();
+    ?>
+
+
     <div class="devotion-header" data-aos="fade-in">
-        <img src="Untitled design.png" alt="Today's Devotion" class="devotion-header-image">
+        <img src="<?= htmlspecialchars($devotion['image_path']) ?>" alt="Today's Devotion"
+            class="devotion-header-image">
         <div class="devotion-header-content">
-            <h1 class="devotion-header-title">Surviving the HEAT</h1>
+            <h1 class="devotion-header-title">
+                <?= htmlspecialchars($devotion['topic']) ?>
+            </h1>
             <div class="devotion-header-date">
                 <i class="fas fa-calendar-alt"></i>
-                <span>The Anchor - June 16, 2025</span>
+                <span>
+                    The Anchor - <?= date("F j, Y", strtotime($devotion['date'])) ?>
+                </span>
             </div>
-            <a href="#" class="download-btn">
+            <a href="download/devotionals.pdf" class="download-btn" download>
                 <i class="fas fa-download"></i> Download PDF
             </a>
         </div>
@@ -567,71 +594,112 @@
         <div class="container">
             <div class="devotion-content" data-aos="fade-up">
                 <p class="devotion-verse">
-                    "Blessed is the man that trusteth in the Lord, and whose hope the Lord is. For he shall be as a tree planted by the waters, and that spreadeth out her roots by the river, and shall not see (FEAR) when heat cometh, but her leaf shall be green; and shall not be careful (WORRIED) in the year of drought, neither shall cease from yielding fruit." 
+                    "Blessed is the man that trusteth in the Lord, and whose hope the Lord is. For he shall be as a tree
+                    planted by the waters, and that spreadeth out her roots by the river, and shall not see (FEAR) when
+                    heat cometh, but her leaf shall be green; and shall not be careful (WORRIED) in the year of drought,
+                    neither shall cease from yielding fruit."
                     <br><br>
                     - Jeremiah 17:7-8
                 </p>
-                
+
                 <div class="devotion-text">
-                    <p>Heat in the Bible and in life generally signifies trouble, hardship, suffering, adversity, and trials. Just as physical heat can be uncomfortable and even dangerous, the "heat" of life's challenges can test our faith, patience, and endurance. But God's Word provides us with powerful truths to not only survive but thrive during these seasons of intensity.</p>
-                    
+                    <p>Heat in the Bible and in life generally signifies trouble, hardship, suffering, adversity, and
+                        trials. Just as physical heat can be uncomfortable and even dangerous, the "heat" of life's
+                        challenges can test our faith, patience, and endurance. But God's Word provides us with powerful
+                        truths to not only survive but thrive during these seasons of intensity.</p>
+
                     <h3>Understanding the Nature of Heat</h3>
-                    
-                    <p>In our opening passage, Jeremiah paints a vivid picture of contrasting responses to heat. The person who trusts in the Lord is compared to a tree planted by water - stable, nourished, and fruitful even in drought. In contrast, those who trust in human strength are like shrubs in the desert, struggling to survive when heat comes.</p>
-                    
+
+                    <p>In our opening passage, Jeremiah paints a vivid picture of contrasting responses to heat. The
+                        person who trusts in the Lord is compared to a tree planted by water - stable, nourished, and
+                        fruitful even in drought. In contrast, those who trust in human strength are like shrubs in the
+                        desert, struggling to survive when heat comes.</p>
+
                     <blockquote>
-                        "Thou shalt be hid from the scourge of the tongue: neither shalt thou be afraid of destruction when it cometh." (Job 5:21)
+                        "Thou shalt be hid from the scourge of the tongue: neither shalt thou be afraid of destruction
+                        when it cometh." (Job 5:21)
                     </blockquote>
-                    
-                    <p>This promise reminds us that God's protection extends even to the verbal attacks and criticisms we might face (the "scourge of the tongue"). The heat of slander, gossip, or false accusation can be just as painful as physical hardship, but God promises to hide us from its full effect.</p>
-                    
+
+                    <p>This promise reminds us that God's protection extends even to the verbal attacks and criticisms
+                        we might face (the "scourge of the tongue"). The heat of slander, gossip, or false accusation
+                        can be just as painful as physical hardship, but God promises to hide us from its full effect.
+                    </p>
+
                     <h3>The Purpose of Heat in Our Lives</h3>
-                    
-                    <p>While heat is uncomfortable, it serves important purposes both in nature and in our spiritual lives:</p>
-                    
-                    <p><strong>1. Refining:</strong> Just as fire purifies gold, heat in our lives can refine our character. Peter writes, "That the trial of your faith, being much more precious than of gold that perisheth, though it be tried with fire, might be found unto praise and honour and glory at the appearing of Jesus Christ" (1 Peter 1:7).</p>
-                    
-                    <p><strong>2. Strengthening:</strong> Difficulties develop spiritual muscles we never knew we had. Paul testified, "When I am weak, then am I strong" (2 Corinthians 12:10), because God's power is perfected in our weakness.</p>
-                    
-                    <p><strong>3. Revealing:</strong> Heat reveals what's really in our hearts. When the pressure is on, our true spiritual condition becomes apparent. This allows us to address areas that need growth.</p>
-                    
+
+                    <p>While heat is uncomfortable, it serves important purposes both in nature and in our spiritual
+                        lives:</p>
+
+                    <p><strong>1. Refining:</strong> Just as fire purifies gold, heat in our lives can refine our
+                        character. Peter writes, "That the trial of your faith, being much more precious than of gold
+                        that perisheth, though it be tried with fire, might be found unto praise and honour and glory at
+                        the appearing of Jesus Christ" (1 Peter 1:7).</p>
+
+                    <p><strong>2. Strengthening:</strong> Difficulties develop spiritual muscles we never knew we had.
+                        Paul testified, "When I am weak, then am I strong" (2 Corinthians 12:10), because God's power is
+                        perfected in our weakness.</p>
+
+                    <p><strong>3. Revealing:</strong> Heat reveals what's really in our hearts. When the pressure is on,
+                        our true spiritual condition becomes apparent. This allows us to address areas that need growth.
+                    </p>
+
                     <h3>Biblical Examples of Surviving Heat</h3>
-                    
+
                     <p>The Bible is full of examples of godly people who endured intense heat:</p>
-                    
-                    <p><strong>Joseph:</strong> Betrayed by his brothers, falsely accused, and forgotten in prison, Joseph endured years of heat before God elevated him to save his family and Egypt (Genesis 37-50).</p>
-                    
-                    <p><strong>David:</strong> Anointed as king but then hunted by Saul for years, David learned to trust God in caves and wilderness places (1 Samuel 18-31).</p>
-                    
-                    <p><strong>Daniel:</strong> Facing the literal heat of a fiery furnace, Daniel's friends emerged without even the smell of smoke (Daniel 3).</p>
-                    
-                    <p>Each of these examples shows us that heat doesn't have to destroy us - it can prepare us for greater things if we respond with faith.</p>
-                    
+
+                    <p><strong>Joseph:</strong> Betrayed by his brothers, falsely accused, and forgotten in prison,
+                        Joseph endured years of heat before God elevated him to save his family and Egypt (Genesis
+                        37-50).</p>
+
+                    <p><strong>David:</strong> Anointed as king but then hunted by Saul for years, David learned to
+                        trust God in caves and wilderness places (1 Samuel 18-31).</p>
+
+                    <p><strong>Daniel:</strong> Facing the literal heat of a fiery furnace, Daniel's friends emerged
+                        without even the smell of smoke (Daniel 3).</p>
+
+                    <p>Each of these examples shows us that heat doesn't have to destroy us - it can prepare us for
+                        greater things if we respond with faith.</p>
+
                     <h3>Practical Steps for Surviving Heat</h3>
-                    
+
                     <p>When you find yourself in a season of heat, consider these biblical strategies:</p>
-                    
-                    <p><strong>1. Stay Rooted in God's Word:</strong> Regular scripture reading anchors your soul in truth when emotions are turbulent. "Thy word is a lamp unto my feet, and a light unto my path" (Psalm 119:105).</p>
-                    
-                    <p><strong>2. Maintain Consistent Prayer:</strong> Prayer is our lifeline to God's power and peace. "Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God" (Philippians 4:6).</p>
-                    
-                    <p><strong>3. Fellowship with Believers:</strong> Isolation makes heat more intense. "Not forsaking the assembling of ourselves together... but exhorting one another" (Hebrews 10:25).</p>
-                    
-                    <p><strong>4. Look for Growth Opportunities:</strong> Ask, "What is God teaching me through this?" rather than just "When will this end?"</p>
-                    
-                    <p><strong>5. Remember God's Faithfulness:</strong> Recalling past deliverances builds faith for current challenges. "This I recall to my mind, therefore have I hope" (Lamentations 3:21).</p>
-                    
+
+                    <p><strong>1. Stay Rooted in God's Word:</strong> Regular scripture reading anchors your soul in
+                        truth when emotions are turbulent. "Thy word is a lamp unto my feet, and a light unto my path"
+                        (Psalm 119:105).</p>
+
+                    <p><strong>2. Maintain Consistent Prayer:</strong> Prayer is our lifeline to God's power and peace.
+                        "Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let
+                        your requests be made known unto God" (Philippians 4:6).</p>
+
+                    <p><strong>3. Fellowship with Believers:</strong> Isolation makes heat more intense. "Not forsaking
+                        the assembling of ourselves together... but exhorting one another" (Hebrews 10:25).</p>
+
+                    <p><strong>4. Look for Growth Opportunities:</strong> Ask, "What is God teaching me through this?"
+                        rather than just "When will this end?"</p>
+
+                    <p><strong>5. Remember God's Faithfulness:</strong> Recalling past deliverances builds faith for
+                        current challenges. "This I recall to my mind, therefore have I hope" (Lamentations 3:21).</p>
+
                     <h3>The Promise of Fruitfulness</h3>
-                    
-                    <p>Notice that Jeremiah's promise isn't just survival - it's fruitfulness. The tree by the water "shall not cease from yielding fruit." God's purpose in allowing heat is never destruction but productivity. As we abide in Christ (John 15:5), even difficult seasons can produce spiritual fruit that blesses others and glorifies God.</p>
-                    
-                    <p>Today, if you're feeling the heat, remember that your roots can go deeper into God's love and faithfulness. The same power that brought Jesus through the ultimate "heat" of the cross is available to sustain you. Your current trial is preparing you for greater usefulness in God's kingdom.</p>
-                    
-                    <p>As the old hymn says: "When through fiery trials thy pathway shall lie, my grace, all sufficient, shall be thy supply; the flame shall not hurt thee; I only design thy dross to consume and thy gold to refine."</p>
+
+                    <p>Notice that Jeremiah's promise isn't just survival - it's fruitfulness. The tree by the water
+                        "shall not cease from yielding fruit." God's purpose in allowing heat is never destruction but
+                        productivity. As we abide in Christ (John 15:5), even difficult seasons can produce spiritual
+                        fruit that blesses others and glorifies God.</p>
+
+                    <p>Today, if you're feeling the heat, remember that your roots can go deeper into God's love and
+                        faithfulness. The same power that brought Jesus through the ultimate "heat" of the cross is
+                        available to sustain you. Your current trial is preparing you for greater usefulness in God's
+                        kingdom.</p>
+
+                    <p>As the old hymn says: "When through fiery trials thy pathway shall lie, my grace, all sufficient,
+                        shall be thy supply; the flame shall not hurt thee; I only design thy dross to consume and thy
+                        gold to refine."</p>
                 </div>
-                
+
                 <div class="devotion-actions">
-                    <a href="#" class="download-btn">
+                    <a href="download/devotionals.pdf" class="download-btn">
                         <i class="fas fa-download"></i> Download Full Devotional
                     </a>
                     <div class="social-share">
@@ -650,7 +718,7 @@
     <div class="more-devotions">
         <div class="container">
             <h2 data-aos="fade-up">Explore More Devotions</h2>
-            <a href="past-devotions.html" class="btn btn-primary" data-aos="fade-up" data-aos-delay="100">
+            <a href="past-devotions.php" class="btn btn-primary" data-aos="fade-up" data-aos-delay="100">
                 <i class="fas fa-book-open"></i> View Past Devotions
             </a>
         </div>
@@ -662,7 +730,8 @@
             <div class="footer-content">
                 <div class="footer-column" data-aos="fade-up">
                     <h3>The Anchor</h3>
-                    <p>A daily devotional ministry committed to helping believers grow in their relationship with God through Scripture meditation and prayer.</p>
+                    <p>A daily devotional ministry committed to helping believers grow in their relationship with God
+                        through Scripture meditation and prayer.</p>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -673,11 +742,11 @@
                 <div class="footer-column" data-aos="fade-up" data-aos-delay="100">
                     <h3>Quick Links</h3>
                     <ul class="footer-links">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="devotions.html">Devotions</a></li>
-                        <li><a href="prayer.html">Prayer</a></li>
-                        <li><a href="testimonies.html">Testimonies</a></li>
-                        <li><a href="about.html">About</a></li>
+                        <li><a href="index.php">Home</a></li>
+                        <li><a href="devotions.php">Devotions</a></li>
+                        <li><a href="prayer.php">Prayer</a></li>
+                        <li><a href="testimonies.php">Testimonies</a></li>
+                        <li><a href="about.php">About</a></li>
                     </ul>
                 </div>
                 <div class="footer-column" data-aos="fade-up" data-aos-delay="200">
@@ -719,7 +788,7 @@
 
         mobileMenuBtn.addEventListener('click', () => {
             navLinks.classList.toggle('active');
-            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') ? 
+            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') ?
                 '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
         });
 
@@ -747,4 +816,5 @@
         }
     </script>
 </body>
+
 </html>
