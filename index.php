@@ -1036,9 +1036,10 @@
                         </div>
 
                         <div class="devotion-actions">
-                            <a href="#" class="download-btn">
-                                <i class="fas fa-download"></i> Download Full Devotional
+                            <a href="download/devotionals.pdf" class="download-btn" download>
+                                <i class="fas fa-download"></i>Download Full Devotional
                             </a>
+
                             <div class="social-share">
                                 <span>Share this devotion:</span>
                                 <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -1198,7 +1199,7 @@
                 faith.
             </p>
             <form class="subscribe-form" id="subscribeForm" data-aos="fade-up" data-aos-delay="100">
-                <input type="email" class="subscribe-input" placeholder="Your email address" required>
+                <input type="email" name="email" class="subscribe-input" placeholder="Your email address" required>
                 <button type="submit" class="subscribe-btn">Subscribe</button>
             </form>
         </div>
@@ -1286,14 +1287,18 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Initialize AOS (Animate On Scroll)
+        // ========================
+        // 1. Animate On Scroll Init
+        // ========================
         AOS.init({
             duration: 800,
             easing: 'ease-in-out',
             once: true
         });
 
-        // Mobile Menu Toggle
+        // ========================
+        // 2. Mobile Menu Toggle
+        // ========================
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const navLinks = document.getElementById('navLinks');
 
@@ -1303,7 +1308,9 @@
                 '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
         });
 
-        // Header Scroll Effect
+        // ========================
+        // 3. Header Scroll Effect
+        // ========================
         window.addEventListener('scroll', () => {
             const header = document.getElementById('header');
             if (window.scrollY > 100) {
@@ -1313,27 +1320,23 @@
             }
         });
 
-        // Form Submissions (would be connected to backend in production)
+        // ========================
+        // 4. Prayer Request Form
+        // ========================
         document.getElementById('prayerRequestForm').addEventListener('submit', function (e) {
-            e.preventDefault(); // prevent default form submission
+            e.preventDefault();
 
             const form = e.target;
             const formData = new FormData(form);
 
-            // Send form data to submit.php
             fetch('submit.php', {
                 method: 'POST',
                 body: formData
             })
                 .then(response => response.text())
                 .then(data => {
-                    // Optional: log the server response
                     console.log('Server response:', data);
-
-                    // Show thank you alert regardless of server response
                     alert('Thank you for your prayer request. Our team will pray for this need.');
-
-                    // Reset the form
                     form.reset();
                 })
                 .catch(error => {
@@ -1342,13 +1345,34 @@
                 });
         });
 
+        // ========================
+        // 5. Subscribe Form
+        // ========================
         document.getElementById('subscribeForm').addEventListener('submit', function (e) {
             e.preventDefault();
-            alert('Thank you for subscribing to The Anchor Devotional! You will receive your first devotional tomorrow morning.');
-            this.reset();
+
+            const email = document.querySelector('.subscribe-input').value;
+
+            fetch('subscribe.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'email=' + encodeURIComponent(email),
+            })
+                .then(response => response.text())
+                .then(data => {
+                    alert(data); // Message returned from PHP (e.g., "Thank you for subscribing")
+                    document.querySelector('.subscribe-input').value = '';
+                })
+                .catch(error => {
+                    alert("There was an error. Please try again.");
+                });
         });
 
-        // Comment Section Functionality
+        // ========================
+        // 6. Comment Section
+        // ========================
         const commentFormBtn = document.getElementById('commentFormBtn');
         const commentModal = document.getElementById('commentModal');
         const commentModalClose = document.getElementById('commentModalClose');
@@ -1356,8 +1380,7 @@
         const commentsList = document.getElementById('commentsList');
         const commentCount = document.getElementById('commentCount');
 
-        // Array to store comments (in a real app, this would be from a database)
-        let comments = [];
+        let comments = []; // In-memory comment array
 
         // Open comment modal
         commentFormBtn.addEventListener('click', () => {
@@ -1371,7 +1394,7 @@
             document.body.style.overflow = 'auto';
         });
 
-        // Close modal when clicking outside
+        // Close modal when clicking outside content
         commentModal.addEventListener('click', (e) => {
             if (e.target === commentModal) {
                 commentModal.classList.remove('active');
@@ -1387,7 +1410,6 @@
             const text = document.getElementById('commentText').value.trim();
 
             if (name && text) {
-                // Create new comment object
                 const newComment = {
                     id: Date.now(),
                     name: name,
@@ -1401,23 +1423,16 @@
                     })
                 };
 
-                // Add to comments array
-                comments.unshift(newComment);
-
-                // Update UI
-                renderComments();
-
-                // Reset form and close modal
+                comments.unshift(newComment); // Add to array
+                renderComments(); // Refresh UI
                 commentForm.reset();
                 commentModal.classList.remove('active');
                 document.body.style.overflow = 'auto';
-
-                // Show success message
                 alert('Thank you for your comment! It has been posted.');
             }
         });
 
-        // Render comments to the page
+        // Render comments to the UI
         function renderComments() {
             if (comments.length === 0) {
                 commentsList.innerHTML = '<div class="no-comments">No comments yet. Be the first to share your thoughts!</div>';
@@ -1425,27 +1440,22 @@
                 return;
             }
 
-            // Clear existing comments
             commentsList.innerHTML = '';
-
-            // Update comment count
             commentCount.textContent = comments.length;
 
-            // Create HTML for each comment
             comments.forEach(comment => {
                 const commentDiv = document.createElement('div');
                 commentDiv.className = 'comment';
                 commentDiv.innerHTML = `
-                    <div class="comment-avatar">${comment.name.charAt(0).toUpperCase()}</div>
-                    <div class="comment-content">
-                        <div class="comment-meta">
-                            <span class="comment-author">${comment.name}</span>
-                            <span class="comment-date">${comment.date}</span>
-                        </div>
-                        <div class="comment-text">${comment.text}</div>
+                <div class="comment-avatar">${comment.name.charAt(0).toUpperCase()}</div>
+                <div class="comment-content">
+                    <div class="comment-meta">
+                        <span class="comment-author">${comment.name}</span>
+                        <span class="comment-date">${comment.date}</span>
                     </div>
-                `;
-
+                    <div class="comment-text">${comment.text}</div>
+                </div>
+            `;
                 commentsList.appendChild(commentDiv);
             });
         }
@@ -1453,6 +1463,7 @@
         // Initial render
         renderComments();
     </script>
+
 </body>
 
 </html>
