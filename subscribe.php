@@ -10,14 +10,10 @@ $username = "root";
 $password = "";
 $database = "prayer_db";
 
-// Create connection
-$conn = new mysqli($host, $port, $username, $password, $database);
-
-// Check connection
+$conn = new mysqli($host, $username, $password, $database, $port);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
 // Get the submitted email
 $email = $_POST['email'] ?? '';
 
@@ -28,7 +24,7 @@ if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $stmt->bind_param("s", $email);
 
     if ($stmt->execute()) {
-        echo "Subscribed successfully!";
+        echo "Thank you for subscribing to The Anchor Devotional! You will receive your first devotional tomorrow morning";
     } else {
         echo "Email already subscribed or an error occurred!";
     }
