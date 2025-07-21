@@ -898,8 +898,6 @@
     </style>
 </head>
 
-
-
 <body>
     <!-- Header with Admin Button -->
     <header id="header">
