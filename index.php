@@ -1139,52 +1139,18 @@
     </section>
 
     <!-- Testimonies Section -->
+
+
+
     <section class="section testimonies" id="testimonies">
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">Recent Testimonies</h2>
-            <div class="testimony-grid">
-                <div class="testimony-card" data-aos="fade-up" data-aos-delay="100">
-                    <div class="testimony-meta">
-                        <div class="testimony-avatar">JD</div>
-                        <div>
-                            <div class="testimony-name">John D.</div>
-                            <div class="testimony-date">June 8, 2023</div>
-                        </div>
-                    </div>
-                    <div class="testimony-content">
-                        <p>After praying with the devotional community, my mother's health improved miraculously. The
-                            doctors can't explain it, but we know God answered our prayers!</p>
-                    </div>
-                </div>
-                <div class="testimony-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="testimony-meta">
-                        <div class="testimony-avatar">SM</div>
-                        <div>
-                            <div class="testimony-name">Sarah M.</div>
-                            <div class="testimony-date">June 5, 2023</div>
-                        </div>
-                    </div>
-                    <div class="testimony-content">
-                        <p>The devotional on Philippians 4:6-7 came exactly when I needed it. I was anxious about my job
-                            situation, but God gave me peace and then provided a better position!</p>
-                    </div>
-                </div>
-                <div class="testimony-card" data-aos="fade-up" data-aos-delay="300">
-                    <div class="testimony-meta">
-                        <div class="testimony-avatar">TP</div>
-                        <div>
-                            <div class="testimony-name">Thomas P.</div>
-                            <div class="testimony-date">May 28, 2023</div>
-                        </div>
-                    </div>
-                    <div class="testimony-content">
-                        <p>I've been using these devotionals for my family's morning prayer time. My children are now
-                            excited about reading the Bible every day!</p>
-                    </div>
-                </div>
-            </div>
+
+            <!-- This will be filled by JavaScript -->
+            <div class="testimony-grid" id="testimony-grid" data-aos="fade-up"></div>
+
             <div style="text-align: center; margin-top: 40px;" data-aos="fade-up">
-                <a href="testimonies.php" class="btn btn-secondary">View More Testimonies</a>
+                <a href="testimonies.php" class="btn btn-secondary">Add More Testimonies</a>
             </div>
         </div>
     </section>
@@ -1304,8 +1270,9 @@
 
         mobileMenuBtn.addEventListener('click', () => {
             navLinks.classList.toggle('active');
-            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') ?
-                '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+            mobileMenuBtn.innerHTML = navLinks.classList.contains('active')
+                ? '<i class="fas fa-times"></i>'
+                : '<i class="fas fa-bars"></i>';
         });
 
         // ========================
@@ -1321,7 +1288,7 @@
         });
 
         // ========================
-        // 4. Prayer Request Form
+        // 4. Prayer Request Form Submission
         // ========================
         document.getElementById('prayerRequestForm').addEventListener('submit', function (e) {
             e.preventDefault();
@@ -1346,7 +1313,7 @@
         });
 
         // ========================
-        // 5. Subscribe Form
+        // 5. Subscribe Form Submission
         // ========================
         document.getElementById('subscribeForm').addEventListener('submit', function (e) {
             e.preventDefault();
@@ -1362,7 +1329,7 @@
             })
                 .then(response => response.text())
                 .then(data => {
-                    alert(data); // Message returned from PHP (e.g., "Thank you for subscribing")
+                    alert(data); // PHP response
                     document.querySelector('.subscribe-input').value = '';
                 })
                 .catch(error => {
@@ -1371,7 +1338,123 @@
         });
 
         // ========================
-        // 6. Comment Section
+        // 6. Load Testimonies via Fetch
+        // ========================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fetch latest testimonies from PHP endpoint
+            fetch('Submit_Testimony.php')
+                .then(response => response.json())
+                .then(data => {
+                    const grid = document.getElementById('testimony-grid');
+
+                    // Clear existing grid content just in case
+                    grid.innerHTML = '';
+
+                    data.forEach(testimony => {
+                        const card = document.createElement('div');
+                        card.className = 'testimony-card';
+                        card.setAttribute('data-aos', 'fade-up');
+                        card.innerHTML = `
+                    <div class="testimony-meta">
+                        <div>
+                            <div class="testimony-name">${testimony.name}</div>
+                            <div class="testimony-date">${testimony.date}</div>
+                        </div>
+                    </div>
+                    <div class="testimony-content">
+                        <p>${testimony.message}</p>
+                    </div>
+                `;
+                        grid.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching testimonies:', error);
+                    document.getElementById('testimony-grid').innerHTML = '<p style="color:red;">Failed to load testimonies.</p>';
+                });
+
+            // Render comments (assuming renderComments() is defined elsewhere)
+            renderComments();
+        });
+        function renderComments(comments) {
+            const commentsList = document.getElementById('commentsList');
+            commentsList.innerHTML = ''; // Clear current comments
+
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
+                return;
+            }
+
+            comments.forEach(({ name, comment, created_at }) => {
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment';
+
+                commentDiv.innerHTML = `
+            <div class="comment-meta">
+                <strong>${name}</strong> <span class="comment-date">${new Date(created_at).toLocaleString()}</span>
+            </div>
+            <p>${comment}</p>
+        `;
+
+                commentsList.appendChild(commentDiv);
+            });
+        }
+
+        function loadComments() {
+            fetch('fetch_comments.php')
+                .then(res => res.json())
+                .then(data => {
+                    renderComments(data);
+                })
+                .catch(err => {
+                    console.error('Error loading comments:', err);
+                });
+        }
+
+        // Call this on page load:
+        document.addEventListener('DOMContentLoaded', loadComments);
+
+
+
+        document.getElementById('commentForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('commentName').value.trim();
+            const comment = document.getElementById('commentText').value.trim();
+
+            if (!name || !comment) {
+                alert("Please fill in both fields.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('comment', comment);
+
+            fetch('submit_comment.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message);
+                    document.getElementById('commentForm').reset();
+                    document.getElementById('commentModal').classList.remove('active');
+                    document.body.style.overflow = 'auto';
+
+                    // Reload comments to show the new one
+                    loadComments();
+                })
+                .catch(err => {
+                    console.error("Error submitting comment:", err);
+                    alert("Something went wrong. Please try again.");
+                });
+        });
+
+
+
+        // ========================
+        // 7. Comment Modal and Logic
         // ========================
         const commentFormBtn = document.getElementById('commentFormBtn');
         const commentModal = document.getElementById('commentModal');
@@ -1380,21 +1463,21 @@
         const commentsList = document.getElementById('commentsList');
         const commentCount = document.getElementById('commentCount');
 
-        let comments = []; // In-memory comment array
+        let comments = []; // In-memory array
 
-        // Open comment modal
+        // Open modal
         commentFormBtn.addEventListener('click', () => {
             commentModal.classList.add('active');
             document.body.style.overflow = 'hidden';
         });
 
-        // Close comment modal
+        // Close modal via button
         commentModalClose.addEventListener('click', () => {
             commentModal.classList.remove('active');
             document.body.style.overflow = 'auto';
         });
 
-        // Close modal when clicking outside content
+        // Close modal by clicking outside content
         commentModal.addEventListener('click', (e) => {
             if (e.target === commentModal) {
                 commentModal.classList.remove('active');
@@ -1402,7 +1485,7 @@
             }
         });
 
-        // Handle comment submission
+        // Submit new comment
         commentForm.addEventListener('submit', (e) => {
             e.preventDefault();
 
@@ -1423,8 +1506,8 @@
                     })
                 };
 
-                comments.unshift(newComment); // Add to array
-                renderComments(); // Refresh UI
+                comments.unshift(newComment);
+                renderComments();
                 commentForm.reset();
                 commentModal.classList.remove('active');
                 document.body.style.overflow = 'auto';
@@ -1432,7 +1515,9 @@
             }
         });
 
-        // Render comments to the UI
+        // ========================
+        // 8. Render Comments to DOM
+        // ========================
         function renderComments() {
             if (comments.length === 0) {
                 commentsList.innerHTML = '<div class="no-comments">No comments yet. Be the first to share your thoughts!</div>';
@@ -1459,10 +1544,8 @@
                 commentsList.appendChild(commentDiv);
             });
         }
-
-        // Initial render
-        renderComments();
     </script>
+
 
 </body>
 
