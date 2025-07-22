@@ -30,7 +30,7 @@ if (empty($name) || empty($comment)) {
     exit;
 }
 
-// Sanitize
+// Sanitize input
 $name = htmlspecialchars($name, ENT_QUOTES);
 $comment = htmlspecialchars($comment, ENT_QUOTES);
 
@@ -39,7 +39,12 @@ $stmt = $conn->prepare("INSERT INTO comments (name, comment) VALUES (?, ?)");
 $stmt->bind_param("ss", $name, $comment);
 
 if ($stmt->execute()) {
-    echo json_encode(["message" => "Comment submitted successfully"]);
+    echo json_encode([
+        "message" => "Comment submitted successfully",
+        "name" => $name,
+        "comment" => $comment,
+        "created_at" => date("F j, Y, g:i a")
+    ]);
 } else {
     http_response_code(500);
     echo json_encode(["message" => "Failed to submit comment"]);
@@ -47,3 +52,4 @@ if ($stmt->execute()) {
 
 $stmt->close();
 $conn->close();
+?>
