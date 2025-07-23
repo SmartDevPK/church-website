@@ -1023,14 +1023,14 @@
         }
 
         .submit-btn:hover {
-            background: linear-gradient(135deg, #2980b9, #1f618d);
+            background: linear-gradient(#ad3128, #e74c3c);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            box-shadow: 0 6px 20px rgba(#ad3128, #e74c3c);
         }
 
         .submit-btn:active {
             transform: translateY(0);
-            box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+            box-shadow: 0 2px 10px rgba(5#ad3128, #e74c3c);
         }
 
         #testimonyMessage {
