@@ -1,34 +1,39 @@
 <?php
-// Enable error reporting (for development)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// fetch_comments.php
 
-// --- Database Configuration ---
+header('Content-Type: application/json');
+
+// DB config
 $host = "localhost";
 $port = 3307;
 $username = "root";
 $password = "";
 $database = "prayer_db";
 
-try {
-    // Create PDO connection
-    $pdo = new PDO(
-        "mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4",
-        $username,
-        $password
-    );
+// DB connection
+$conn = new mysqli($host, $username, $password, $database, $port);
 
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    // --- Fetch comments ---
-    $stmt = $pdo->query("SELECT name, comment, created_at FROM comments ORDER BY created_at DESC");
-    $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // --- Return comments as JSON ---
-    header('Content-Type: application/json');
-    echo json_encode($comments);
-} catch (PDOException $e) {
+// Check connection
+if ($conn->connect_error) {
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to fetch comments: ' . $e->getMessage()]);
+    echo json_encode(["message" => "Database connection failed"]);
+    exit;
 }
+
+$sql = "SELECT name, comment, created_at FROM comments ORDER BY created_at DESC";
+$result = $conn->query($sql);
+
+$comments = [];
+
+while ($row = $result->fetch_assoc()) {
+    $comments[] = [
+        "name" => htmlspecialchars($row['name'], ENT_QUOTES),
+        "comment" => htmlspecialchars($row['comment'], ENT_QUOTES),
+        "created_at" => date("F j, Y, g:i a", strtotime($row['created_at']))
+    ];
+}
+
+echo json_encode($comments);
+
+$conn->close();
 ?>

@@ -1058,7 +1058,7 @@
                             </button>
                         </div>
 
-                        <div class="comments-list">
+                        <div class="comments-list" id="commentsList">
                             <div class="no-comments">No comments yet. Be the first to share your thoughts!</div>
                         </div>
                     </div>
@@ -1228,27 +1228,29 @@
     </footer>
 
     <!-- Comment Modal -->
-    <div class="modal-overlay comment-modal" id="commentModal">
-        <div class="modal-container" data-aos="zoom-in">
-            <button class="modal-close" id="commentModalClose">&times;</button>
-            <div class="modal-content">
-                <h2>Leave a Comment</h2>
-                <p>Share your thoughts about this devotion with our community.</p>
-                <form class="modal-form" id="commentForm">
-                    <div class="form-group">
-                        <label for="commentName">Your Name</label>
-                        <input type="text" id="commentName" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="commentText">Your Comment</label>
-                        <textarea id="commentText" class="form-control" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Post Comment</button>
-                </form>
-                <p class="modal-note">Comments will be visible to everyone after submission.</p>
+    <div class="modal-content">
+        <h2>Leave a Comment</h2>
+        <p>Share your thoughts about this devotion with our community.</p>
+
+        <form action="submit_comment.php" method="POST">
+            <div class="form-group">
+                <label for="commentName">Your Name</label>
+                <input type="text" id="commentName" name="name" class="form-control" required>
             </div>
-        </div>
+
+            <div class="form-group">
+                <label for="commentText">Your Comment</label>
+                <textarea id="commentText" name="comment" class="form-control" required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Post Comment</button>
+        </form>
+
+
+        <p style="color: #555; font-style: italic;">Comments will be visible to everyone after submission.</p>
+        <div id="commentList"></div>
     </div>
+
 
     <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -1341,14 +1343,15 @@
         // 6. Load Testimonies via Fetch
         // ========================
         document.addEventListener('DOMContentLoaded', () => {
-            // Fetch latest testimonies from PHP endpoint
+            // Load comments on page load
+            loadComments();
+
+            // Load testimonies
             fetch('Submit_Testimony.php')
                 .then(response => response.json())
                 .then(data => {
                     const grid = document.getElementById('testimony-grid');
-
-                    // Clear existing grid content just in case
-                    grid.innerHTML = '';
+                    grid.innerHTML = ''; // Clear existing content
 
                     data.forEach(testimony => {
                         const card = document.createElement('div');
@@ -1356,6 +1359,7 @@
                         card.setAttribute('data-aos', 'fade-up');
                         card.innerHTML = `
                     <div class="testimony-meta">
+                        <div class="testimony-avatar">${testimony.initials}</div>
                         <div>
                             <div class="testimony-name">${testimony.name}</div>
                             <div class="testimony-date">${testimony.date}</div>
@@ -1372,84 +1376,46 @@
                     console.error('Error fetching testimonies:', error);
                     document.getElementById('testimony-grid').innerHTML = '<p style="color:red;">Failed to load testimonies.</p>';
                 });
-
-            // Render comments (assuming renderComments() is defined elsewhere)
-            renderComments();
         });
-        function renderComments(comments) {
-            const commentsList = document.getElementById('commentsList');
-            commentsList.innerHTML = ''; // Clear current comments
 
-            if (comments.length === 0) {
-                commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
-                return;
-            }
-
-            comments.forEach(({ name, comment, created_at }) => {
-                const commentDiv = document.createElement('div');
-                commentDiv.className = 'comment';
-
-                commentDiv.innerHTML = `
-            <div class="comment-meta">
-                <strong>${name}</strong> <span class="comment-date">${new Date(created_at).toLocaleString()}</span>
-            </div>
-            <p>${comment}</p>
-        `;
-
-                commentsList.appendChild(commentDiv);
-            });
-        }
+        // Remove this duplicate renderComments function to avoid conflicts
 
         function loadComments() {
             fetch('fetch_comments.php')
                 .then(res => res.json())
                 .then(data => {
-                    renderComments(data);
+                    const commentList = document.getElementById("commentsList");
+                    const commentCount = document.getElementById("commentCount");
+
+                    commentList.innerHTML = ""; // clear old comments
+
+                    if (data.length === 0) {
+                        commentList.innerHTML = '<div class="no-comments">No comments yet. Be the first to share your thoughts!</div>';
+                        commentCount.textContent = '0';
+                        return;
+                    }
+
+                    data.forEach(comment => {
+                        const commentHTML = `
+                    <div class="comment">
+                        <h4>${comment.name}</h4>
+                        <small>${comment.created_at}</small>
+                        <p>${comment.comment}</p>
+                        <hr>
+                    </div>
+                `;
+                        commentList.insertAdjacentHTML("beforeend", commentHTML);
+                    });
+
+                    commentCount.textContent = data.length;
                 })
-                .catch(err => {
-                    console.error('Error loading comments:', err);
+                .catch(error => {
+                    console.error("Error fetching comments:", error);
                 });
         }
 
-        // Call this on page load:
-        document.addEventListener('DOMContentLoaded', loadComments);
-
-
-
-        document.getElementById('commentForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const name = document.getElementById('commentName').value.trim();
-            const comment = document.getElementById('commentText').value.trim();
-
-            if (!name || !comment) {
-                alert("Please fill in both fields.");
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('name', name);
-            formData.append('comment', comment);
-
-            fetch('submit_comment.php', {
-                method: 'POST',
-                body: formData
-            })
-                .then(res => res.json())
-                .then(data => {
-                    alert(data.message);
-                    document.getElementById('commentForm').reset();
-                    document.getElementById('commentModal').classList.remove('active');
-                    document.body.style.overflow = 'auto';
-
-                    // Reload comments to show the new one
-                    loadComments();
-                })
-                .catch(err => {
-                    console.error("Error submitting comment:", err);
-                    alert("Something went wrong. Please try again.");
-                });
-        });
+        // Load comments when the page loads
+        document.addEventListener("DOMContentLoaded", loadComments);
 
 
 
