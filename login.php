@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($email === $validEmail && $password === $validPassword) {
         $_SESSION['user_email'] = $email;
-        header("Location: dashboad.php");
+        header("Location: dashboard.php");
         exit();
     } else {
         $errorMessage = "Invalid email or password.";

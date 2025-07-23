@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -95,6 +96,7 @@
         .page-content {
             display: none;
         }
+
         .page-content.active {
             display: block;
         }
@@ -161,7 +163,7 @@
             justify-content: space-between;
             align-items: center;
             background-color: var(--light);
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .card-body {
@@ -251,18 +253,24 @@
             .sidebar {
                 left: -var(--sidebar-width);
             }
+
             .main-content {
                 margin-left: 0;
             }
+
             .sidebar.active {
                 left: 0;
             }
+
             .main-content.active {
                 margin-left: var(--sidebar-width);
             }
         }
     </style>
 </head>
+
+
+
 <body>
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
@@ -278,7 +286,14 @@
             </li>
             <li>
                 <a href="#" data-page="devotionals">
-                    <i class="fas fa-book-open"></i> Devotionals
+                    <i class="fas fa-book-open"></i> Devotionals 1
+                    <span class="badge bg-primary">12</span>
+                </a>
+            </li>
+            </li>
+            <li>
+                <a href="#" data-page="devotionals">
+                    <i class="fas fa-book-open"></i> Devotionals 2
                     <span class="badge bg-primary">12</span>
                 </a>
             </li>
@@ -286,6 +301,20 @@
                 <a href="#" data-page="prayer-requests">
                     <i class="fas fa-pray"></i> Prayer Requests
                     <span class="badge bg-danger">5</span>
+                </a>
+            </li>
+            </li>
+            <li>
+                <a href="#" data-page="devotionals">
+                    <i class="fas fa-book-open"></i> Front Page
+                    <span class="badge bg-primary">12</span>
+                </a>
+            </li>
+            </li>
+            <li>
+                <a href="#" data-page="devotionals">
+                    <i class="fas fa-book-open"></i> Past Devotionals
+                    <span class="badge bg-primary">12</span>
                 </a>
             </li>
             <li>
@@ -304,18 +333,10 @@
                     <i class="fas fa-comments"></i> Comments
                 </a>
             </li>
+
+
             <li>
-                <a href="#" data-page="authors">
-                    <i class="fas fa-user-cog"></i> Authors
-                </a>
-            </li>
-            <li>
-                <a href="#" data-page="settings">
-                    <i class="fas fa-cog"></i> Settings
-                </a>
-            </li>
-            <li>
-                <a href="#">
+                <a href="logout.php">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </li>
@@ -346,7 +367,7 @@
         <div class="page-content active" id="dashboard-page">
             <div class="container-fluid mt-4">
                 <h4 class="mb-4">Dashboard Overview</h4>
-                
+
                 <!-- Stats Cards -->
                 <div class="row">
                     <div class="col-md-3">
@@ -412,8 +433,10 @@
                                                 <td>June 5, 2023</td>
                                                 <td><span class="badge bg-success">Published</span></td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></button>
-                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                    <button class="btn btn-sm btn-outline-primary"><i
+                                                            class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i
+                                                            class="fas fa-trash"></i></button>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -421,8 +444,10 @@
                                                 <td>June 4, 2023</td>
                                                 <td><span class="badge bg-success">Published</span></td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></button>
-                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                    <button class="btn btn-sm btn-outline-primary"><i
+                                                            class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i
+                                                            class="fas fa-trash"></i></button>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -443,7 +468,8 @@
                                     <div class="activity-item mb-3">
                                         <div class="d-flex">
                                             <div class="flex-shrink-0">
-                                                <i class="fas fa-book-open bg-primary text-white p-2 rounded-circle"></i>
+                                                <i
+                                                    class="fas fa-book-open bg-primary text-white p-2 rounded-circle"></i>
                                             </div>
                                             <div class="flex-grow-1 ms-3">
                                                 <strong>New Devotional Added</strong>
@@ -510,7 +536,8 @@
                                 <tbody>
                                     <tr>
                                         <td>
-                                            <img src="https://via.placeholder.com/50" alt="Cover" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                            <img src="https://via.placeholder.com/50" alt="Cover"
+                                                style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
                                         </td>
                                         <td>Surviving the HEAT</td>
                                         <td>Faith in Trials</td>
@@ -518,13 +545,16 @@
                                         <td>June 5, 2023</td>
                                         <td><span class="badge bg-success">Published</span></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                            <button class="btn btn-sm btn-outline-primary"><i
+                                                    class="fas fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger"><i
+                                                    class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <img src="https://via.placeholder.com/50" alt="Cover" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                            <img src="https://via.placeholder.com/50" alt="Cover"
+                                                style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
                                         </td>
                                         <td>Peace in the Storm</td>
                                         <td>Peace</td>
@@ -532,8 +562,10 @@
                                         <td>June 4, 2023</td>
                                         <td><span class="badge bg-success">Published</span></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                            <button class="btn btn-sm btn-outline-primary"><i
+                                                    class="fas fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger"><i
+                                                    class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -573,27 +605,30 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="devotional-title">Title</label>
-                                    <input type="text" class="form-control" id="devotional-title" placeholder="Enter title" value="Surviving the HEAT">
+                                    <input type="text" class="form-control" id="devotional-title"
+                                        placeholder="Enter title" value="Surviving the HEAT">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="devotional-topic">Topic</label>
-                                    <input type="text" class="form-control" id="devotional-topic" placeholder="Enter topic" value="Faith in Trials">
+                                    <input type="text" class="form-control" id="devotional-topic"
+                                        placeholder="Enter topic" value="Faith in Trials">
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-group mb-3">
                             <label for="devotional-verse">Bible Verse</label>
-                            <input type="text" class="form-control" id="devotional-verse" placeholder="e.g. Jeremiah 17:7-8" value="Jeremiah 17:7-8">
+                            <input type="text" class="form-control" id="devotional-verse"
+                                placeholder="e.g. Jeremiah 17:7-8" value="Jeremiah 17:7-8">
                         </div>
-                        
+
                         <div class="form-group mb-3">
                             <label for="devotional-date">Date</label>
                             <input type="date" class="form-control" id="devotional-date" value="2023-06-05">
                         </div>
-                        
+
                         <div class="form-group mb-3">
                             <label for="devotional-author">Author</label>
                             <select class="form-select" id="devotional-author">
@@ -602,11 +637,12 @@
                                 <option>Rev. Mary Johnson</option>
                             </select>
                         </div>
-                        
+
                         <div class="form-group mb-3">
                             <label>Cover Image</label>
                             <div class="cover-preview" id="cover-preview">
-                                <img src="https://via.placeholder.com/800x400" alt="Cover Preview" id="cover-image-preview">
+                                <img src="https://via.placeholder.com/800x400" alt="Cover Preview"
+                                    id="cover-image-preview">
                                 <div class="placeholder" id="cover-placeholder">
                                     <i class="fas fa-image fa-3x mb-2"></i>
                                     <p>No cover image selected</p>
@@ -614,16 +650,17 @@
                             </div>
                             <input type="file" class="form-control" id="cover-image-upload" accept="image/*">
                         </div>
-                        
+
                         <div class="form-group mb-3">
                             <label for="devotional-content">Devotional Content</label>
-                            <textarea class="form-control" id="devotional-content" rows="12" placeholder="Write your devotional content here...">Blessed is the man that trusteth in the Lord, and whose hope the Lord is. For he shall be as a tree planted by the waters, and that spreadeth out her roots by the river, and shall not see (FEAR) when heat cometh, but her leaf shall be green; and shall not be careful (WORRIED) in the year of drought, neither shall cease from yielding fruit. - Jeremiah 17:7-8
+                            <textarea class="form-control" id="devotional-content" rows="12"
+                                placeholder="Write your devotional content here...">Blessed is the man that trusteth in the Lord, and whose hope the Lord is. For he shall be as a tree planted by the waters, and that spreadeth out her roots by the river, and shall not see (FEAR) when heat cometh, but her leaf shall be green; and shall not be careful (WORRIED) in the year of drought, neither shall cease from yielding fruit. - Jeremiah 17:7-8
 
 Heat in the Bible and in life generally signifies trouble, hardship, suffering, adversity, and trails.
 
 In life, we all encounter different levels, dissensions and intensity of heat. However, we should be encouraged that God has also made a way of escape for those who trust and hope in him.</textarea>
                         </div>
-                        
+
                         <div class="form-group mb-3">
                             <label for="devotional-status">Status</label>
                             <select class="form-select" id="devotional-status">
@@ -632,7 +669,7 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
                                 <option value="archived">Archived</option>
                             </select>
                         </div>
-                        
+
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" class="btn btn-outline-secondary">Save Draft</button>
                             <button type="submit" class="btn btn-primary">Publish Devotional</button>
@@ -646,7 +683,7 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
         <div class="page-content" id="prayer-requests-page">
             <div class="container-fluid mt-4">
                 <h4 class="mb-4">Prayer Requests</h4>
-                
+
                 <div class="dashboard-card">
                     <div class="card-header">
                         <span>All Prayer Requests</span>
@@ -674,23 +711,29 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
                                     <tr>
                                         <td>John Doe</td>
                                         <td>john@example.com</td>
-                                        <td class="text-truncate" style="max-width: 200px;">Pray for healing from chronic illness...</td>
+                                        <td class="text-truncate" style="max-width: 200px;">Pray for healing from
+                                            chronic illness...</td>
                                         <td>June 5, 2023</td>
                                         <td><span class="badge bg-warning text-dark">Pending</span></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
+                                            <button class="btn btn-sm btn-outline-primary"><i
+                                                    class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-success"><i
+                                                    class="fas fa-check"></i></button>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>Sarah Smith</td>
                                         <td>sarah@example.com</td>
-                                        <td class="text-truncate" style="max-width: 200px;">Pray for my family's financial situation...</td>
+                                        <td class="text-truncate" style="max-width: 200px;">Pray for my family's
+                                            financial situation...</td>
                                         <td>June 4, 2023</td>
                                         <td><span class="badge bg-success">Prayed</span></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
+                                            <button class="btn btn-sm btn-outline-primary"><i
+                                                    class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-success"><i
+                                                    class="fas fa-check"></i></button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -705,7 +748,7 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
         <div class="page-content" id="testimonies-page">
             <div class="container-fluid mt-4">
                 <h4 class="mb-4">Testimonies</h4>
-                
+
                 <div class="dashboard-card">
                     <div class="card-header">
                         <span>All Testimonies</span>
@@ -731,22 +774,28 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
                                 <tbody>
                                     <tr>
                                         <td>John D.</td>
-                                        <td class="text-truncate" style="max-width: 300px;">After praying with the devotional community, my mother's health improved miraculously...</td>
+                                        <td class="text-truncate" style="max-width: 300px;">After praying with the
+                                            devotional community, my mother's health improved miraculously...</td>
                                         <td>June 8, 2023</td>
                                         <td><span class="badge bg-success">Approved</span></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-ban"></i></button>
+                                            <button class="btn btn-sm btn-outline-primary"><i
+                                                    class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger"><i
+                                                    class="fas fa-ban"></i></button>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>Sarah M.</td>
-                                        <td class="text-truncate" style="max-width: 300px;">The devotional on Philippians 4:6-7 came exactly when I needed it...</td>
+                                        <td class="text-truncate" style="max-width: 300px;">The devotional on
+                                            Philippians 4:6-7 came exactly when I needed it...</td>
                                         <td>June 5, 2023</td>
                                         <td><span class="badge bg-warning text-dark">Pending</span></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
+                                            <button class="btn btn-sm btn-outline-primary"><i
+                                                    class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-success"><i
+                                                    class="fas fa-check"></i></button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -766,7 +815,7 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
                         <i class="fas fa-download"></i> Export List
                     </button>
                 </div>
-                
+
                 <div class="dashboard-card">
                     <div class="card-header">
                         <span>All Subscribers</span>
@@ -796,8 +845,10 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
                                         <td>May 15, 2023</td>
                                         <td><span class="badge bg-success">Active</span></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-envelope"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                            <button class="btn btn-sm btn-outline-primary"><i
+                                                    class="fas fa-envelope"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger"><i
+                                                    class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                     <tr>
@@ -806,8 +857,10 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
                                         <td>April 28, 2023</td>
                                         <td><span class="badge bg-success">Active</span></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-envelope"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                            <button class="btn btn-sm btn-outline-primary"><i
+                                                    class="fas fa-envelope"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger"><i
+                                                    class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -837,29 +890,29 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Toggle sidebar on mobile
-        document.getElementById('sidebarToggle').addEventListener('click', function() {
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('main-content').classList.toggle('active');
         });
 
         // Page navigation
         document.querySelectorAll('.sidebar-menu a').forEach(link => {
-            link.addEventListener('click', function(e) {
+            link.addEventListener('click', function (e) {
                 e.preventDefault();
-                
+
                 // Remove active class from all links
                 document.querySelectorAll('.sidebar-menu a').forEach(item => {
                     item.classList.remove('active');
                 });
-                
+
                 // Add active class to clicked link
                 this.classList.add('active');
-                
+
                 // Hide all pages
                 document.querySelectorAll('.page-content').forEach(page => {
                     page.classList.remove('active');
                 });
-                
+
                 // Show selected page
                 const pageId = this.getAttribute('data-page') + '-page';
                 document.getElementById(pageId).classList.add('active');
@@ -867,35 +920,35 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
         });
 
         // Devotional form navigation
-        document.getElementById('add-devotional-btn').addEventListener('click', function(e) {
+        document.getElementById('add-devotional-btn').addEventListener('click', function (e) {
             e.preventDefault();
             document.getElementById('devotionals-page').classList.remove('active');
             document.getElementById('edit-devotional-page').classList.add('active');
             document.getElementById('devotional-form-title').textContent = 'Add New Devotional';
         });
 
-        document.getElementById('new-devotional-btn').addEventListener('click', function(e) {
+        document.getElementById('new-devotional-btn').addEventListener('click', function (e) {
             e.preventDefault();
             document.getElementById('devotionals-page').classList.remove('active');
             document.getElementById('edit-devotional-page').classList.add('active');
             document.getElementById('devotional-form-title').textContent = 'Add New Devotional';
         });
 
-        document.getElementById('back-to-devotionals').addEventListener('click', function(e) {
+        document.getElementById('back-to-devotionals').addEventListener('click', function (e) {
             e.preventDefault();
             document.getElementById('edit-devotional-page').classList.remove('active');
             document.getElementById('devotionals-page').classList.add('active');
         });
 
         // Cover image preview
-        document.getElementById('cover-image-upload').addEventListener('change', function(e) {
+        document.getElementById('cover-image-upload').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
+                reader.onload = function (event) {
                     const preview = document.getElementById('cover-image-preview');
                     const placeholder = document.getElementById('cover-placeholder');
-                    
+
                     preview.src = event.target.result;
                     preview.style.display = 'block';
                     placeholder.style.display = 'none';
@@ -905,7 +958,7 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
         });
 
         // Form submission (would be connected to backend in production)
-        document.getElementById('devotional-form').addEventListener('submit', function(e) {
+        document.getElementById('devotional-form').addEventListener('submit', function (e) {
             e.preventDefault();
             alert('Devotional saved successfully!');
             document.getElementById('edit-devotional-page').classList.remove('active');
@@ -913,4 +966,5 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
         });
     </script>
 </body>
+
 </html>
