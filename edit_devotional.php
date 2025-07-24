@@ -101,66 +101,151 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Edit Devotional</title>
     <style>
+        /* Reset some default styles */
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 2rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 2rem;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #222;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
         }
 
         form {
-            max-width: 500px;
-            margin: auto;
+            background: #fff;
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 2rem 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        form:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
 
         label {
             display: block;
-            margin-top: 1rem;
-            font-weight: bold;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: #444;
         }
 
         input[type="text"],
         input[type="date"],
         input[type="file"] {
             width: 100%;
-            padding: 8px;
-            margin-top: 4px;
-            box-sizing: border-box;
+            padding: 0.65rem 1rem;
+            border: 1.8px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.25s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="file"]:focus {
+            border-color: #007BFF;
+            outline: none;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
         }
 
         .error {
-            color: red;
-            margin-top: 1rem;
+            background: #ffebe8;
+            color: #d8000c;
+            border-left: 5px solid #d8000c;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1.25rem;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 0.95rem;
         }
 
         .current-files {
-            margin-top: 1rem;
+            margin-top: 1.3rem;
             font-style: italic;
-            color: #555;
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .current-files div {
+            margin-bottom: 0.4rem;
+        }
+
+        .current-files a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .current-files a:hover {
+            text-decoration: underline;
         }
 
         button {
-            margin-top: 1.5rem;
-            padding: 10px 20px;
+            display: inline-block;
+            width: 100%;
+            padding: 12px 0;
+            margin-top: 2rem;
             background-color: #007BFF;
-            border: none;
             color: white;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 1rem;
-            border-radius: 4px;
+            transition: background-color 0.25s ease;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
         }
 
         button:hover {
             background-color: #0056b3;
+            box-shadow: 0 6px 15px rgba(0, 86, 179, 0.6);
         }
 
         a.back-link {
-            display: inline-block;
-            margin-top: 1rem;
+            display: block;
+            max-width: 520px;
+            margin: 1.8rem auto 0 auto;
+            text-align: center;
             color: #007BFF;
+            font-weight: 600;
             text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s ease;
         }
 
         a.back-link:hover {
+            color: #0056b3;
             text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+            }
+
+            form {
+                padding: 1.5rem 1.5rem;
+            }
+
+            button {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -173,7 +258,7 @@ $conn->close();
         <div class="error"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <form method="POST" action="" enctype="multipart/form-data">
+    <form method="POST" action="" enctype="multipart/form-data" novalidate>
         <label for="topic">Topic:</label>
         <input type="text" id="topic" name="topic" value="<?= htmlspecialchars($devotional['topic']) ?>" required />
 

@@ -24,6 +24,9 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
         $devotion[] = $row;
     }
 }
+
+// $sql = "SELECT id, title, date as devotion_date, image_path, excerpt FROM devotions ORDER BY date DESC";
+// $result = $mysqli->query($sql);
 ?>
 
 
@@ -437,7 +440,7 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
                 </div>
 
                 <!-- Recent Devotionals -->
-                <h1>Recent Devotionals</h1>
+                <h1>FRONT PAGE </h1>
 
                 <?php if ($errorMessage): ?>
                     <div class="alert alert-danger"><?= htmlspecialchars($errorMessage) ?></div>
@@ -450,7 +453,7 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
                 <!-- Recent devotionals table -->
                 <div class="dashboard-card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Recent Devotionals</span>
+                        <span>Recent FRONT PAGE</span>
                         <button class="btn btn-sm btn-primary" id="add-devotional-btn">Add New</button>
                     </div>
                     <div class="card-body">
@@ -529,40 +532,11 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
             <div class="col-md-4">
                 <div class="dashboard-card">
                     <div class="card-header">
-                        <span>Recent Activity</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="activity-list">
-                            <div class="activity-item mb-3">
-                                <div class="d-flex">
-                                    <div class="flex-shrink-0">
-                                        <i class="fas fa-book-open bg-primary text-white p-2 rounded-circle"></i>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <strong>New Devotional Added</strong>
-                                        <p class="mb-0">"Surviving the HEAT" was published</p>
-                                        <small class="text-muted">2 hours ago</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="activity-item mb-3">
-                                <div class="d-flex">
-                                    <div class="flex-shrink-0">
-                                        <i class="fas fa-pray bg-danger text-white p-2 rounded-circle"></i>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <strong>New Prayer Request</strong>
-                                        <p class="mb-0">From John Doe</p>
-                                        <small class="text-muted">5 hours ago</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     </div>
 
     <!-- Devotionals Page -->
@@ -580,10 +554,7 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
                 <div class="card-header">
                     <span>All Devotionals</span>
                     <div class="input-group" style="width: 300px;">
-                        <input type="text" class="form-control" placeholder="Search devotionals...">
-                        <button class="btn btn-outline-secondary" type="button">
-                            <i class="fas fa-search"></i>
-                        </button>
+
                     </div>
                 </div>
                 <div class="card-body">
@@ -592,49 +563,46 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
                             <thead>
                                 <tr>
                                     <th>Cover</th>
-                                    <th>Title</th>
                                     <th>Topic</th>
-                                    <th>Verse</th>
                                     <th>Date</th>
-                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>
-                                        <img src="https://via.placeholder.com/50" alt="Cover"
-                                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
-                                    </td>
-                                    <td>Surviving the HEAT</td>
-                                    <td>Faith in Trials</td>
-                                    <td>Jeremiah 17:7-8</td>
-                                    <td>June 5, 2023</td>
-                                    <td><span class="badge bg-success">Published</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-edit"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger"><i
-                                                class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <img src="https://via.placeholder.com/50" alt="Cover"
-                                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
-                                    </td>
-                                    <td>Peace in the Storm</td>
-                                    <td>Peace</td>
-                                    <td>Philippians 4:6-7</td>
-                                    <td>June 4, 2023</td>
-                                    <td><span class="badge bg-success">Published</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-edit"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger"><i
-                                                class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
+                                <?php if ($result && $result->num_rows > 0): ?>
+                                    <?php while ($row = $result->fetch_assoc()): ?>
+                                        <tr>
+                                            <td>
+                                                <img src="<?= htmlspecialchars($row['image_path']) ?: 'default-image.jpg' ?>"
+                                                    alt="Image for <?= htmlspecialchars($row['topic']) ?>"
+                                                    style="width:50px; height:50px;" />
+                                            </td>
+                                            <td><?= htmlspecialchars($row['topic']) ?></td>
+                                            <td><?= date("F j, Y", strtotime($row['devotion_date'])) ?></td>
+                                            <td>
+                                                <!-- Actions: edit and delete buttons (not implemented yet) -->
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <a href="edit_devotional.php?id=<?= $row['id'] ?? '' ?>"
+                                                        style="text-decoration:none; color:inherit;">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                </button>
+                                                <form method="POST" action="delete_devotional.php"
+                                                    style="display:inline-block;">
+                                                    <input type="hidden" name="id" value="<?= $row['id'] ?? '' ?>">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('Are you sure you want to delete this devotional?');">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="4">No devotionals found.</td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
