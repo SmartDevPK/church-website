@@ -1,4 +1,6 @@
 <?php
+ob_start();
+
 session_start();
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
@@ -188,8 +190,10 @@ $result = $conn->query($sql);
 
         $conn->close();
         ?>
-        <li><a href="dashboardForm.php">Return to Dashboard</a></li>
+        <li><a href="dashboard.php">Return to Dashboard</a></li>
     </div>
 </body>
 
 </html>
+
+<?php ob_end_flush(); ?>

@@ -1,3 +1,21 @@
+<?php
+include 'db.php'; // your database connection
+
+// Create separate queries for each table
+$counts = [];
+
+$tables = ['devotion', 'devotions', 'prayer_requests', 'testimonies', 'subscribers', 'comments'];
+
+foreach ($tables as $table) {
+    $query = "SELECT COUNT(*) AS total FROM $table";
+    $result = $mysqli->query($query);
+    $row = $result->fetch_assoc();
+    $counts[$table] = $row['total'];
+}
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -269,8 +287,6 @@
     </style>
 </head>
 
-
-
 <body>
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
@@ -286,57 +302,56 @@
             </li>
             <li>
                 <a href="#" data-page="devotionals">
-                    <i class="fas fa-book-open"></i> Devotionals 1
-                    <span class="badge bg-primary">12</span>
+                    <i class="fas fa-book-open"></i> Devotionals
+                    <span class="badge bg-primary">
+                        <?php echo $counts['devotion']; ?>
+                    </span>
                 </a>
-            </li>
             </li>
             <li>
                 <a href="#" data-page="devotionals">
-                    <i class="fas fa-book-open"></i> Devotionals 2
-                    <span class="badge bg-primary">12</span>
+                    <i class="fas fa-book-open"></i> Devotionals
+                    <span class="badge bg-primary">
+                        <?php echo $counts['devotions']; ?>
+                    </span>
                 </a>
             </li>
+
             <li>
                 <a href="#" data-page="prayer-requests">
                     <i class="fas fa-pray"></i> Prayer Requests
-                    <span class="badge bg-danger">5</span>
-                </a>
-            </li>
-            </li>
-            <li>
-                <a href="#" data-page="devotionals">
-                    <i class="fas fa-book-open"></i> Front Page
-                    <span class="badge bg-primary">12</span>
-                </a>
-            </li>
-            </li>
-            <li>
-                <a href="#" data-page="devotionals">
-                    <i class="fas fa-book-open"></i> Past Devotionals
-                    <span class="badge bg-primary">12</span>
+                    <span class="badge bg-danger">
+                        <?php echo $counts['prayer_requests']; ?>
+
+                    </span>
                 </a>
             </li>
             <li>
                 <a href="#" data-page="testimonies">
                     <i class="fas fa-comment-alt"></i> Testimonies
+                    <span class="badge bg-success">
+                        <?php echo $counts['testimonies']; ?>
+                    </span>
                 </a>
             </li>
             <li>
                 <a href="#" data-page="subscribers">
                     <i class="fas fa-users"></i> Subscribers
-                    <span class="badge bg-success">1,234</span>
+                    <span class="badge bg-success">
+                        <?php echo $counts['subscribers']; ?>
+                    </span>
                 </a>
             </li>
             <li>
                 <a href="#" data-page="comments">
                     <i class="fas fa-comments"></i> Comments
+                    <span class="badge bg-success">
+                        <?php echo $counts['comments']; ?>
+                    </span>
                 </a>
             </li>
-
-
             <li>
-                <a href="logout.php">
+                <a href="#">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </li>
@@ -356,15 +371,12 @@
             </div>
             <div class="user-menu">
                 <img src="https://via.placeholder.com/40" alt="Admin">
-                <div>
-                    <div class="fw-bold">Admin User</div>
-                    <small class="text-muted">Super Admin</small>
-                </div>
+
             </div>
         </div>
 
         <!-- Dashboard Page -->
-        <div class="page-content active" id="dashboard-page">
+        <div class="page-content active " id="dashboard-page">
             <div class="container-fluid mt-4">
                 <h4 class="mb-4">Dashboard Overview</h4>
 
@@ -374,7 +386,16 @@
                         <div class="dashboard-card">
                             <div class="stat-card">
                                 <i class="fas fa-book-open text-primary"></i>
-                                <h2>48</h2>
+                                <h2><?php echo $counts['devotion']; ?></h2>
+                                <p>Devotionals</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="dashboard-card">
+                            <div class="stat-card">
+                                <i class="fas fa-book-open text-primary"></i>
+                                <h2><?php echo $counts['devotions']; ?></h2>
                                 <p>Devotionals</p>
                             </div>
                         </div>
@@ -383,7 +404,7 @@
                         <div class="dashboard-card">
                             <div class="stat-card">
                                 <i class="fas fa-pray text-danger"></i>
-                                <h2>24</h2>
+                                <h2><?php echo $counts['prayer_requests']; ?></h2>
                                 <p>Prayer Requests</p>
                             </div>
                         </div>
@@ -392,7 +413,7 @@
                         <div class="dashboard-card">
                             <div class="stat-card">
                                 <i class="fas fa-comment-alt text-warning"></i>
-                                <h2>156</h2>
+                                <h2><?php echo $counts['comments']; ?></h2>
                                 <p>Testimonies</p>
                             </div>
                         </div>
@@ -401,7 +422,7 @@
                         <div class="dashboard-card">
                             <div class="stat-card">
                                 <i class="fas fa-users text-success"></i>
-                                <h2>1,234</h2>
+                                <h2><?php echo $counts['subscribers']; ?></h2>
                                 <p>Subscribers</p>
                             </div>
                         </div>
@@ -898,7 +919,6 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
         // Page navigation
         document.querySelectorAll('.sidebar-menu a').forEach(link => {
             link.addEventListener('click', function (e) {
-                e.preventDefault();
 
                 // Remove active class from all links
                 document.querySelectorAll('.sidebar-menu a').forEach(item => {
@@ -921,21 +941,18 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
 
         // Devotional form navigation
         document.getElementById('add-devotional-btn').addEventListener('click', function (e) {
-            e.preventDefault();
             document.getElementById('devotionals-page').classList.remove('active');
             document.getElementById('edit-devotional-page').classList.add('active');
             document.getElementById('devotional-form-title').textContent = 'Add New Devotional';
         });
 
         document.getElementById('new-devotional-btn').addEventListener('click', function (e) {
-            e.preventDefault();
             document.getElementById('devotionals-page').classList.remove('active');
             document.getElementById('edit-devotional-page').classList.add('active');
             document.getElementById('devotional-form-title').textContent = 'Add New Devotional';
         });
 
         document.getElementById('back-to-devotionals').addEventListener('click', function (e) {
-            e.preventDefault();
             document.getElementById('edit-devotional-page').classList.remove('active');
             document.getElementById('devotionals-page').classList.add('active');
         });
@@ -959,7 +976,6 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
 
         // Form submission (would be connected to backend in production)
         document.getElementById('devotional-form').addEventListener('submit', function (e) {
-            e.preventDefault();
             alert('Devotional saved successfully!');
             document.getElementById('edit-devotional-page').classList.remove('active');
             document.getElementById('devotionals-page').classList.add('active');
