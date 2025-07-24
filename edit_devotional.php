@@ -43,21 +43,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $topic = trim($_POST['topic'] ?? '');
     $date = trim($_POST['date'] ?? '');
 
-    // Simple validation
     if (empty($topic) || empty($date)) {
         $error = "Topic and Date are required.";
     } else {
-        $stmt_update = $conn->prepare("UPDATE devotion SET topic = ?, date = ? WHERE id = ?");
-        $stmt_update->bind_param("ssi", $topic, $date, $id);
+        $imagePath = $devotional['image_path']; // default: keep old image
 
-        if ($stmt_update->execute()) {
-            $stmt_update->close();
-            $conn->close();
-            // Redirect after successful update
-            header("Location: dashboard.php?message=updated");
-            exit();
-        } else {
-            $error = "Error updating devotional: {$stmt_update->error}";
+        // Check if image uploaded
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = 'uploads/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            $tmpName = $_FILES['image']['tmp_name'];
+            $originalName = basename($_FILES['image']['name']);
+            // Create a unique file name to avoid conflicts
+            $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+            $newFileName = uniqid('img_', true) . '.' . $ext;
+            $targetPath = $uploadDir . $newFileName;
+
+            if (move_uploaded_file($tmpName, $targetPath)) {
+                $imagePath = $targetPath;
+                // Optionally: delete old image file if you want
+                if (!empty($devotional['image_path']) && file_exists($devotional['image_path'])) {
+                    unlink($devotional['image_path']);
+                }
+            } else {
+                $error = "Failed to upload image.";
+            }
+        }
+
+        if (!$error) {
+            $stmt_update = $conn->prepare("UPDATE devotion SET topic = ?, date = ?, image_path = ? WHERE id = ?");
+            $stmt_update->bind_param("sssi", $topic, $date, $imagePath, $id);
+
+            if ($stmt_update->execute()) {
+                $stmt_update->close();
+                $conn->close();
+                // Redirect after successful update
+                header("Location: dashboard.php?message=updated");
+                exit();
+            } else {
+                $error = "Error updating devotional: {$stmt_update->error}";
+            }
         }
     }
 }
@@ -90,7 +118,8 @@ $conn->close();
         }
 
         input[type="text"],
-        input[type="date"] {
+        input[type="date"],
+        input[type="file"] {
             width: 100%;
             padding: 8px;
             margin-top: 4px;
@@ -144,12 +173,15 @@ $conn->close();
         <div class="error"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <form method="POST" action="">
+    <form method="POST" action="" enctype="multipart/form-data">
         <label for="topic">Topic:</label>
         <input type="text" id="topic" name="topic" value="<?= htmlspecialchars($devotional['topic']) ?>" required />
 
         <label for="date">Date:</label>
         <input type="date" id="date" name="date" value="<?= htmlspecialchars($devotional['date']) ?>" required />
+
+        <label for="image">Change Image (optional):</label>
+        <input type="file" id="image" name="image" accept="image/*" />
 
         <div class="current-files">
             <?php if (!empty($devotional['image_path'])): ?>
