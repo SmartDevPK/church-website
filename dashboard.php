@@ -474,10 +474,20 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
                                                 <td><?= date("F j, Y", strtotime($dev['date'])) ?></td>
                                                 <td>
                                                     <!-- Actions: edit and delete buttons (not implemented yet) -->
-                                                    <button class="btn btn-sm btn-outline-primary"><i
-                                                            class="fas fa-edit"></i></button>
-                                                    <button class="btn btn-sm btn-outline-danger"><i
-                                                            class="fas fa-trash"></i></button>
+                                                    <button class="btn btn-sm btn-outline-primary">
+                                                        <a href="edit_devotional.php?id=<?php echo $dev['id']; ?>"
+                                                            style="text-decoration:none; color:inherit;">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    </button>
+                                                    <form method="POST" action="delete_devotional.php"
+                                                        style="display:inline-block;">
+                                                        <input type="hidden" name="id" value="<?php echo $dev['id']; ?>">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                            onclick="return confirm('Are you sure you want to delete this devotional?');">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>

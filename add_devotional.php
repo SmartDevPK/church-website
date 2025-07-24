@@ -52,8 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $errorMessage = "Database error: " . $stmt->error;
             }
-
             $stmt->close();
+            header("Location: dashboard.php?message=updated");
+            exit;
         } else {
             $errorMessage = "Image upload failed.";
         }
