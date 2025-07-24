@@ -1,6 +1,8 @@
 <?php
-include 'db.php'; // your database connection
+include 'db.php';
 
+$errorMessage = '';
+$successMessage = '';
 // Create separate queries for each table
 $counts = [];
 
@@ -11,6 +13,16 @@ foreach ($tables as $table) {
     $result = $mysqli->query($query);
     $row = $result->fetch_assoc();
     $counts[$table] = $row['total'];
+}
+
+// Fetch recent devotionals (example: from 'devotion' table, limit 5)
+$devotion = [];
+$devotionQuery = "SELECT * FROM devotion ORDER BY date DESC LIMIT 5";
+$devotionResult = $mysqli->query($devotionQuery);
+if ($devotionResult && $devotionResult->num_rows > 0) {
+    while ($row = $devotionResult->fetch_assoc()) {
+        $devotion[] = $row;
+    }
 }
 ?>
 
@@ -365,20 +377,15 @@ foreach ($tables as $table) {
             <button class="btn btn-outline-secondary d-md-none" id="sidebarToggle">
                 <i class="fas fa-bars"></i>
             </button>
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" class="form-control" placeholder="Search...">
-            </div>
-            <div class="user-menu">
-                <img src="https://via.placeholder.com/40" alt="Admin">
 
-            </div>
+
         </div>
 
         <!-- Dashboard Page -->
         <div class="page-content active " id="dashboard-page">
             <div class="container-fluid mt-4">
                 <h4 class="mb-4">Dashboard Overview</h4>
+
 
                 <!-- Stats Cards -->
                 <div class="row">
@@ -430,115 +437,21 @@ foreach ($tables as $table) {
                 </div>
 
                 <!-- Recent Devotionals -->
-                <div class="row mt-4">
-                    <div class="col-md-8">
-                        <div class="dashboard-card">
-                            <div class="card-header">
-                                <span>Recent Devotionals</span>
-                                <a href="#" class="btn btn-sm btn-primary" id="add-devotional-btn">Add New</a>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Title</th>
-                                                <th>Date</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Surviving the HEAT</td>
-                                                <td>June 5, 2023</td>
-                                                <td><span class="badge bg-success">Published</span></td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary"><i
-                                                            class="fas fa-edit"></i></button>
-                                                    <button class="btn btn-sm btn-outline-danger"><i
-                                                            class="fas fa-trash"></i></button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Peace in the Storm</td>
-                                                <td>June 4, 2023</td>
-                                                <td><span class="badge bg-success">Published</span></td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary"><i
-                                                            class="fas fa-edit"></i></button>
-                                                    <button class="btn btn-sm btn-outline-danger"><i
-                                                            class="fas fa-trash"></i></button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <h1>Recent Devotionals</h1>
 
-                    <!-- Recent Activity -->
-                    <div class="col-md-4">
-                        <div class="dashboard-card">
-                            <div class="card-header">
-                                <span>Recent Activity</span>
-                            </div>
-                            <div class="card-body">
-                                <div class="activity-list">
-                                    <div class="activity-item mb-3">
-                                        <div class="d-flex">
-                                            <div class="flex-shrink-0">
-                                                <i
-                                                    class="fas fa-book-open bg-primary text-white p-2 rounded-circle"></i>
-                                            </div>
-                                            <div class="flex-grow-1 ms-3">
-                                                <strong>New Devotional Added</strong>
-                                                <p class="mb-0">"Surviving the HEAT" was published</p>
-                                                <small class="text-muted">2 hours ago</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="activity-item mb-3">
-                                        <div class="d-flex">
-                                            <div class="flex-shrink-0">
-                                                <i class="fas fa-pray bg-danger text-white p-2 rounded-circle"></i>
-                                            </div>
-                                            <div class="flex-grow-1 ms-3">
-                                                <strong>New Prayer Request</strong>
-                                                <p class="mb-0">From John Doe</p>
-                                                <small class="text-muted">5 hours ago</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                <?php if ($errorMessage): ?>
+                    <div class="alert alert-danger"><?= htmlspecialchars($errorMessage) ?></div>
+                <?php endif; ?>
 
-        <!-- Devotionals Page -->
-        <div class="page-content" id="devotionals-page">
-            <div class="container-fluid mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4>Manage Devotionals</h4>
-                    <button class="btn btn-primary" id="new-devotional-btn">
-                        <i class="fas fa-plus"></i> Add New Devotional
-                    </button>
-                </div>
+                <?php if ($successMessage): ?>
+                    <div class="alert alert-success"><?= htmlspecialchars($successMessage) ?></div>
+                <?php endif; ?>
 
-                <!-- Devotionals Table -->
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <span>All Devotionals</span>
-                        <div class="input-group" style="width: 300px;">
-                            <input type="text" class="form-control" placeholder="Search devotionals...">
-                            <button class="btn btn-outline-secondary" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
+                <!-- Recent devotionals table -->
+                <div class="dashboard-card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Recent Devotionals</span>
+                        <button class="btn btn-sm btn-primary" id="add-devotional-btn">Add New</button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -547,365 +460,487 @@ foreach ($tables as $table) {
                                     <tr>
                                         <th>Cover</th>
                                         <th>Title</th>
-                                        <th>Topic</th>
-                                        <th>Verse</th>
                                         <th>Date</th>
-                                        <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>
-                                            <img src="https://via.placeholder.com/50" alt="Cover"
-                                                style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
-                                        </td>
-                                        <td>Surviving the HEAT</td>
-                                        <td>Faith in Trials</td>
-                                        <td>Jeremiah 17:7-8</td>
-                                        <td>June 5, 2023</td>
-                                        <td><span class="badge bg-success">Published</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i
-                                                    class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger"><i
-                                                    class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <img src="https://via.placeholder.com/50" alt="Cover"
-                                                style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
-                                        </td>
-                                        <td>Peace in the Storm</td>
-                                        <td>Peace</td>
-                                        <td>Philippians 4:6-7</td>
-                                        <td>June 4, 2023</td>
-                                        <td><span class="badge bg-success">Published</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i
-                                                    class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger"><i
-                                                    class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
+                                    <?php if (count($devotion) > 0): ?>
+                                        <?php foreach ($devotion as $dev): ?>
+                                            <tr>
+                                                <td><img src="<?= htmlspecialchars($dev['image_path']) ?>"
+                                                        style="width:50px; height:50px;" /></td>
+                                                <td><?= htmlspecialchars($dev['topic']) ?></td>
+                                                <td><?= date("F j, Y", strtotime($dev['date'])) ?></td>
+                                                <td>
+                                                    <!-- Actions: edit and delete buttons (not implemented yet) -->
+                                                    <button class="btn btn-sm btn-outline-primary"><i
+                                                            class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i
+                                                            class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="4">No devotionals found.</td>
+                                        </tr>
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>
-                        <nav aria-label="Page navigation" class="mt-3">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
+                    </div>
+                </div>
+
+                <!-- Add devotional form - hidden by default -->
+                <div id="add-devotional-form" style="display:none;">
+                    <h2>Add New Devotional</h2>
+                    <form action="add_devotional.php" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="topic" class="form-label">Title / Topic</label>
+                            <input type="text" class="form-control" name="topic" id="topic" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            <input type="date" class="form-control" name="date" id="date" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Cover Image</label>
+                            <input type="file" class="form-control" name="image" id="image" accept="image/*" required />
+                        </div>
+                        <button type="submit" class="btn btn-success">Save Devotional</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-add">Cancel</button>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="col-md-4">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <span>Recent Activity</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-list">
+                            <div class="activity-item mb-3">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-book-open bg-primary text-white p-2 rounded-circle"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <strong>New Devotional Added</strong>
+                                        <p class="mb-0">"Surviving the HEAT" was published</p>
+                                        <small class="text-muted">2 hours ago</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="activity-item mb-3">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-pray bg-danger text-white p-2 rounded-circle"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <strong>New Prayer Request</strong>
+                                        <p class="mb-0">From John Doe</p>
+                                        <small class="text-muted">5 hours ago</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    </div>
 
-        <!-- Add/Edit Devotional Form -->
-        <div class="page-content" id="edit-devotional-page">
-            <div class="container-fluid mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 id="devotional-form-title">Add New Devotional</h4>
-                    <button class="btn btn-outline-secondary" id="back-to-devotionals">
-                        <i class="fas fa-arrow-left"></i> Back to Devotionals
-                    </button>
+    <!-- Devotionals Page -->
+    <div class="page-content" id="devotionals-page">
+        <div class="container-fluid mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4>Manage Devotionals</h4>
+                <button class="btn btn-primary" id="new-devotional-btn">
+                    <i class="fas fa-plus"></i> Add New Devotional
+                </button>
+            </div>
+
+            <!-- Devotionals Table -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <span>All Devotionals</span>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" placeholder="Search devotionals...">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
                 </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Cover</th>
+                                    <th>Title</th>
+                                    <th>Topic</th>
+                                    <th>Verse</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <img src="https://via.placeholder.com/50" alt="Cover"
+                                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                    </td>
+                                    <td>Surviving the HEAT</td>
+                                    <td>Faith in Trials</td>
+                                    <td>Jeremiah 17:7-8</td>
+                                    <td>June 5, 2023</td>
+                                    <td><span class="badge bg-success">Published</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i
+                                                class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i
+                                                class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <img src="https://via.placeholder.com/50" alt="Cover"
+                                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                    </td>
+                                    <td>Peace in the Storm</td>
+                                    <td>Peace</td>
+                                    <td>Philippians 4:6-7</td>
+                                    <td>June 4, 2023</td>
+                                    <td><span class="badge bg-success">Published</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i
+                                                class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i
+                                                class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav aria-label="Page navigation" class="mt-3">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">Previous</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="form-container">
-                    <form id="devotional-form">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="devotional-title">Title</label>
-                                    <input type="text" class="form-control" id="devotional-title"
-                                        placeholder="Enter title" value="Surviving the HEAT">
-                                </div>
+    <!-- Add/Edit Devotional Form -->
+    <div class="page-content" id="edit-devotional-page">
+        <div class="container-fluid mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 id="devotional-form-title">Add New Devotional</h4>
+                <button class="btn btn-outline-secondary" id="back-to-devotionals">
+                    <i class="fas fa-arrow-left"></i> Back to Devotionals
+                </button>
+            </div>
+
+            <div class="form-container">
+                <form id="devotional-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="devotional-title">Title</label>
+                                <input type="text" class="form-control" id="devotional-title" placeholder="Enter title"
+                                    value="Surviving the HEAT">
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="devotional-topic">Topic</label>
-                                    <input type="text" class="form-control" id="devotional-topic"
-                                        placeholder="Enter topic" value="Faith in Trials">
-                                </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="devotional-topic">Topic</label>
+                                <input type="text" class="form-control" id="devotional-topic" placeholder="Enter topic"
+                                    value="Faith in Trials">
                             </div>
                         </div>
+                    </div>
 
-                        <div class="form-group mb-3">
-                            <label for="devotional-verse">Bible Verse</label>
-                            <input type="text" class="form-control" id="devotional-verse"
-                                placeholder="e.g. Jeremiah 17:7-8" value="Jeremiah 17:7-8">
-                        </div>
+                    <div class="form-group mb-3">
+                        <label for="devotional-verse">Bible Verse</label>
+                        <input type="text" class="form-control" id="devotional-verse" placeholder="e.g. Jeremiah 17:7-8"
+                            value="Jeremiah 17:7-8">
+                    </div>
 
-                        <div class="form-group mb-3">
-                            <label for="devotional-date">Date</label>
-                            <input type="date" class="form-control" id="devotional-date" value="2023-06-05">
-                        </div>
+                    <div class="form-group mb-3">
+                        <label for="devotional-date">Date</label>
+                        <input type="date" class="form-control" id="devotional-date" value="2023-06-05">
+                    </div>
 
-                        <div class="form-group mb-3">
-                            <label for="devotional-author">Author</label>
-                            <select class="form-select" id="devotional-author">
-                                <option>Maj Gen (Dr) Ezra Jahadi Jakko (Rtd)</option>
-                                <option>Pastor John Smith</option>
-                                <option>Rev. Mary Johnson</option>
-                            </select>
-                        </div>
+                    <div class="form-group mb-3">
+                        <label for="devotional-author">Author</label>
+                        <select class="form-select" id="devotional-author">
+                            <option>Maj Gen (Dr) Ezra Jahadi Jakko (Rtd)</option>
+                            <option>Pastor John Smith</option>
+                            <option>Rev. Mary Johnson</option>
+                        </select>
+                    </div>
 
-                        <div class="form-group mb-3">
-                            <label>Cover Image</label>
-                            <div class="cover-preview" id="cover-preview">
-                                <img src="https://via.placeholder.com/800x400" alt="Cover Preview"
-                                    id="cover-image-preview">
-                                <div class="placeholder" id="cover-placeholder">
-                                    <i class="fas fa-image fa-3x mb-2"></i>
-                                    <p>No cover image selected</p>
-                                </div>
+                    <div class="form-group mb-3">
+                        <label>Cover Image</label>
+                        <div class="cover-preview" id="cover-preview">
+                            <img src="https://via.placeholder.com/800x400" alt="Cover Preview" id="cover-image-preview">
+                            <div class="placeholder" id="cover-placeholder">
+                                <i class="fas fa-image fa-3x mb-2"></i>
+                                <p>No cover image selected</p>
                             </div>
-                            <input type="file" class="form-control" id="cover-image-upload" accept="image/*">
                         </div>
+                        <input type="file" class="form-control" id="cover-image-upload" accept="image/*">
+                    </div>
 
-                        <div class="form-group mb-3">
-                            <label for="devotional-content">Devotional Content</label>
-                            <textarea class="form-control" id="devotional-content" rows="12"
-                                placeholder="Write your devotional content here...">Blessed is the man that trusteth in the Lord, and whose hope the Lord is. For he shall be as a tree planted by the waters, and that spreadeth out her roots by the river, and shall not see (FEAR) when heat cometh, but her leaf shall be green; and shall not be careful (WORRIED) in the year of drought, neither shall cease from yielding fruit. - Jeremiah 17:7-8
+                    <div class="form-group mb-3">
+                        <label for="devotional-content">Devotional Content</label>
+                        <textarea class="form-control" id="devotional-content" rows="12"
+                            placeholder="Write your devotional content here...">Blessed is the man that trusteth in the Lord, and whose hope the Lord is. For he shall be as a tree planted by the waters, and that spreadeth out her roots by the river, and shall not see (FEAR) when heat cometh, but her leaf shall be green; and shall not be careful (WORRIED) in the year of drought, neither shall cease from yielding fruit. - Jeremiah 17:7-8
 
 Heat in the Bible and in life generally signifies trouble, hardship, suffering, adversity, and trails.
 
 In life, we all encounter different levels, dissensions and intensity of heat. However, we should be encouraged that God has also made a way of escape for those who trust and hope in him.</textarea>
-                        </div>
+                    </div>
 
-                        <div class="form-group mb-3">
-                            <label for="devotional-status">Status</label>
-                            <select class="form-select" id="devotional-status">
-                                <option value="published">Published</option>
-                                <option value="draft">Draft</option>
-                                <option value="archived">Archived</option>
-                            </select>
-                        </div>
+                    <div class="form-group mb-3">
+                        <label for="devotional-status">Status</label>
+                        <select class="form-select" id="devotional-status">
+                            <option value="published">Published</option>
+                            <option value="draft">Draft</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                    </div>
 
-                        <div class="d-flex justify-content-end gap-2">
-                            <button type="button" class="btn btn-outline-secondary">Save Draft</button>
-                            <button type="submit" class="btn btn-primary">Publish Devotional</button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary">Save Draft</button>
+                        <button type="submit" class="btn btn-primary">Publish Devotional</button>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
 
-        <!-- Prayer Requests Page -->
-        <div class="page-content" id="prayer-requests-page">
-            <div class="container-fluid mt-4">
-                <h4 class="mb-4">Prayer Requests</h4>
+    <!-- Prayer Requests Page -->
+    <div class="page-content" id="prayer-requests-page">
+        <div class="container-fluid mt-4">
+            <h4 class="mb-4">Prayer Requests</h4>
 
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <span>All Prayer Requests</span>
-                        <div class="input-group" style="width: 300px;">
-                            <input type="text" class="form-control" placeholder="Search requests...">
-                            <button class="btn btn-outline-secondary" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Request</th>
-                                        <th>Date</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>John Doe</td>
-                                        <td>john@example.com</td>
-                                        <td class="text-truncate" style="max-width: 200px;">Pray for healing from
-                                            chronic illness...</td>
-                                        <td>June 5, 2023</td>
-                                        <td><span class="badge bg-warning text-dark">Pending</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i
-                                                    class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-success"><i
-                                                    class="fas fa-check"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Sarah Smith</td>
-                                        <td>sarah@example.com</td>
-                                        <td class="text-truncate" style="max-width: 200px;">Pray for my family's
-                                            financial situation...</td>
-                                        <td>June 4, 2023</td>
-                                        <td><span class="badge bg-success">Prayed</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i
-                                                    class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-success"><i
-                                                    class="fas fa-check"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <span>All Prayer Requests</span>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" placeholder="Search requests...">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Testimonies Page -->
-        <div class="page-content" id="testimonies-page">
-            <div class="container-fluid mt-4">
-                <h4 class="mb-4">Testimonies</h4>
-
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <span>All Testimonies</span>
-                        <div class="input-group" style="width: 300px;">
-                            <input type="text" class="form-control" placeholder="Search testimonies...">
-                            <button class="btn btn-outline-secondary" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Testimony</th>
-                                        <th>Date</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>John D.</td>
-                                        <td class="text-truncate" style="max-width: 300px;">After praying with the
-                                            devotional community, my mother's health improved miraculously...</td>
-                                        <td>June 8, 2023</td>
-                                        <td><span class="badge bg-success">Approved</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i
-                                                    class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger"><i
-                                                    class="fas fa-ban"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Sarah M.</td>
-                                        <td class="text-truncate" style="max-width: 300px;">The devotional on
-                                            Philippians 4:6-7 came exactly when I needed it...</td>
-                                        <td>June 5, 2023</td>
-                                        <td><span class="badge bg-warning text-dark">Pending</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i
-                                                    class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-success"><i
-                                                    class="fas fa-check"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Request</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>John Doe</td>
+                                    <td>john@example.com</td>
+                                    <td class="text-truncate" style="max-width: 200px;">Pray for healing from
+                                        chronic illness...</td>
+                                    <td>June 5, 2023</td>
+                                    <td><span class="badge bg-warning text-dark">Pending</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i
+                                                class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-success"><i
+                                                class="fas fa-check"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Sarah Smith</td>
+                                    <td>sarah@example.com</td>
+                                    <td class="text-truncate" style="max-width: 200px;">Pray for my family's
+                                        financial situation...</td>
+                                    <td>June 4, 2023</td>
+                                    <td><span class="badge bg-success">Prayed</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i
+                                                class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-success"><i
+                                                class="fas fa-check"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Subscribers Page -->
-        <div class="page-content" id="subscribers-page">
-            <div class="container-fluid mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4>Subscribers</h4>
-                    <button class="btn btn-primary">
-                        <i class="fas fa-download"></i> Export List
-                    </button>
-                </div>
+    <!-- Testimonies Page -->
+    <div class="page-content" id="testimonies-page">
+        <div class="container-fluid mt-4">
+            <h4 class="mb-4">Testimonies</h4>
 
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <span>All Subscribers</span>
-                        <div class="input-group" style="width: 300px;">
-                            <input type="text" class="form-control" placeholder="Search subscribers...">
-                            <button class="btn btn-outline-secondary" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <span>All Testimonies</span>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" placeholder="Search testimonies...">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Email</th>
-                                        <th>Name</th>
-                                        <th>Join Date</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>user1@example.com</td>
-                                        <td>John Doe</td>
-                                        <td>May 15, 2023</td>
-                                        <td><span class="badge bg-success">Active</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i
-                                                    class="fas fa-envelope"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger"><i
-                                                    class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>user2@example.com</td>
-                                        <td>Sarah Smith</td>
-                                        <td>April 28, 2023</td>
-                                        <td><span class="badge bg-success">Active</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i
-                                                    class="fas fa-envelope"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger"><i
-                                                    class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <nav aria-label="Page navigation" class="mt-3">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Testimony</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>John D.</td>
+                                    <td class="text-truncate" style="max-width: 300px;">After praying with the
+                                        devotional community, my mother's health improved miraculously...</td>
+                                    <td>June 8, 2023</td>
+                                    <td><span class="badge bg-success">Approved</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i
+                                                class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i
+                                                class="fas fa-ban"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Sarah M.</td>
+                                    <td class="text-truncate" style="max-width: 300px;">The devotional on
+                                        Philippians 4:6-7 came exactly when I needed it...</td>
+                                    <td>June 5, 2023</td>
+                                    <td><span class="badge bg-warning text-dark">Pending</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i
+                                                class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-success"><i
+                                                class="fas fa-check"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Other pages would follow the same pattern -->
+    <!-- Subscribers Page -->
+    <div class="page-content" id="subscribers-page">
+        <div class="container-fluid mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4>Subscribers</h4>
+                <button class="btn btn-primary">
+                    <i class="fas fa-download"></i> Export List
+                </button>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <span>All Subscribers</span>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" placeholder="Search subscribers...">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>Join Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>user1@example.com</td>
+                                    <td>John Doe</td>
+                                    <td>May 15, 2023</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i
+                                                class="fas fa-envelope"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i
+                                                class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>user2@example.com</td>
+                                    <td>Sarah Smith</td>
+                                    <td>April 28, 2023</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i
+                                                class="fas fa-envelope"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i
+                                                class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav aria-label="Page navigation" class="mt-3">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">Previous</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Other pages would follow the same pattern -->
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -979,6 +1014,17 @@ In life, we all encounter different levels, dissensions and intensity of heat. H
             alert('Devotional saved successfully!');
             document.getElementById('edit-devotional-page').classList.remove('active');
             document.getElementById('devotionals-page').classList.add('active');
+        });
+        // Show the add devotional form on button click
+        document.getElementById('add-devotional-btn').addEventListener('click', function () {
+            document.querySelector('.dashboard-card').style.display = 'none'; // hide table
+            document.getElementById('add-devotional-form').style.display = 'block'; // show form
+        });
+
+        // Cancel add devotional, show the table again
+        document.getElementById('cancel-add').addEventListener('click', function () {
+            document.getElementById('add-devotional-form').style.display = 'none';
+            document.querySelector('.dashboard-card').style.display = 'block';
         });
     </script>
 </body>
