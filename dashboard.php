@@ -56,14 +56,7 @@ $result = $mysqli->query($sql);
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
             </li>
-            <li>
-                <a href="#" data-page="devotionals">
-                    <i class="fas fa-book-open"></i> Devotionals
-                    <span class="badge bg-primary">
-                        <?php echo $counts['devotion']; ?>
-                    </span>
-                </a>
-            </li>
+          
             <li>
                 <a href="#" data-page="devotionals">
                     <i class="fas fa-book-open"></i> Devotionals
@@ -98,16 +91,9 @@ $result = $mysqli->query($sql);
                     </span>
                 </a>
             </li>
+           
             <li>
-                <a href="#" data-page="comments">
-                    <i class="fas fa-comments"></i> Comments
-                    <span class="badge bg-success">
-                        <?php echo $counts['comments']; ?>
-                    </span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
+                <a href="logout.php">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </li>
@@ -195,7 +181,7 @@ $result = $mysqli->query($sql);
                 <div class="dashboard-card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span>Recent FRONT PAGE</span>
-                        <a href="AddDevotion.php" class="btn btn-sm btn-primary">Add New Devotional</a>
+                        <!-- <a href="AddDevotion.php" class="btn btn-sm btn-primary">Add New Devotional</a> -->
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -247,7 +233,6 @@ $result = $mysqli->query($sql);
                 </div>
 
                 <!-- Add devotional form - hidden by default -->
-                <div id="add-devotional-form" style="display:none;">
                     <h2>Add New Devotional</h2>
                     <form action="add_devotional.php" method="POST" enctype="multipart/form-data">
                         <div class="mb-3">
@@ -286,8 +271,7 @@ $result = $mysqli->query($sql);
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4>Manage Devotionals</h4>
                 <button class="btn btn-primary" id="new-devotional-btn">
-                    <i class="fas fa-plus"></i> Add New Devotional
-                </button>
+                        <a href="save_devotion.php" class="btn btn-sm btn-primary">Add New Devotional</a>
             </div>
 
             <!-- Devotionals Table -->

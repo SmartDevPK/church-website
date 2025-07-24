@@ -1,68 +1,59 @@
 <?php
-// Enable full error reporting for debugging
+// Enable error reporting
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
-// Database connection parameters
-$host = "localhost";
-$port = 3307;
-$username = "root";
-$password = "";
-$database = "prayer_db";
-
-// Connect to the database
-$mysqli = new mysqli($host, $username, $password, $database, $port);
-
-// Check database connection
-if ($mysqli->connect_errno) {
-    die("Connection failed: {$mysqli->connect_error}");
-}
-
 // Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
-    // Sanitize and validate input
-    $title = trim($_POST['title'] ?? '');
-    $excerpt = trim($_POST['excerpt'] ?? '');
-    $devotional_date = trim($_POST['devotional_date'] ?? '');
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    // Database connection settings
+    $host = "localhost";
+    $port = 3307;
+    $username = "root";
+    $password = "";
+    $database = "prayer_db";
 
-    if (empty($title) || empty($excerpt) || empty($devotional_date)) {
-        echo "All fields (title, excerpt, date) are required.";
-        exit;
+    // Connect to MySQL
+    $conn = new mysqli($host, $username, $password, $database, $port);
+    if ($conn->connect_error) {
+        die("Connection failed: {$conn->connect_error}");
     }
 
-    // Validate and handle image upload
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $imageName = basename($_FILES['image']['name']);
-        $imageTmp = $_FILES['image']['tmp_name'];
-        $imagePath = "uploads/" . time() . "_" . $imageName;
+    // Escape user inputs
+    $title = $conn->real_escape_string($_POST["title"]);
+    $excerpt = $conn->real_escape_string($_POST["excerpt"]);
+    $devotional_date = $conn->real_escape_string($_POST["devotional_date"]);
 
-        // Move the uploaded file to the server
-        if (move_uploaded_file($imageTmp, $imagePath)) {
-            // Prepare SQL insert statement
-            $stmt = $mysqli->prepare(
-                "INSERT INTO devotions (title, excerpt, devotion_date, image) VALUES (?, ?, ?, ?)"
-            );
-
-            if ($stmt) {
-                $stmt->bind_param("ssss", $title, $excerpt, $devotional_date, $imagePath);
-
-                if ($stmt->execute()) {
-                    // Redirect on success
-                    header("Location: dashboard.php?message=updated");
-                    exit;
-                } else {
-                    echo "Database error: {$stmt->error}";
-                }
-
-                $stmt->close();
-            } else {
-                echo "Failed to prepare statement: {$mysqli->error}";
-            }
-        } else {
-            echo "Failed to upload image.";
+    // Handle image upload
+    $image_path = "";
+    if (isset($_FILES["image"]) && $_FILES["image"]["error"] === UPLOAD_ERR_OK) {
+        $target_dir = "uploads/";
+        if (!is_dir($target_dir)) {
+            mkdir($target_dir, 0777, true);
         }
-    } else {
-        echo "No image selected or file upload error.";
+
+        $image_name = basename($_FILES["image"]["name"]);
+        $new_image_name = time() . "_" . $image_name;
+        $target_file = "{$target_dir}{$new_image_name}";
+
+        if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+            $image_path = $conn->real_escape_string($target_file);
+        } else {
+            echo "<div style='color: red;'>Image upload failed.</div>";
+            exit;
+        }
     }
+
+    // Insert into database
+    $sql = "INSERT INTO devotions (title, excerpt, devotion_date, image) 
+            VALUES ('$title', '$excerpt', '$devotional_date', '$image_path')";
+
+    if ($conn->query($sql) === TRUE) {
+        header("Location: dashboard.php?message=updated");
+        exit;
+    } else {
+        echo "<div style='color: red;'>Error: {$conn->error}</div>";
+    }
+
+    $conn->close();
 }
 ?>
