@@ -25,8 +25,8 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
     }
 }
 
-// $sql = "SELECT id, title, date as devotion_date, image_path, excerpt FROM devotions ORDER BY date DESC";
-// $result = $mysqli->query($sql);
+$sql = "SELECT id, title,  devotion_date, image, excerpt FROM devotions ORDER BY devotion_date DESC LIMIT 5";
+$result = $mysqli->query($sql);
 ?>
 
 
@@ -40,266 +40,7 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
     <title>The Anchor Devotional - Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #ad3128;
-            --secondary: #2c3e50;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
-            --sidebar-width: 250px;
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: #f5f7fa;
-            overflow-x: hidden;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: var(--sidebar-width);
-            height: 100vh;
-            background-color: var(--secondary);
-            color: white;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.2);
-            text-align: center;
-        }
-
-        .sidebar-header h3 {
-            margin-bottom: 0;
-            font-weight: 600;
-        }
-
-        .sidebar-menu {
-            padding: 20px 0;
-        }
-
-        .sidebar-menu li {
-            position: relative;
-            margin-bottom: 5px;
-        }
-
-        .sidebar-menu a {
-            display: block;
-            padding: 12px 20px;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .sidebar-menu a:hover,
-        .sidebar-menu a.active {
-            color: white;
-            background-color: rgba(0, 0, 0, 0.2);
-        }
-
-        .sidebar-menu a i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .sidebar-menu .badge {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 20px;
-            transition: all 0.3s;
-        }
-
-        /* Page Content */
-        .page-content {
-            display: none;
-        }
-
-        .page-content.active {
-            display: block;
-        }
-
-        /* Top Navigation */
-        .top-nav {
-            background-color: white;
-            padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .search-box {
-            position: relative;
-            width: 300px;
-        }
-
-        .search-box input {
-            padding-left: 40px;
-            border-radius: 50px;
-            border: 1px solid #ddd;
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 10px;
-            color: #6c757d;
-        }
-
-        .user-menu {
-            display: flex;
-            align-items: center;
-        }
-
-        .user-menu img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-
-        /* Dashboard Cards */
-        .dashboard-card {
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            transition: all 0.3s;
-            background-color: white;
-        }
-
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .card-header {
-            padding: 15px 20px;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--light);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        .stat-card {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .stat-card i {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-
-        .stat-card h2 {
-            font-size: 2.5rem;
-            margin-bottom: 5px;
-        }
-
-        .stat-card p {
-            color: #6c757d;
-            margin-bottom: 0;
-        }
-
-        /* Tables */
-        .table-responsive {
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .table th {
-            background-color: var(--light);
-            border-top: none;
-        }
-
-        .badge {
-            padding: 6px 10px;
-            font-weight: 500;
-        }
-
-        /* Forms */
-        .form-container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group label {
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        /* Cover Image Preview */
-        .cover-preview {
-            width: 100%;
-            height: 200px;
-            background-color: #f5f5f5;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 15px;
-            position: relative;
-            border: 2px dashed #ddd;
-        }
-
-        .cover-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-
-        .cover-preview .placeholder {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: #6c757d;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                left: -var(--sidebar-width);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .sidebar.active {
-                left: 0;
-            }
-
-            .main-content.active {
-                margin-left: var(--sidebar-width);
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -565,6 +306,7 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
                                     <th>Cover</th>
                                     <th>Topic</th>
                                     <th>Date</th>
+                                    <th>Excerpt</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -573,14 +315,17 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
                                     <?php while ($row = $result->fetch_assoc()): ?>
                                         <tr>
                                             <td>
-                                                <img src="<?= htmlspecialchars($row['image_path']) ?: 'default-image.jpg' ?>"
-                                                    alt="Image for <?= htmlspecialchars($row['topic']) ?>"
+                                                <?php
+                                                $imagePath = !empty($row['image']) ? $row['image'] : 'default-image.jpg';
+                                                ?>
+                                                <img src="<?= htmlspecialchars($imagePath) ?>" alt="Cover Image"
                                                     style="width:50px; height:50px;" />
                                             </td>
-                                            <td><?= htmlspecialchars($row['topic']) ?></td>
-                                            <td><?= date("F j, Y", strtotime($row['devotion_date'])) ?></td>
+                                            <td><?= htmlspecialchars($row['title'] ?? '') ?></td>
+                                            <td><?= isset($row['devotion_date']) ? date("F j, Y", strtotime($row['devotion_date'])) : '' ?>
+                                            </td>
+                                            <td><?= htmlspecialchars($row['excerpt'] ?? '') ?></td>
                                             <td>
-                                                <!-- Actions: edit and delete buttons (not implemented yet) -->
                                                 <button class="btn btn-sm btn-outline-primary">
                                                     <a href="edit_devotional.php?id=<?= $row['id'] ?? '' ?>"
                                                         style="text-decoration:none; color:inherit;">
@@ -600,7 +345,7 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="4">No devotionals found.</td>
+                                        <td colspan="5">No devotionals found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -635,79 +380,33 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
             </div>
 
             <div class="form-container">
-                <form id="devotional-form">
+                <form id="devotional-form" action="save_devotional.php" method="POST" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="devotional-title">Title</label>
-                                <input type="text" class="form-control" id="devotional-title" placeholder="Enter title"
-                                    value="Surviving the HEAT">
+                                <label for="title">Title</label>
+                                <input type="text" name="title" class="form-control" required </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="excerpt">Excerpt</label>
+                                    <textarea name="excerpt" class="form-control" rows="3" required></textarea>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label for="devotional-topic">Topic</label>
-                                <input type="text" class="form-control" id="devotional-topic" placeholder="Enter topic"
-                                    value="Faith in Trials">
-                            </div>
+
+                        <div class="form-group mb-3">
+                            <label for="devotional_date">Date</label>
+                            <input type="date" name="devotional_date" class="form-control" required>
                         </div>
-                    </div>
 
-                    <div class="form-group mb-3">
-                        <label for="devotional-verse">Bible Verse</label>
-                        <input type="text" class="form-control" id="devotional-verse" placeholder="e.g. Jeremiah 17:7-8"
-                            value="Jeremiah 17:7-8">
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label for="devotional-date">Date</label>
-                        <input type="date" class="form-control" id="devotional-date" value="2023-06-05">
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label for="devotional-author">Author</label>
-                        <select class="form-select" id="devotional-author">
-                            <option>Maj Gen (Dr) Ezra Jahadi Jakko (Rtd)</option>
-                            <option>Pastor John Smith</option>
-                            <option>Rev. Mary Johnson</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label>Cover Image</label>
-                        <div class="cover-preview" id="cover-preview">
-                            <img src="https://via.placeholder.com/800x400" alt="Cover Preview" id="cover-image-preview">
-                            <div class="placeholder" id="cover-placeholder">
-                                <i class="fas fa-image fa-3x mb-2"></i>
-                                <p>No cover image selected</p>
-                            </div>
+                        <div class="form-group mb-3">
+                            <label for="image">Cover Image</label>
+                            <input type="file" name="image" class="form-control" accept="image/*" required>
                         </div>
-                        <input type="file" class="form-control" id="cover-image-upload" accept="image/*">
-                    </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="submit" name="submit" class="btn btn-primary">Publish Devotional</button>
 
-                    <div class="form-group mb-3">
-                        <label for="devotional-content">Devotional Content</label>
-                        <textarea class="form-control" id="devotional-content" rows="12"
-                            placeholder="Write your devotional content here...">Blessed is the man that trusteth in the Lord, and whose hope the Lord is. For he shall be as a tree planted by the waters, and that spreadeth out her roots by the river, and shall not see (FEAR) when heat cometh, but her leaf shall be green; and shall not be careful (WORRIED) in the year of drought, neither shall cease from yielding fruit. - Jeremiah 17:7-8
-
-Heat in the Bible and in life generally signifies trouble, hardship, suffering, adversity, and trails.
-
-In life, we all encounter different levels, dissensions and intensity of heat. However, we should be encouraged that God has also made a way of escape for those who trust and hope in him.</textarea>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label for="devotional-status">Status</label>
-                        <select class="form-select" id="devotional-status">
-                            <option value="published">Published</option>
-                            <option value="draft">Draft</option>
-                            <option value="archived">Archived</option>
-                        </select>
-                    </div>
-
-                    <div class="d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-outline-secondary">Save Draft</button>
-                        <button type="submit" class="btn btn-primary">Publish Devotional</button>
-                    </div>
                 </form>
             </div>
         </div>
