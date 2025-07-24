@@ -195,7 +195,7 @@ $result = $mysqli->query($sql);
                 <div class="dashboard-card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span>Recent FRONT PAGE</span>
-                        <button class="btn btn-sm btn-primary" id="add-devotional-btn">Add New</button>
+                        <a href="AddDevotion.php" class="btn btn-sm btn-primary">Add New Devotional</a>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -405,7 +405,7 @@ $result = $mysqli->query($sql);
                             <input type="file" name="image" class="form-control" accept="image/*" required>
                         </div>
                         <div class="d-flex justify-content-end gap-2">
-                            <button type="submit" name="submit" class="btn btn-primary">Publish Devotional</button>
+                            <button type="submit" name="submit" class="btn btn-outline-secondary">Submit</button>
 
                 </form>
             </div>
@@ -702,6 +702,19 @@ $result = $mysqli->query($sql);
         document.getElementById('cancel-add').addEventListener('click', function () {
             document.getElementById('add-devotional-form').style.display = 'none';
             document.querySelector('.dashboard-card').style.display = 'block';
+        });
+        const showAddFormBtn = document.getElementById("show-add-form-btn");
+        const formDiv = document.getElementById("add-devotional-form");
+        const cancelButton = document.getElementById("cancel-add");
+
+        showAddFormBtn.addEventListener("click", () => {
+            formDiv.style.display = "block";
+            showAddFormBtn.style.display = "none";
+        });
+
+        cancelButton.addEventListener("click", () => {
+            formDiv.style.display = "none";
+            showAddFormBtn.style.display = "inline-block";
         });
     </script>
 </body>
