@@ -27,6 +27,41 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
 
 $sql = "SELECT id, title,  devotion_date, image, excerpt FROM devotions ORDER BY devotion_date DESC LIMIT 5";
 $result = $mysqli->query($sql);
+
+$prayerRequests = [];
+
+$prayerQuery = "SELECT name, email, prayer AS title, request_date AS created_at 
+                FROM prayer_requests 
+                WHERE request_date >= NOW() - INTERVAL 1 DAY
+                ORDER BY created_at DESC 
+                LIMIT 20";
+
+$prayerResult = $mysqli->query($prayerQuery);
+
+if ($prayerResult && $prayerResult->num_rows > 0) {
+    while ($row = $prayerResult->fetch_assoc()) {
+        $prayerRequests[] = $row;
+    }
+}
+
+$testimonies = [];
+
+$sqlT = "
+    SELECT id, name, created_at, status 
+    FROM testimonies 
+    WHERE status = 'approved' 
+      AND created_at >= NOW() - INTERVAL 1 DAY
+    ORDER BY created_at DESC
+";
+
+$result = $mysqli->query($sqlT);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $testimonies[] = $row;
+    }
+}
+
 ?>
 
 
@@ -363,57 +398,52 @@ $result = $mysqli->query($sql);
             <h4 class="mb-4">Prayer Requests</h4>
 
             <div class="dashboard-card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <span>All Prayer Requests</span>
                     <div class="input-group" style="width: 300px;">
-                        <input type="text" class="form-control" placeholder="Search requests...">
-                        <button class="btn btn-outline-secondary" type="button">
+                        <input type="text" class="form-control" placeholder="Search requests..." id="searchInput">
+                        <button class="btn btn-outline-secondary" type="button" onclick="searchRequests()">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover" id="prayerRequestsTable">
                             <thead>
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Request</th>
+                                    <th>Prayer Request</th>
                                     <th>Date</th>
-                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>John Doe</td>
-                                    <td>john@example.com</td>
-                                    <td class="text-truncate" style="max-width: 200px;">Pray for healing from
-                                        chronic illness...</td>
-                                    <td>June 5, 2023</td>
-                                    <td><span class="badge bg-warning text-dark">Pending</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-success"><i
-                                                class="fas fa-check"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Sarah Smith</td>
-                                    <td>sarah@example.com</td>
-                                    <td class="text-truncate" style="max-width: 200px;">Pray for my family's
-                                        financial situation...</td>
-                                    <td>June 4, 2023</td>
-                                    <td><span class="badge bg-success">Prayed</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-success"><i
-                                                class="fas fa-check"></i></button>
-                                    </td>
-                                </tr>
+                                <?php if (!empty($prayerRequests)): ?>
+                                    <?php foreach ($prayerRequests as $request): ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($request['name']); ?></td>
+                                            <td><?php echo htmlspecialchars($request['email']); ?></td>
+                                            <td class="text-truncate" style="max-width: 200px;"
+                                                title="<?php echo htmlspecialchars($request['title']); ?>">
+                                                <?php echo htmlspecialchars($request['title']); ?>
+                                            </td>
+                                            <td><?php echo date('F j, Y, g:i a', strtotime($request['created_at'])); ?></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary" title="View"><i
+                                                        class="fas fa-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-success" title="Mark as Prayed"><i
+                                                        class="fas fa-check"></i></button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="5" class="text-center">No prayer requests found within the last 24
+                                            hours.</td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -443,39 +473,43 @@ $result = $mysqli->query($sql);
                             <thead>
                                 <tr>
                                     <th>Name</th>
+                                    <th>initials</th>
                                     <th>Testimony</th>
                                     <th>Date</th>
                                     <th>Status</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>John D.</td>
-                                    <td class="text-truncate" style="max-width: 300px;">After praying with the
-                                        devotional community, my mother's health improved miraculously...</td>
-                                    <td>June 8, 2023</td>
-                                    <td><span class="badge bg-success">Approved</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger"><i
-                                                class="fas fa-ban"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Sarah M.</td>
-                                    <td class="text-truncate" style="max-width: 300px;">The devotional on
-                                        Philippians 4:6-7 came exactly when I needed it...</td>
-                                    <td>June 5, 2023</td>
-                                    <td><span class="badge bg-warning text-dark">Pending</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-success"><i
-                                                class="fas fa-check"></i></button>
-                                    </td>
-                                </tr>
+                                <?php if (!empty($testimonies)): ?>
+                                    <?php foreach ($testimonies as $testimony): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($testimony['name']); ?></td>
+                                            <td class="text-truncate" style="max-width: 300px;">
+                                                <?= htmlspecialchars($testimony['testimony']); ?>
+                                            </td>
+                                            <td><?= date('F j, Y', strtotime($testimony['date'])); ?></td>
+                                            <td>
+                                                <?php if ($testimony['status'] === 'approved'): ?>
+                                                    <span class="badge bg-success">Approved</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-warning text-dark">
+                                                        <?= htmlspecialchars($testimony['status']); ?>
+                                                    </span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <!-- Additional action buttons can be added here -->
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="5" class="text-center">No approved testimonies found.</td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -483,6 +517,7 @@ $result = $mysqli->query($sql);
             </div>
         </div>
     </div>
+
 
     <!-- Subscribers Page -->
     <div class="page-content" id="subscribers-page">
@@ -619,6 +654,7 @@ $result = $mysqli->query($sql);
                     document.getElementById('edit-devotional-page').classList.add('active');
                     document.getElementById('devotional-form-title').textContent = 'Add New Devotional';
                 });
+
             }
 
             if (backToDevotionals) {
@@ -641,6 +677,17 @@ $result = $mysqli->query($sql);
                 });
             }
         });
+
+        // Optional: Simple client-side search function
+        function searchRequests() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#prayerRequestsTable tbody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(input) ? '' : 'none';
+            });
+        }
     </script>
 </body>
 
