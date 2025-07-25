@@ -265,8 +265,7 @@ $result = $mysqli->query($sql);
                                                 <td><?= htmlspecialchars($row['excerpt'] ?? '') ?></td>
                                                 <td>
                                                     <button class="btn btn-sm btn-outline-primary">
-                                                        <a href="edit_devotions.php?id=<?= $row['id'] ?? '' ?>"
-                                                            style="text-decoration:none; color:inherit;">
+                                                        <a href=" Edevotional.php?id=<?= $row['id'] ?>">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
                                                     </button>
