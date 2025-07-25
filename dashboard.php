@@ -265,12 +265,12 @@ $result = $mysqli->query($sql);
                                                 <td><?= htmlspecialchars($row['excerpt'] ?? '') ?></td>
                                                 <td>
                                                     <button class="btn btn-sm btn-outline-primary">
-                                                        <a href="edit_devotional.php?id=<?= $row['id'] ?? '' ?>"
+                                                        <a href="edit_devotions.php?id=<?= $row['id'] ?? '' ?>"
                                                             style="text-decoration:none; color:inherit;">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
                                                     </button>
-                                                    <form method="POST" action="delete_devotional.php"
+                                                    <form method="POST" action="delete_devotions.php"
                                                         style="display:inline-block;">
                                                         <input type="hidden" name="id" value="<?= $row['id'] ?? '' ?>">
                                                         <button type="submit" class="btn btn-sm btn-outline-danger"

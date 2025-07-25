@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['id'])) {
 }
 
 if ($stmt->execute()) {
-    header("Location: devotions.php");
+    header("Location:dashboard.php");
     exit();
 } else {
     echo "Error deleting record: " . $stmt->error;
