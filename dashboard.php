@@ -56,7 +56,7 @@ $result = $mysqli->query($sql);
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
             </li>
-          
+
             <li>
                 <a href="#" data-page="devotionals">
                     <i class="fas fa-book-open"></i> Devotionals
@@ -68,6 +68,7 @@ $result = $mysqli->query($sql);
 
             <li>
                 <a href="#" data-page="prayer-requests">
+
                     <i class="fas fa-pray"></i> Prayer Requests
                     <span class="badge bg-danger">
                         <?php echo $counts['prayer_requests']; ?>
@@ -91,7 +92,7 @@ $result = $mysqli->query($sql);
                     </span>
                 </a>
             </li>
-           
+
             <li>
                 <a href="logout.php">
                     <i class="fas fa-sign-out-alt"></i> Logout
@@ -181,7 +182,7 @@ $result = $mysqli->query($sql);
                 <div class="dashboard-card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span>Recent FRONT PAGE</span>
-                        <!-- <a href="AddDevotion.php" class="btn btn-sm btn-primary">Add New Devotional</a> -->
+                        <a href="AddDevotion.php" class="btn btn-sm btn-primary">Add New Devotional</a>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -233,36 +234,36 @@ $result = $mysqli->query($sql);
                 </div>
 
                 <!-- Add devotional form - hidden by default -->
-                    <h2>Add New Devotional</h2>
-                    <form action="add_devotional.php" method="POST" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="topic" class="form-label">Title / Topic</label>
-                            <input type="text" class="form-control" name="topic" id="topic" required />
-                        </div>
-                        <div class="mb-3">
-                            <label for="date" class="form-label">Date</label>
-                            <input type="date" class="form-control" name="date" id="date" required />
-                        </div>
-                        <div class="mb-3">
-                            <label for="image" class="form-label">Cover Image</label>
-                            <input type="file" class="form-control" name="image" id="image" accept="image/*" required />
-                        </div>
-                        <button type="submit" class="btn btn-success">Save Devotional</button>
-                        <button type="button" class="btn btn-secondary" id="cancel-add">Cancel</button>
-                    </form>
-                </div>
-
+                <h2>Add New Devotional</h2>
+                <form action="add_devotional.php" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="topic" class="form-label">Title / Topic</label>
+                        <input type="text" class="form-control" name="topic" id="topic" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" class="form-control" name="date" id="date" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Cover Image</label>
+                        <input type="file" class="form-control" name="image" id="image" accept="image/*" required />
+                    </div>
+                    <button type="submit" class="btn btn-success">Save Devotional</button>
+                    <button type="button" class="btn btn-secondary" id="cancel-add">Cancel</button>
+                </form>
             </div>
 
-            <!-- Recent Activity -->
-            <div class="col-md-4">
-                <div class="dashboard-card">
-                    <div class="card-header">
+        </div>
 
-                    </div>
+        <!-- Recent Activity -->
+        <div class="col-md-4">
+            <div class="dashboard-card">
+                <div class="card-header">
+
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- Devotionals Page -->
@@ -271,7 +272,7 @@ $result = $mysqli->query($sql);
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4>Manage Devotionals</h4>
                 <button class="btn btn-primary" id="new-devotional-btn">
-                        <a href="save_devotion.php" class="btn btn-sm btn-primary">Add New Devotional</a>
+                    <a href="save_devotion.php" class="btn btn-sm btn-primary">Add New Devotional</a>
             </div>
 
             <!-- Devotionals Table -->
@@ -428,8 +429,8 @@ $result = $mysqli->query($sql);
                                 <tr>
                                     <td>John Doe</td>
                                     <td>john@example.com</td>
-                                    <td class="text-truncate" style="max-width: 200px;">Pray for healing from
-                                        chronic illness...</td>
+                                    <td class="text-truncate" style="max-width: 200px;">Pray for healing from chronic
+                                        illness...</td>
                                     <td>June 5, 2023</td>
                                     <td><span class="badge bg-warning text-dark">Pending</span></td>
                                     <td>
@@ -442,8 +443,8 @@ $result = $mysqli->query($sql);
                                 <tr>
                                     <td>Sarah Smith</td>
                                     <td>sarah@example.com</td>
-                                    <td class="text-truncate" style="max-width: 200px;">Pray for my family's
-                                        financial situation...</td>
+                                    <td class="text-truncate" style="max-width: 200px;">Pray for my family's financial
+                                        situation...</td>
                                     <td>June 4, 2023</td>
                                     <td><span class="badge bg-success">Prayed</span></td>
                                     <td>
@@ -606,7 +607,6 @@ $result = $mysqli->query($sql);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Toggle sidebar on mobile
         document.getElementById('sidebarToggle').addEventListener('click', function () {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('main-content').classList.toggle('active');
@@ -676,30 +676,7 @@ $result = $mysqli->query($sql);
             document.getElementById('edit-devotional-page').classList.remove('active');
             document.getElementById('devotionals-page').classList.add('active');
         });
-        // Show the add devotional form on button click
-        document.getElementById('add-devotional-btn').addEventListener('click', function () {
-            document.querySelector('.dashboard-card').style.display = 'none'; // hide table
-            document.getElementById('add-devotional-form').style.display = 'block'; // show form
-        });
 
-        // Cancel add devotional, show the table again
-        document.getElementById('cancel-add').addEventListener('click', function () {
-            document.getElementById('add-devotional-form').style.display = 'none';
-            document.querySelector('.dashboard-card').style.display = 'block';
-        });
-        const showAddFormBtn = document.getElementById("show-add-form-btn");
-        const formDiv = document.getElementById("add-devotional-form");
-        const cancelButton = document.getElementById("cancel-add");
-
-        showAddFormBtn.addEventListener("click", () => {
-            formDiv.style.display = "block";
-            showAddFormBtn.style.display = "none";
-        });
-
-        cancelButton.addEventListener("click", () => {
-            formDiv.style.display = "none";
-            showAddFormBtn.style.display = "inline-block";
-        });
     </script>
 </body>
 

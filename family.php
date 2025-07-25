@@ -1,2417 +1,1121 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Anchor Devotional - Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Family Resources - The Anchor Devotional</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         :root {
             --primary: #ad3128;
             --secondary: #2c3e50;
             --light: #f8f9fa;
             --dark: #212529;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
-            --sidebar-width: 250px;
+            --text: #333;
+            --text-light: #6c757d;
+            --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-heading: 'Georgia', serif;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: #f5f7fa;
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--text);
+            background-color: #fff;
             overflow-x: hidden;
         }
 
-        /* Sidebar Styles */
-        .sidebar {
+        /* Header Styles */
+        header {
             position: fixed;
             top: 0;
             left: 0;
-            width: var(--sidebar-width);
-            height: 100vh;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            padding: 15px 0;
+            transition: var(--transition);
+        }
+
+        .header-scrolled {
+            padding: 10px 0;
+            background-color: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 15px;
+        }
+
+        .logo-img {
+            height: 50px;
+            width: auto;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .logo-main {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: var(--font-heading);
+        }
+
+        .logo-sub {
+            font-size: 0.9rem;
+            color: var(--secondary);
+            font-weight: 500;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links li {
+            margin-left: 25px;
+            position: relative;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .btn-admin {
+            background-color: var(--primary);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-admin:hover {
+            background-color: #8a2520;
+            transform: translateY(-2px);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 80px;
+            left: -100%;
+            width: 100%;
+            height: calc(100vh - 80px);
+            background-color: white;
+            padding: 30px 20px;
+            transition: var(--transition);
+            z-index: 999;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mobile-menu.active {
+            left: 0;
+        }
+
+        /* Hero Section */
+        .resources-hero {
+            position: relative;
+            height: 400px;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                url('https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            margin-top: 80px;
+        }
+
+        .resources-hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-family: var(--font-heading);
+        }
+
+        .resources-hero-content p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            padding: 14px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
             background-color: var(--secondary);
             color: white;
-            transition: all 0.3s;
-            z-index: 1000;
         }
 
-        .sidebar-header {
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.2);
-            text-align: center;
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
         }
 
-        .sidebar-header h3 {
-            margin-bottom: 0;
-            font-weight: 600;
-        }
-
-        .sidebar-menu {
-            padding: 20px 0;
-        }
-
-        .sidebar-menu li {
-            position: relative;
-            margin-bottom: 5px;
-        }
-
-        .sidebar-menu a {
-            display: block;
-            padding: 12px 20px;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .sidebar-menu a:hover,
-        .sidebar-menu a.active {
+        .btn-secondary:hover {
+            background-color: var(--primary);
             color: white;
-            background-color: rgba(0, 0, 0, 0.2);
         }
 
-        .sidebar-menu a i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .sidebar-menu .badge {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 20px;
-            transition: all 0.3s;
-        }
-
-        /* Page Content */
-        .page-content {
-            display: none;
-        }
-        .page-content.active {
-            display: block;
-        }
-
-        /* Top Navigation */
-        .top-nav {
+        .btn-white {
             background-color: white;
-            padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            color: var(--primary);
         }
 
-        .search-box {
+        /* Resources Section */
+        .resources-container {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 2.5rem;
+            color: var(--primary);
+            font-family: var(--font-heading);
             position: relative;
-            width: 300px;
         }
 
-        .search-box input {
-            padding-left: 40px;
-            border-radius: 50px;
-            border: 1px solid #ddd;
-        }
-
-        .search-box i {
+        .section-title::after {
+            content: '';
             position: absolute;
-            left: 15px;
-            top: 10px;
-            color: #6c757d;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary);
         }
 
-        .user-menu {
+        /* Category Navigation */
+        .category-nav {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            padding: 12px 25px;
+            margin: 0 5px 10px;
+            background-color: var(--light);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .category-tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .category-tab:hover:not(.active) {
+            background-color: #e9ecef;
+        }
+
+        /* Category Sections */
+        .category-section {
+            margin-bottom: 60px;
+        }
+
+        .category-header {
             display: flex;
             align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light);
         }
 
-        .user-menu img {
+        .category-icon {
             width: 40px;
             height: 40px;
+            background-color: var(--primary);
+            color: white;
             border-radius: 50%;
-            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
         }
 
-        /* Dashboard Cards */
-        .dashboard-card {
+        .category-title {
+            font-size: 1.8rem;
+            color: var(--secondary);
+            font-family: var(--font-heading);
+        }
+
+        /* Resources Grid */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .resource-card {
+            background-color: white;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            transition: all 0.3s;
-            background-color: white;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
         }
 
-        .dashboard-card:hover {
+        .resource-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-lg);
         }
 
-        .card-header {
-            padding: 15px 20px;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--light);
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        .stat-card {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .stat-card i {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-
-        .stat-card h2 {
-            font-size: 2.5rem;
-            margin-bottom: 5px;
-        }
-
-        .stat-card p {
-            color: #6c757d;
-            margin-bottom: 0;
-        }
-
-        /* Tables */
-        .table-responsive {
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .table th {
-            background-color: var(--light);
-            border-top: none;
-        }
-
-        .badge {
-            padding: 6px 10px;
-            font-weight: 500;
-        }
-
-        /* Forms */
-        .form-container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group label {
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        /* Cover Image Preview */
-        .cover-preview {
-            width: 100%;
+        .resource-image {
             height: 200px;
-            background-color: #f5f5f5;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 15px;
-            position: relative;
-            border: 2px dashed #ddd;
-        }
-
-        .cover-preview img {
             width: 100%;
-            height: 100%;
             object-fit: cover;
-            display: none;
         }
 
-        .cover-preview .placeholder {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: #6c757d;
+        .resource-content {
+            padding: 20px;
         }
 
-        /* File Upload Preview */
-        .file-preview {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            margin-bottom: 15px;
+        .resource-category {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: var(--light);
+            color: var(--primary);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
         }
 
-        .file-preview i {
-            font-size: 2rem;
+        .resource-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-family: var(--font-heading);
             color: var(--secondary);
         }
 
-        .file-info {
-            flex-grow: 1;
+        .resource-description {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
         }
 
-        .file-name {
-            font-weight: 500;
-            margin-bottom: 5px;
+        .resource-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--text-light);
         }
 
-        .file-size {
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                left: -var(--sidebar-width);
-            }
-            .main-content {
-                margin-left: 0;
-            }
-            .sidebar.active {
-                left: 0;
-            }
-            .main-content.active {
-                margin-left: var(--sidebar-width);
-            }
-        }
-
-        /* Testimony/Prayer Request View Modal */
-        .testimony-content, .prayer-content {
-            white-space: pre-line;
-            line-height: 1.6;
-            padding: 15px;
-            background-color: #f8f9fa;
+        .download-btn {
+            background-color: var(--primary);
+            color: white;
+            padding: 8px 15px;
             border-radius: 5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .download-btn:hover {
+            background-color: #8a2520;
+        }
+
+        /* Search */
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 50px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            padding-right: 50px;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+        }
+
+        /* Subscribe Section */
+        .subscribe {
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 80px 0;
+        }
+
+        .subscribe-form {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .subscribe-input {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px;
+            border: none;
+            border-radius: 50px 0 0 50px;
+        }
+
+        .subscribe-btn {
+            padding: 15px 30px;
+            border-radius: 0 50px 50px 0;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 80px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .resources-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+
+            .resources-hero-content h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .logo-text {
+                display: none;
+            }
+
+            .resources-hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .resources-hero-content p {
+                font-size: 1rem;
+            }
+
+            .category-nav {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .category-tab {
+                width: 100%;
+                text-align: center;
+                margin: 5px 0;
+            }
+
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-admin {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .resources-hero-content h1 {
+                font-size: 1.8rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .subscribe-form {
+                flex-direction: column;
+            }
+
+            .subscribe-input {
+                border-radius: 50px;
+                margin-bottom: 10px;
+            }
+
+            .subscribe-btn {
+                border-radius: 50px;
+            }
         }
     </style>
 </head>
+
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3>The Anchor</h3>
-            <small>Admin Dashboard</small>
-        </div>
-        <ul class="sidebar-menu">
-            <li>
-                <a href="#" class="active" data-page="dashboard">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
+    <!-- Header with Admin Button -->
+    <header id="header">
+        <div class="container">
+            <nav>
+                <a href="index.php" class="logo-container">
+                    <img src="the anch logo.png" alt="The Anchor Logo" class="logo-img">
+                    <div class="logo-text">
+                        <span class="logo-main">The Anchor</span>
+                        <span class="logo-sub">Daily Devotional</span>
+                    </div>
                 </a>
-            </li>
-            <li>
-                <a href="#" data-page="devotionals">
-                    <i class="fas fa-book-open"></i> Devotionals
-                    <span class="badge bg-primary">12</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" data-page="past-devotionals">
-                    <i class="fas fa-calendar-alt"></i> Past Devotionals
-                </a>
-            </li>
-            <li>
-                <a href="#" data-page="family-resources">
-                    <i class="fas fa-file-pdf"></i> Family Resources
-                </a>
-            </li>
-            <li>
-                <a href="#" data-page="prayer-requests">
-                    <i class="fas fa-pray"></i> Prayer Requests
-                    <span class="badge bg-danger">5</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" data-page="testimonies">
-                    <i class="fas fa-comment-alt"></i> Testimonies
-                </a>
-            </li>
-            <li>
-                <a href="#" data-page="subscribers">
-                    <i class="fas fa-users"></i> Subscribers
-                    <span class="badge bg-success">1,234</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" data-page="settings">
-                    <i class="fas fa-cog"></i> Settings
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
-            </li>
-        </ul>
-    </div>
 
-    <!-- Main Content -->
-    <div class="main-content" id="main-content">
-        <!-- Top Navigation -->
-        <div class="top-nav">
-            <button class="btn btn-outline-secondary d-md-none" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" class="form-control" placeholder="Search...">
-            </div>
-            <div class="user-menu">
-                <img src="https://via.placeholder.com/40" alt="Admin">
-                <div>
-                    <div class="fw-bold">Admin User</div>
-                    <small class="text-muted">Super Admin</small>
-                </div>
-            </div>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <ul class="nav-links">
+                    <li><a href="index.php">Home</a></li>
+                    <li><a href="todays-devotion.php">Devotions</a></li>
+                    <li><a href="about.php">About</a></li>
+                    <li><a href="family.php" class="active">Family</a></li>
+                    <li><a href="#subscribe">Subscribe</a></li>
+                    <li><a href="login.php" class="btn-admin"><i class="fas fa-lock"></i> Admin</a></li>
+                </ul>
+            </nav>
         </div>
 
-        <!-- Dashboard Page -->
-        <div class="page-content active" id="dashboard-page">
-            <div class="container-fluid mt-4">
-                <h4 class="mb-4">Dashboard Overview</h4>
-                
-                <!-- Stats Cards -->
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="dashboard-card">
-                            <div class="stat-card">
-                                <i class="fas fa-book-open text-primary"></i>
-                                <h2>48</h2>
-                                <p>Devotionals</p>
-                            </div>
-                        </div>
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <ul>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="todays-devotion.php">Devotions</a></li>
+                <li><a href="about.php">About</a></li>
+                <li><a href="family.php" class="active">Family</a></li>
+                <li><a href="#subscribe">Subscribe</a></li>
+                <li><a href="login.php" pclass="btn-admin"><i class="fas fa-lock"></i> Admin Login</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Resources Hero Section -->
+    <section class="resources-hero">
+        <div class="resources-hero-content">
+            <h1>Family & Life Stage Resources</h1>
+            <p>Discover helpful resources tailored for every stage of life - from children to teens, singles to married
+                couples.</p>
+            <a href="#resources" class="btn btn-white">Explore Resources</a>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section class="resources-container" id="resources">
+        <div class="container">
+            <h2 class="section-title">Spiritual Resources for All Ages</h2>
+
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search resources...">
+                <button class="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+
+            <div class="category-nav">
+                <div class="category-tab active" data-category="all">All Resources</div>
+                <div class="category-tab" data-category="children">Children</div>
+                <div class="category-tab" data-category="teens">Teens</div>
+                <div class="category-tab" data-category="singles">Singles</div>
+                <div class="category-tab" data-category="married">Married</div>
+                <div class="category-tab" data-category="parents">Parents</div>
+            </div>
+
+            <!-- Children's Resources -->
+            <div class="category-section" id="children">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-child"></i>
                     </div>
-                    <div class="col-md-3">
-                        <div class="dashboard-card">
-                            <div class="stat-card">
-                                <i class="fas fa-file-pdf text-warning"></i>
-                                <h2>24</h2>
-                                <p>Family Resources</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="dashboard-card">
-                            <div class="stat-card">
-                                <i class="fas fa-pray text-danger"></i>
-                                <h2>24</h2>
-                                <p>Prayer Requests</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="dashboard-card">
-                            <div class="stat-card">
-                                <i class="fas fa-users text-success"></i>
-                                <h2>1,234</h2>
-                                <p>Subscribers</p>
-                            </div>
-                        </div>
-                    </div>
+                    <h3 class="category-title">Children's Resources (Ages 5-12)</h3>
                 </div>
 
-                <!-- Recent Devotionals -->
-                <div class="row mt-4">
-                    <div class="col-md-8">
-                        <div class="dashboard-card">
-                            <div class="card-header">
-                                <span>Recent Devotionals</span>
-                                <a href="#" class="btn btn-sm btn-primary" id="add-devotional-btn">Add New</a>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Title</th>
-                                                <th>Date</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Surviving the HEAT</td>
-                                                <td>June 5, 2023</td>
-                                                <td><span class="badge bg-success">Published</span></td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary edit-devotional" data-id="1"><i class="fas fa-edit"></i></button>
-                                                    <button class="btn btn-sm btn-outline-danger delete-devotional" data-id="1"><i class="fas fa-trash"></i></button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Peace in the Storm</td>
-                                                <td>June 4, 2023</td>
-                                                <td><span class="badge bg-success">Published</span></td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary edit-devotional" data-id="2"><i class="fas fa-edit"></i></button>
-                                                    <button class="btn btn-sm btn-outline-danger delete-devotional" data-id="2"><i class="fas fa-trash"></i></button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                <div class="resources-grid">
+                    <div class="resource-card" data-category="children">
+                        <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Bible Coloring Pages" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Children</span>
+                            <h3 class="resource-title">Bible Story Coloring Book</h3>
+                            <p class="resource-description">25 coloring pages featuring key Bible stories with simple
+                                explanations for young children.</p>
+                            <div class="resource-meta">
+                                <span>PDF • 5.1 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Recent Activity -->
-                    <div class="col-md-4">
-                        <div class="dashboard-card">
-                            <div class="card-header">
-                                <span>Recent Activity</span>
+                    <div class="resource-card" data-category="children">
+                        <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Sunday School" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Children</span>
+                            <h3 class="resource-title">Fruit of the Spirit Activities</h3>
+                            <p class="resource-description">Games, crafts and lessons to help children understand and
+                                practice the Fruit of the Spirit.</p>
+                            <div class="resource-meta">
+                                <span>PDF • 2.9 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
                             </div>
-                            <div class="card-body">
-                                <div class="activity-list">
-                                    <div class="activity-item mb-3">
-                                        <div class="d-flex">
-                                            <div class="flex-shrink-0">
-                                                <i class="fas fa-book-open bg-primary text-white p-2 rounded-circle"></i>
-                                            </div>
-                                            <div class="flex-grow-1 ms-3">
-                                                <strong>New Devotional Added</strong>
-                                                <p class="mb-0">"Surviving the HEAT" was published</p>
-                                                <small class="text-muted">2 hours ago</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="activity-item mb-3">
-                                        <div class="d-flex">
-                                            <div class="flex-shrink-0">
-                                                <i class="fas fa-file-pdf bg-warning text-white p-2 rounded-circle"></i>
-                                            </div>
-                                            <div class="flex-grow-1 ms-3">
-                                                <strong>New Family Resource</strong>
-                                                <p class="mb-0">"Parenting Guide" was uploaded</p>
-                                                <small class="text-muted">5 hours ago</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                        </div>
+                    </div>
+
+                    <div class="resource-card" data-category="children">
+                        <img src="https://images.unsplash.com/photo-1585771724684-38269d6639fd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Memory Verse Cards" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Children</span>
+                            <h3 class="resource-title">Memory Verse Cards</h3>
+                            <p class="resource-description">52 printable memory verse cards - one for each week of the
+                                year. Perfect for family memorization.</p>
+                            <div class="resource-meta">
+                                <span>PDF • 1.5 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Devotionals Page -->
-        <div class="page-content" id="devotionals-page">
-            <div class="container-fluid mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4>Devotionals</h4>
-                    <button class="btn btn-primary" id="new-devotional-btn">
-                        <i class="fas fa-plus"></i> New Devotional
-                    </button>
+            <!-- Teen Resources -->
+            <div class="category-section" id="teens">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h3 class="category-title">Teen Resources (Ages 13-19)</h3>
                 </div>
 
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <span>All Devotionals</span>
-                        <div class="input-group" style="width: 300px;">
-                            <input type="text" class="form-control" placeholder="Search devotionals...">
-                            <button class="btn btn-outline-secondary" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
+                <div class="resources-grid">
+                    <div class="resource-card" data-category="teens">
+                        <img src="https://images.unsplash.com/photo-1518655048521-f130df041f66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Prayer Journal" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Teens</span>
+                            <h3 class="resource-title">Teen Prayer Journal</h3>
+                            <p class="resource-description">Guided prayer journal template designed specifically for
+                                teenagers to grow their prayer life.</p>
+                            <div class="resource-meta">
+                                <span>PDF • 1.1 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="devotional-status-filter">Status</label>
-                                    <select id="devotional-status-filter" class="form-control">
-                                        <option value="">All Statuses</option>
-                                        <option>Draft</option>
-                                        <option>Published</option>
-                                        <option>Archived</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="devotional-date-filter">Date Range</label>
-                                    <select id="devotional-date-filter" class="form-control">
-                                        <option value="">All Time</option>
-                                        <option>Last 7 Days</option>
-                                        <option>Last 30 Days</option>
-                                        <option>Last 90 Days</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="devotional-author-filter">Author</label>
-                                    <select id="devotional-author-filter" class="form-control">
-                                        <option value="">All Authors</option>
-                                        <option>Maj Gen (Dr) Ezra Jahadi Jakko (Rtd)</option>
-                                        <option>Pastor John Smith</option>
-                                        <option>Rev. Sarah Johnson</option>
-                                    </select>
-                                </div>
+
+                    <div class="resource-card" data-category="teens">
+                        <img src="https://images.unsplash.com/photo-1549060279-7e168fcee0c2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Bible Study" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Teens</span>
+                            <h3 class="resource-title">30-Day Teen Devotional</h3>
+                            <p class="resource-description">Daily readings addressing issues teens face today with
+                                biblical wisdom and practical application.</p>
+                            <div class="resource-meta">
+                                <span>PDF • 2.4 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
                             </div>
                         </div>
-                        
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Topic</th>
-                                        <th>Author</th>
-                                        <th>Date</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Surviving the HEAT</td>
-                                        <td>Faith in Trials</td>
-                                        <td>Maj Gen (Dr) Ezra Jahadi Jakko (Rtd)</td>
-                                        <td>June 5, 2023</td>
-                                        <td><span class="badge bg-success">Published</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary edit-devotional" data-id="1"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger delete-devotional" data-id="1"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Peace in the Storm</td>
-                                        <td>Peace</td>
-                                        <td>Maj Gen (Dr) Ezra Jahadi Jakko (Rtd)</td>
-                                        <td>June 4, 2023</td>
-                                        <td><span class="badge bg-success">Published</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary edit-devotional" data-id="2"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger delete-devotional" data-id="2"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    </div>
+
+                    <div class="resource-card" data-category="teens">
+                        <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Bible Study" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Teens</span>
+                            <h3 class="resource-title">Social Media & Faith Guide</h3>
+                            <p class="resource-description">Biblical perspective on using social media wisely as a
+                                Christian teen.</p>
+                            <div class="resource-meta">
+                                <span>PDF • 1.7 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
+                            </div>
                         </div>
-                        <nav aria-label="Page navigation" class="mt-3">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Edit Devotional Page -->
-        <div class="page-content" id="edit-devotional-page">
-            <div class="container-fluid mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 id="devotional-form-title">Add New Devotional</h4>
-                    <button class="btn btn-outline-secondary" id="back-to-devotionals">
-                        <i class="fas fa-arrow-left"></i> Back to Devotionals
-                    </button>
+            <!-- Singles Resources -->
+            <div class="category-section" id="singles">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3 class="category-title">Resources for Singles</h3>
                 </div>
 
-                <div class="form-container">
-                    <form id="devotional-form">
-                        <input type="hidden" id="devotional-id" value="">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="form-group mb-3">
-                                    <label for="devotional-title">Title</label>
-                                    <input type="text" class="form-control" id="devotional-title" placeholder="Enter devotional title">
-                                </div>
+                <div class="resources-grid">
+                    <div class="resource-card" data-category="singles">
+                        <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Single Life" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Singles</span>
+                            <h3 class="resource-title">Thriving in Singleness</h3>
+                            <p class="resource-description">Biblical perspective on making the most of your single years
+                                for God's glory.</p>
+                            <div class="resource-meta">
+                                <span>PDF • 3.2 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group mb-3">
-                                    <label for="devotional-date">Date</label>
-                                    <input type="date" class="form-control" id="devotional-date">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="devotional-topic">Topic</label>
-                                    <input type="text" class="form-control" id="devotional-topic" placeholder="Enter topic">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="devotional-verse">Bible Verse</label>
-                                    <input type="text" class="form-control" id="devotional-verse" placeholder="Enter Bible verse reference">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="devotional-author">Author</label>
-                            <select class="form-select" id="devotional-author">
-                                <option>Maj Gen (Dr) Ezra Jahadi Jakko (Rtd)</option>
-                                <option>Pastor John Smith</option>
-                                <option>Rev. Sarah Johnson</option>
-                                <option>Other</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="devotional-content">Content</label>
-                            <textarea class="form-control" id="devotional-content" rows="10" placeholder="Enter devotional content"></textarea>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label>Cover Image</label>
-                            <div class="cover-preview" id="cover-image-preview-container">
-                                <img id="cover-image-preview" src="" alt="Cover Preview">
-                                <div class="placeholder" id="cover-placeholder">
-                                    <i class="fas fa-image fa-3x mb-2"></i>
-                                    <p>No cover image selected</p>
-                                </div>
-                            </div>
-                            <input type="file" class="form-control" id="cover-image-upload" accept="image/*">
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="devotional-status">Status</label>
-                            <select class="form-select" id="devotional-status">
-                                <option value="draft">Draft</option>
-                                <option value="published">Published</option>
-                                <option value="archived">Archived</option>
-                            </select>
-                        </div>
-                        
-                        <div class="d-flex justify-content-end gap-2">
-                            <button type="button" class="btn btn-outline-secondary">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save Devotional</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Past Devotionals Page -->
-        <div class="page-content" id="past-devotionals-page">
-            <div class="container-fluid mt-4">
-                <h4 class="mb-4">Past Devotionals</h4>
-                
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <span>Archived Devotionals</span>
-                        <div class="input-group" style="width: 300px;">
-                            <input type="text" class="form-control" placeholder="Search devotionals...">
-                            <button class="btn btn-outline-secondary" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="past-year-filter">Year</label>
-                                    <select id="past-year-filter" class="form-control">
-                                        <option value="">All Years</option>
-                                        <option>2023</option>
-                                        <option>2022</option>
-                                        <option>2021</option>
-                                        <option>2020</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="past-month-filter">Month</label>
-                                    <select id="past-month-filter" class="form-control">
-                                        <option value="">All Months</option>
-                                        <option>January</option>
-                                        <option>February</option>
-                                        <option>March</option>
-                                        <option>April</option>
-                                        <option>May</option>
-                                        <option>June</option>
-                                        <option>July</option>
-                                        <option>August</option>
-                                        <option>September</option>
-                                        <option>October</option>
-                                        <option>November</option>
-                                        <option>December</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="past-author-filter">Author</label>
-                                    <select id="past-author-filter" class="form-control">
-                                        <option value="">All Authors</option>
-                                        <option>Maj Gen (Dr) Ezra Jahadi Jakko (Rtd)</option>
-                                        <option>Pastor John Smith</option>
-                                        <option>Rev. Sarah Johnson</option>
-                                    </select>
-                                </div>
+
+                    <div class="resource-card" data-category="singles">
+                        <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Prayer" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Singles</span>
+                            <h3 class="resource-title">Prayer Guide for Singles</h3>
+                            <p class="resource-description">30-day prayer guide covering specific needs and challenges
+                                faced by singles.</p>
+                            <div class="resource-meta">
+                                <span>PDF • 1.8 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
                             </div>
                         </div>
-                        
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Topic</th>
-                                        <th>Author</th>
-                                        <th>Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Walking in Faith</td>
-                                        <td>Faith</td>
-                                        <td>Pastor John Smith</td>
-                                        <td>June 3, 2023</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> View</button>
-                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-redo"></i> Restore</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>The Power of Prayer</td>
-                                        <td>Prayer</td>
-                                        <td>Rev. Sarah Johnson</td>
-                                        <td>May 28, 2023</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> View</button>
-                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-redo"></i> Restore</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    </div>
+
+                    <div class="resource-card" data-category="singles">
+                        <img src="https://images.unsplash.com/photo-1549060279-7e168fcee0c2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Bible Study" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Singles</span>
+                            <h3 class="resource-title">Dating with Purpose</h3>
+                            <p class="resource-description">Biblical principles for Christian dating and relationships.
+                            </p>
+                            <div class="resource-meta">
+                                <span>PDF • 2.1 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
+                            </div>
                         </div>
-                        <nav aria-label="Page navigation" class="mt-3">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Family Resources Page -->
-        <div class="page-content" id="family-resources-page">
-            <div class="container-fluid mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4>Family Resources</h4>
-                    <button class="btn btn-primary" id="add-resource-btn">
-                        <i class="fas fa-plus"></i> Add Resource
-                    </button>
+            <!-- Married Resources -->
+            <div class="category-section" id="married">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-ring"></i>
+                    </div>
+                    <h3 class="category-title">Resources for Married Couples</h3>
                 </div>
 
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <span>All Resources</span>
-                        <div class="input-group" style="width: 300px;">
-                            <input type="text" class="form-control" placeholder="Search resources...">
-                            <button class="btn btn-outline-secondary" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
+                <div class="resources-grid">
+                    <div class="resource-card" data-category="married">
+                        <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Couple Praying" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Married</span>
+                            <h3 class="resource-title">Praying Together Guide</h3>
+                            <p class="resource-description">Practical guide to help couples establish and maintain a
+                                prayer life together.</p>
+                            <div class="resource-meta">
+                                <span>PDF • 1.8 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="resource-category-filter">Category</label>
-                                    <select id="resource-category-filter" class="form-control">
-                                        <option value="">All Categories</option>
-                                        <option>Parenting</option>
-                                        <option>Marriage</option>
-                                        <option>Devotional</option>
-                                        <option>Study Guide</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="resource-type-filter">Type</label>
-                                    <select id="resource-type-filter" class="form-control">
-                                        <option value="">All Types</option>
-                                        <option>PDF</option>
-                                        <option>Video</option>
-                                        <option>Audio</option>
-                                        <option>Link</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="resource-date-filter">Date Added</label>
-                                    <select id="resource-date-filter" class="form-control">
-                                        <option value="">All Time</option>
-                                        <option>Last 7 Days</option>
-                                        <option>Last 30 Days</option>
-                                        <option>Last 90 Days</option>
-                                    </select>
-                                </div>
+
+                    <div class="resource-card" data-category="married">
+                        <img src="https://images.unsplash.com/photo-1529257414772-1960b7bea4eb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Marriage" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Married</span>
+                            <h3 class="resource-title">Biblical Marriage Principles</h3>
+                            <p class="resource-description">Foundational biblical teachings on marriage roles,
+                                communication, and conflict resolution.</p>
+                            <div class="resource-meta">
+                                <span>PDF • 2.5 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
                             </div>
                         </div>
-                        
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Category</th>
-                                        <th>Type</th>
-                                        <th>Date Added</th>
-                                        <th>Downloads</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Parenting Guide</td>
-                                        <td>Parenting</td>
-                                        <td>PDF</td>
-                                        <td>June 10, 2023</td>
-                                        <td>124</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Marriage Workshop</td>
-                                        <td>Marriage</td>
-                                        <td>Video</td>
-                                        <td>June 5, 2023</td>
-                                        <td>87</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    </div>
+
+                    <div class="resource-card" data-category="married">
+                        <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Date Night" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Married</span>
+                            <h3 class="resource-title">52 Date Night Ideas</h3>
+                            <p class="resource-description">Creative, budget-friendly date ideas to keep your marriage
+                                strong throughout the year.</p>
+                            <div class="resource-meta">
+                                <span>PDF • 1.3 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
+                            </div>
                         </div>
-                        <nav aria-label="Page navigation" class="mt-3">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Prayer Requests Page -->
-        <div class="page-content" id="prayer-requests-page">
-            <div class="container-fluid mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4>Prayer Requests</h4>
-                    <button class="btn btn-primary" id="add-prayer-request-btn">
-                        <i class="fas fa-plus"></i> Add New Request
-                    </button>
-                </div>
-
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <span>All Prayer Requests</span>
-                        <div class="input-group" style="width: 300px;">
-                            <input type="text" class="form-control" placeholder="Search prayer requests...">
-                            <button class="btn btn-outline-secondary" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
+            <!-- Parents Resources -->
+            <div class="category-section" id="parents">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-users"></i>
                     </div>
-                    <div class="card-body">
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="prayer-status-filter">Status</label>
-                                    <select id="prayer-status-filter" class="form-control">
-                                        <option value="">All Statuses</option>
-                                        <option>Pending</option>
-                                        <option>In Progress</option>
-                                        <option>Answered</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="prayer-date-filter">Date Range</label>
-                                    <select id="prayer-date-filter" class="form-control">
-                                        <option value="">All Time</option>
-                                        <option>Last 7 Days</option>
-                                        <option>Last 30 Days</option>
-                                        <option>Last 90 Days</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="prayer-category-filter">Category</label>
-                                    <select id="prayer-category-filter" class="form-control">
-                                        <option value="">All Categories</option>
-                                        <option>Healing</option>
-                                        <option>Family</option>
-                                        <option>Financial</option>
-                                        <option>Spiritual</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Name</th>
-                                        <th>Request</th>
-                                        <th>Category</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>June 10, 2023</td>
-                                        <td>John Doe</td>
-                                        <td>Pray for healing from illness</td>
-                                        <td>Healing</td>
-                                        <td><span class="badge bg-warning">Pending</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary view-prayer" data-id="1"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-success update-prayer-status" data-id="1"><i class="fas fa-check"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger delete-prayer" data-id="1"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>June 8, 2023</td>
-                                        <td>Jane Smith</td>
-                                        <td>Pray for family reconciliation</td>
-                                        <td>Family</td>
-                                        <td><span class="badge bg-success">Answered</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary view-prayer" data-id="2"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-success update-prayer-status" data-id="2"><i class="fas fa-check"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger delete-prayer" data-id="2"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <nav aria-label="Page navigation" class="mt-3">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Add/Edit Prayer Request Form -->
-        <div class="page-content" id="edit-prayer-page">
-            <div class="container-fluid mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 id="prayer-form-title">Add New Prayer Request</h4>
-                    <button class="btn btn-outline-secondary" id="back-to-prayers">
-                        <i class="fas fa-arrow-left"></i> Back to Requests
-                    </button>
+                    <h3 class="category-title">Parenting Resources</h3>
                 </div>
 
-                <div class="form-container">
-                    <form id="prayer-form">
-                        <input type="hidden" id="prayer-id" value="">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="prayer-name">Name</label>
-                                    <input type="text" class="form-control" id="prayer-name" placeholder="Enter name">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="prayer-email">Email</label>
-                                    <input type="email" class="form-control" id="prayer-email" placeholder="Enter email">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="prayer-phone">Phone</label>
-                                    <input type="tel" class="form-control" id="prayer-phone" placeholder="Enter phone number">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="prayer-category">Category</label>
-                                    <select class="form-select" id="prayer-category">
-                                        <option>Healing</option>
-                                        <option>Family</option>
-                                        <option>Financial</option>
-                                        <option>Spiritual</option>
-                                        <option>Other</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="prayer-request">Prayer Request</label>
-                            <textarea class="form-control" id="prayer-request" rows="6" placeholder="Enter the prayer request details"></textarea>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="prayer-status">Status</label>
-                            <select class="form-select" id="prayer-status">
-                                <option value="pending">Pending</option>
-                                <option value="in-progress">In Progress</option>
-                                <option value="answered">Answered</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="prayer-notes">Admin Notes</label>
-                            <textarea class="form-control" id="prayer-notes" rows="3" placeholder="Enter any admin notes"></textarea>
-                        </div>
-                        
-                        <div class="d-flex justify-content-end gap-2">
-                            <button type="button" class="btn btn-outline-secondary">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save Request</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Testimonies Page -->
-        <div class="page-content" id="testimonies-page">
-            <div class="container-fluid mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4>Testimonies</h4>
-                    <div class="btn-group">
-                        <button class="btn btn-primary" id="add-testimony-btn">
-                            <i class="fas fa-plus"></i> Add Testimony
-                        </button>
-                        <button class="btn btn-outline-secondary" id="export-testimonies-btn">
-                            <i class="fas fa-download"></i> Export
-                        </button>
-                    </div>
-                </div>
-
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <span>All Testimonies</span>
-                        <div class="input-group" style="width: 300px;">
-                            <input type="text" class="form-control" placeholder="Search testimonies...">
-                            <button class="btn btn-outline-secondary" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="testimony-status-filter">Status</label>
-                                    <select id="testimony-status-filter" class="form-control">
-                                        <option value="">All Statuses</option>
-                                        <option>Pending</option>
-                                        <option>Approved</option>
-                                        <option>Rejected</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="testimony-date-filter">Date Range</label>
-                                    <select id="testimony-date-filter" class="form-control">
-                                        <option value="">All Time</option>
-                                        <option>Last 7 Days</option>
-                                        <option>Last 30 Days</option>
-                                        <option>Last 90 Days</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="testimony-category-filter">Category</label>
-                                    <select id="testimony-category-filter" class="form-control">
-                                        <option value="">All Categories</option>
-                                        <option>Healing</option>
-                                        <option>Provision</option>
-                                        <option>Deliverance</option>
-                                        <option>Other</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Name</th>
-                                        <th>Testimony</th>
-                                        <th>Category</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>June 12, 2023</td>
-                                        <td>Michael Brown</td>
-                                        <td>God healed me from a chronic condition...</td>
-                                        <td>Healing</td>
-                                        <td><span class="badge bg-success">Approved</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary view-testimony" data-id="1"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-warning edit-testimony" data-id="1"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger delete-testimony" data-id="1"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>June 9, 2023</td>
-                                        <td>Sarah Johnson</td>
-                                        <td>God provided miraculously during financial crisis...</td>
-                                        <td>Provision</td>
-                                        <td><span class="badge bg-warning">Pending</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary view-testimony" data-id="2"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-warning edit-testimony" data-id="2"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger delete-testimony" data-id="2"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <nav aria-label="Page navigation" class="mt-3">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Add/Edit Testimony Form -->
-        <div class="page-content" id="edit-testimony-page">
-            <div class="container-fluid mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 id="testimony-form-title">Add New Testimony</h4>
-                    <button class="btn btn-outline-secondary" id="back-to-testimonies">
-                        <i class="fas fa-arrow-left"></i> Back to Testimonies
-                    </button>
-                </div>
-
-                <div class="form-container">
-                    <form id="testimony-form">
-                        <input type="hidden" id="testimony-id" value="">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="testimony-name">Name</label>
-                                    <input type="text" class="form-control" id="testimony-name" placeholder="Enter name">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="testimony-email">Email</label>
-                                    <input type="email" class="form-control" id="testimony-email" placeholder="Enter email">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="testimony-location">Location</label>
-                                    <input type="text" class="form-control" id="testimony-location" placeholder="Enter location (optional)">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="testimony-category">Category</label>
-                                    <select class="form-select" id="testimony-category">
-                                        <option>Healing</option>
-                                        <option>Provision</option>
-                                        <option>Deliverance</option>
-                                        <option>Other</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="testimony-title">Title</label>
-                            <input type="text" class="form-control" id="testimony-title" placeholder="Enter testimony title">
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="testimony-content">Testimony Content</label>
-                            <textarea class="form-control" id="testimony-content" rows="8" placeholder="Share your testimony..."></textarea>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="testimony-status">Status</label>
-                            <select class="form-select" id="testimony-status">
-                                <option value="pending">Pending</option>
-                                <option value="approved">Approved</option>
-                                <option value="rejected">Rejected</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="testimony-notes">Admin Notes</label>
-                            <textarea class="form-control" id="testimony-notes" rows="3" placeholder="Enter any admin notes"></textarea>
-                        </div>
-                        
-                        <div class="d-flex justify-content-end gap-2">
-                            <button type="button" class="btn btn-outline-secondary">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save Testimony</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Subscribers Page -->
-        <div class="page-content" id="subscribers-page">
-            <div class="container-fluid mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4>Subscribers</h4>
-                    <div class="btn-group">
-                        <button class="btn btn-primary" id="add-subscriber-btn">
-                            <i class="fas fa-plus"></i> Add Subscriber
-                        </button>
-                        <button class="btn btn-outline-secondary" id="export-subscribers-btn">
-                            <i class="fas fa-download"></i> Export
-                        </button>
-                    </div>
-                </div>
-
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <span>All Subscribers</span>
-                        <div class="input-group" style="width: 300px;">
-                            <input type="text" class="form-control" placeholder="Search subscribers...">
-                            <button class="btn btn-outline-secondary" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="subscriber-status-filter">Status</label>
-                                    <select id="subscriber-status-filter" class="form-control">
-                                        <option value="">All Statuses</option>
-                                        <option>Active</option>
-                                        <option>Inactive</option>
-                                        <option>Unsubscribed</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="subscriber-type-filter">Type</label>
-                                    <select id="subscriber-type-filter" class="form-control">
-                                        <option value="">All Types</option>
-                                        <option>Email</option>
-                                        <option>SMS</option>
-                                        <option>Both</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="subscriber-date-filter">Date Joined</label>
-                                    <select id="subscriber-date-filter" class="form-control">
-                                        <option value="">All Time</option>
-                                        <option>Last 7 Days</option>
-                                        <option>Last 30 Days</option>
-                                        <option>Last 90 Days</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Phone</th>
-                                        <th>Type</th>
-                                        <th>Date Joined</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>David Wilson</td>
-                                        <td>david@example.com</td>
-                                        <td>+1234567890</td>
-                                        <td>Email</td>
-                                        <td>June 10, 2023</td>
-                                        <td><span class="badge bg-success">Active</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary view-subscriber" data-id="1"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-warning edit-subscriber" data-id="1"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger delete-subscriber" data-id="1"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Emily Davis</td>
-                                        <td>emily@example.com</td>
-                                        <td>+1987654321</td>
-                                        <td>Both</td>
-                                        <td>June 5, 2023</td>
-                                        <td><span class="badge bg-success">Active</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary view-subscriber" data-id="2"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-warning edit-subscriber" data-id="2"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger delete-subscriber" data-id="2"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <nav aria-label="Page navigation" class="mt-3">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Add/Edit Subscriber Form -->
-        <div class="page-content" id="edit-subscriber-page">
-            <div class="container-fluid mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 id="subscriber-form-title">Add New Subscriber</h4>
-                    <button class="btn btn-outline-secondary" id="back-to-subscribers">
-                        <i class="fas fa-arrow-left"></i> Back to Subscribers
-                    </button>
-                </div>
-
-                <div class="form-container">
-                    <form id="subscriber-form">
-                        <input type="hidden" id="subscriber-id" value="">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="subscriber-name">Name</label>
-                                    <input type="text" class="form-control" id="subscriber-name" placeholder="Enter name">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="subscriber-email">Email</label>
-                                    <input type="email" class="form-control" id="subscriber-email" placeholder="Enter email">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="subscriber-phone">Phone</label>
-                                    <input type="tel" class="form-control" id="subscriber-phone" placeholder="Enter phone number">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="subscriber-type">Subscription Type</label>
-                                    <select class="form-select" id="subscriber-type">
-                                        <option>Email</option>
-                                        <option>SMS</option>
-                                        <option>Both</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="subscriber-join-date">Join Date</label>
-                                    <input type="date" class="form-control" id="subscriber-join-date">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="subscriber-status">Status</label>
-                                    <select class="form-select" id="subscriber-status">
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
-                                        <option value="unsubscribed">Unsubscribed</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="subscriber-notes">Notes</label>
-                            <textarea class="form-control" id="subscriber-notes" rows="3" placeholder="Enter any notes about this subscriber"></textarea>
-                        </div>
-                        
-                        <div class="d-flex justify-content-end gap-2">
-                            <button type="button" class="btn btn-outline-secondary">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save Subscriber</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Settings Page -->
-        <div class="page-content" id="settings-page">
-            <div class="container-fluid mt-4">
-                <h4 class="mb-4">Settings</h4>
-                
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="dashboard-card">
-                            <div class="card-header">
-                                <span>General Settings</span>
-                            </div>
-                            <div class="card-body">
-                                <form id="general-settings-form">
-                                    <div class="form-group mb-3">
-                                        <label for="site-name">Site Name</label>
-                                        <input type="text" class="form-control" id="site-name" value="The Anchor Devotional">
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="site-description">Site Description</label>
-                                        <textarea class="form-control" id="site-description" rows="3">Daily devotionals for spiritual growth</textarea>
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="timezone">Timezone</label>
-                                        <select class="form-select" id="timezone">
-                                            <option>UTC</option>
-                                            <option selected>Africa/Lagos</option>
-                                            <option>America/New_York</option>
-                                            <option>Europe/London</option>
-                                        </select>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Save Settings</button>
-                                </form>
+                <div class="resources-grid">
+                    <div class="resource-card" data-category="parents">
+                        <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Parent and Child" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Parents</span>
+                            <h3 class="resource-title">Raising Godly Children</h3>
+                            <p class="resource-description">Biblical principles for parenting at different stages of
+                                childhood and adolescence.</p>
+                            <div class="resource-meta">
+                                <span>PDF • 3.2 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="col-md-4">
-                        <div class="dashboard-card">
-                            <div class="card-header">
-                                <span>Email Settings</span>
-                            </div>
-                            <div class="card-body">
-                                <form id="email-settings-form">
-                                    <div class="form-group mb-3">
-                                        <label for="smtp-host">SMTP Host</label>
-                                        <input type="text" class="form-control" id="smtp-host" value="smtp.example.com">
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="smtp-port">SMTP Port</label>
-                                        <input type="number" class="form-control" id="smtp-port" value="587">
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="smtp-username">SMTP Username</label>
-                                        <input type="text" class="form-control" id="smtp-username" value="admin@example.com">
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="smtp-password">SMTP Password</label>
-                                        <input type="password" class="form-control" id="smtp-password" placeholder="Enter password">
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Save Settings</button>
-                                </form>
+
+                    <div class="resource-card" data-category="parents">
+                        <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Family Devotional" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Parents</span>
+                            <h3 class="resource-title">Family Devotional Guide</h3>
+                            <p class="resource-description">Practical guide to establishing regular family devotions
+                                with children of all ages.</p>
+                            <div class="resource-meta">
+                                <span>PDF • 2.7 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="col-md-4">
-                        <div class="dashboard-card">
-                            <div class="card-header">
-                                <span>System Information</span>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <strong>Version:</strong> 1.0.0
-                                </div>
-                                <div class="mb-3">
-                                    <strong>Last Updated:</strong> June 15, 2023
-                                </div>
-                                <div class="mb-3">
-                                    <strong>Server:</strong> Apache/2.4.41
-                                </div>
-                                <div class="mb-3">
-                                    <strong>PHP Version:</strong> 8.1.2
-                                </div>
-                                <div class="mb-3">
-                                    <strong>Database:</strong> MySQL 8.0
-                                </div>
-                                <button class="btn btn-outline-secondary mt-2">Check for Updates</button>
+
+                    <div class="resource-card" data-category="parents">
+                        <img src="https://images.unsplash.com/photo-1549060279-7e168fcee0c2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                            alt="Family Bible Study" class="resource-image">
+                        <div class="resource-content">
+                            <span class="resource-category">Parents</span>
+                            <h3 class="resource-title">30-Day Family Devotional</h3>
+                            <p class="resource-description">A month of daily devotionals designed for families with
+                                children of all ages.</p>
+                            <div class="resource-meta">
+                                <span>PDF • 2.4 MB</span>
+                                <a href="#" class="download-btn"><i class="fas fa-download"></i> Download</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- View Testimony Modal -->
-        <div class="modal fade" id="viewTestimonyModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="testimonyModalTitle">Testimony Details</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <p><strong>Name:</strong> <span id="testimony-view-name"></span></p>
-                                <p><strong>Email:</strong> <span id="testimony-view-email"></span></p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><strong>Date:</strong> <span id="testimony-view-date"></span></p>
-                                <p><strong>Category:</strong> <span id="testimony-view-category"></span></p>
-                            </div>
-                        </div>
-                        <h5 class="mb-2" id="testimony-view-title"></h5>
-                        <div class="testimony-content mb-3" id="testimony-view-content"></div>
-                        <div class="card">
-                            <div class="card-header bg-light">
-                                <strong>Admin Notes</strong>
-                            </div>
-                            <div class="card-body">
-                                <p id="testimony-view-notes">No notes available.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <!-- Subscribe Section -->
+    <section class="subscribe" id="subscribe">
+        <div class="container">
+            <h2 class="section-title" style="color: white;">Stay Connected</h2>
+            <p
+                style="text-align: center; margin-bottom: 30px; max-width: 700px; margin-left: auto; margin-right: auto;">
+                Receive updates when new family resources are added. Join our community growing together in faith.
+            </p>
+            <form class="subscribe-form" id="subscribeForm">
+                <input type="email" class="subscribe-input" placeholder="Your email address" required>
+                <button type="submit" class="subscribe-btn">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>The Anchor</h3>
+                    <p>A daily devotional ministry committed to helping believers anchor their faith in God's Word
+                        through daily spiritual nourishment.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- View Prayer Request Modal -->
-        <div class="modal fade" id="viewPrayerModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="prayerModalTitle">Prayer Request Details</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <p><strong>Name:</strong> <span id="prayer-view-name"></span></p>
-                                <p><strong>Email:</strong> <span id="prayer-view-email"></span></p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><strong>Date:</strong> <span id="prayer-view-date"></span></p>
-                                <p><strong>Category:</strong> <span id="prayer-view-category"></span></p>
-                            </div>
-                        </div>
-                        <h5 class="mb-2">Prayer Request</h5>
-                        <div class="prayer-content mb-3" id="prayer-view-content"></div>
-                        <div class="card">
-                            <div class="card-header bg-light">
-                                <strong>Admin Notes</strong>
-                            </div>
-                            <div class="card-body">
-                                <p id="prayer-view-notes">No notes available.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="update-prayer-status-btn">Update Status</button>
-                    </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.php">Home</a></li>
+                        <li><a href="todays-devotion.php">Today's Devotion</a></li>
+                        <li><a href="family.php">Family Resources</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> Gospel Believers Mission HQ, Abuja, Nigeria</li>
+                        <li><i class="fas fa-phone"></i> +234 812 345 6789</li>
+                        <li><i class="fas fa-envelope"></i> info@theanchor.com</li>
+                    </ul>
                 </div>
             </div>
-        </div>
-
-        <!-- View Subscriber Modal -->
-        <div class="modal fade" id="viewSubscriberModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="subscriberModalTitle">Subscriber Details</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <p><strong>Name:</strong> <span id="subscriber-view-name"></span></p>
-                                <p><strong>Email:</strong> <span id="subscriber-view-email"></span></p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><strong>Phone:</strong> <span id="subscriber-view-phone"></span></p>
-                                <p><strong>Join Date:</strong> <span id="subscriber-view-join-date"></span></p>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <p><strong>Subscription Type:</strong> <span id="subscriber-view-type"></span></p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><strong>Status:</strong> <span id="subscriber-view-status" class="badge"></span></p>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header bg-light">
-                                <strong>Notes</strong>
-                            </div>
-                            <div class="card-body">
-                                <p id="subscriber-view-notes">No notes available.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
+            <div class="copyright">
+                <p>&copy; 2023 The Anchor Devotional. All Rights Reserved.</p>
             </div>
         </div>
+    </footer>
 
-        <!-- Delete Confirmation Modal -->
-        <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Confirm Deletion</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Are you sure you want to delete this item? This action cannot be undone.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" id="confirm-delete">Delete</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Data storage (in a real app, this would be API calls to a backend)
-        const prayerRequests = [
-            {
-                id: 1,
-                name: "John Doe",
-                email: "john@example.com",
-                phone: "+1234567890",
-                category: "Healing",
-                request: "Pray for healing from illness. I've been struggling with a chronic condition for several months and believe God can heal me.",
-                status: "pending",
-                date: "2023-06-10",
-                notes: "Follow up in 2 weeks"
-            },
-            {
-                id: 2,
-                name: "Jane Smith",
-                email: "jane@example.com",
-                phone: "+1987654321",
-                category: "Family",
-                request: "Pray for family reconciliation. There's been a rift between me and my siblings that needs healing.",
-                status: "answered",
-                date: "2023-06-08",
-                notes: "Reported reconciliation last week"
-            }
-        ];
-
-        const testimonies = [
-            {
-                id: 1,
-                name: "Michael Brown",
-                email: "michael@example.com",
-                location: "New York",
-                category: "Healing",
-                title: "God healed me from a chronic condition",
-                content: "For years I suffered from a chronic condition that doctors said was incurable. After months of prayer and faith, God completely healed me during a worship service. The doctors confirmed there's no trace of the condition anymore!",
-                status: "approved",
-                date: "2023-06-12",
-                notes: "Powerful testimony of healing"
-            },
-            {
-                id: 2,
-                name: "Sarah Johnson",
-                email: "sarah@example.com",
-                location: "Chicago",
-                category: "Provision",
-                title: "God provided miraculously during financial crisis",
-                content: "When I lost my job unexpectedly, I didn't know how I would pay my bills. I committed to trusting God and within a week, I received three job offers and an unexpected financial gift that covered all my needs.",
-                status: "pending",
-                date: "2023-06-09",
-                notes: "Needs review before publishing"
-            }
-        ];
-
-        const subscribers = [
-            {
-                id: 1,
-                name: "David Wilson",
-                email: "david@example.com",
-                phone: "+1234567890",
-                type: "Email",
-                joinDate: "2023-06-10",
-                status: "active",
-                notes: "Interested in daily devotionals"
-            },
-            {
-                id: 2,
-                name: "Emily Davis",
-                email: "emily@example.com",
-                phone: "+1987654321",
-                type: "Both",
-                joinDate: "2023-06-05",
-                status: "active",
-                notes: "Prefers morning notifications"
-            }
-        ];
-
-        // Global variables
-        let currentItemId = null;
-        let currentItemType = null;
-        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        const viewTestimonyModal = new bootstrap.Modal(document.getElementById('viewTestimonyModal'));
-        const viewPrayerModal = new bootstrap.Modal(document.getElementById('viewPrayerModal'));
-        const viewSubscriberModal = new bootstrap.Modal(document.getElementById('viewSubscriberModal'));
-
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            // Toggle sidebar on mobile
-            document.getElementById('sidebarToggle').addEventListener('click', function() {
-                document.getElementById('sidebar').classList.toggle('active');
-                document.getElementById('main-content').classList.toggle('active');
-            });
-
-            // Initialize page navigation
-            setupPageNavigation();
-            
-            // Initialize devotional functionality
-            setupDevotionalFunctionality();
-            
-            // Initialize prayer request functionality
-            setupPrayerRequestFunctionality();
-            
-            // Initialize testimony functionality
-            setupTestimonyFunctionality();
-            
-            // Initialize subscriber functionality
-            setupSubscriberFunctionality();
-            
-            // Initialize delete confirmation
-            setupDeleteConfirmation();
+        // Initialize AOS animations
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
         });
 
-        // Page navigation setup
-        function setupPageNavigation() {
-            document.querySelectorAll('.sidebar-menu a').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Remove active class from all links
-                    document.querySelectorAll('.sidebar-menu a').forEach(item => {
-                        item.classList.remove('active');
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            mobileMenuBtn.innerHTML = mobileMenu.classList.contains('active') ?
+                '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+        });
+
+        // Form submission
+        document.getElementById('subscribeForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            alert('Thank you for subscribing to family resources updates!');
+            this.reset();
+        });
+
+        // Category filtering
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        const categorySections = document.querySelectorAll('.category-section');
+
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Update active tab
+                categoryTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const category = tab.dataset.category;
+
+                // Show/hide sections
+                if (category === 'all') {
+                    categorySections.forEach(section => {
+                        section.style.display = 'block';
                     });
-                    
-                    // Add active class to clicked link
-                    this.classList.add('active');
-                    
-                    // Hide all pages
-                    document.querySelectorAll('.page-content').forEach(page => {
-                        page.classList.remove('active');
+                } else {
+                    categorySections.forEach(section => {
+                        section.style.display = 'none';
                     });
-                    
-                    // Show selected page
-                    const pageId = this.getAttribute('data-page') + '-page';
-                    document.getElementById(pageId).classList.add('active');
-                });
-            });
-        }
+                    document.getElementById(category).style.display = 'block';
+                }
 
-        // Devotional functionality
-        function setupDevotionalFunctionality() {
-            // Add devotional button
-            document.getElementById('add-devotional-btn').addEventListener('click', function(e) {
-                e.preventDefault();
-                showDevotionalForm();
-            });
-
-            // New devotional button
-            document.getElementById('new-devotional-btn').addEventListener('click', function(e) {
-                e.preventDefault();
-                showDevotionalForm();
-            });
-
-            // Back to devotionals
-            document.getElementById('back-to-devotionals').addEventListener('click', function(e) {
-                e.preventDefault();
-                hideDevotionalForm();
-            });
-
-            // Cover image preview
-            document.getElementById('cover-image-upload').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const preview = document.getElementById('cover-image-preview');
-                        const placeholder = document.getElementById('cover-placeholder');
-                        
-                        preview.src = event.target.result;
-                        preview.style.display = 'block';
-                        placeholder.style.display = 'none';
-                    };
-                    reader.readAsDataURL(file);
+                // Scroll to section
+                if (category !== 'all') {
+                    document.getElementById(category).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                } else {
+                    window.scrollTo({
+                        top: document.getElementById('resources').offsetTop - 100,
+                        behavior: 'smooth'
+                    });
                 }
             });
+        });
 
-            // Edit devotional buttons
-            document.querySelectorAll('.edit-devotional').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const devotionalId = this.getAttribute('data-id');
-                    const devotionalData = getDevotionalById(devotionalId);
-                    
-                    if (devotionalData) {
-                        document.getElementById('devotional-id').value = devotionalId;
-                        document.getElementById('devotional-title').value = devotionalData.title;
-                        document.getElementById('devotional-topic').value = devotionalData.topic;
-                        document.getElementById('devotional-verse').value = devotionalData.verse;
-                        document.getElementById('devotional-date').value = devotionalData.date;
-                        document.getElementById('devotional-content').value = devotionalData.content;
-                        document.getElementById('devotional-status').value = devotionalData.status;
-                        
-                        // Set author
-                        const authorSelect = document.getElementById('devotional-author');
-                        for (let i = 0; i < authorSelect.options.length; i++) {
-                            if (authorSelect.options[i].text === devotionalData.author) {
-                                authorSelect.selectedIndex = i;
-                                break;
-                            }
-                        }
-                        
-                        // Set cover image preview
-                        const preview = document.getElementById('cover-image-preview');
-                        const placeholder = document.getElementById('cover-placeholder');
-                        if (devotionalData.coverImage) {
-                            preview.src = devotionalData.coverImage;
-                            preview.style.display = 'block';
-                            placeholder.style.display = 'none';
-                        } else {
-                            preview.style.display = 'none';
-                            placeholder.style.display = 'block';
-                        }
-                        
-                        document.getElementById('devotional-form-title').textContent = 'Edit Devotional';
-                        showDevotionalForm();
-                    }
-                });
-            });
+        // Simple search functionality
+        const searchInput = document.querySelector('.search-input');
+        const resourceCards = document.querySelectorAll('.resource-card');
 
-            // Form submission
-            document.getElementById('devotional-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const isNew = document.getElementById('devotional-id').value === '';
-                const action = isNew ? 'added' : 'updated';
-                
-                alert(`Devotional ${action} successfully!`);
-                hideDevotionalForm();
-            });
-        }
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
 
-        function showDevotionalForm() {
-            document.getElementById('devotionals-page').classList.remove('active');
-            document.getElementById('edit-devotional-page').classList.add('active');
-            document.getElementById('devotional-form-title').textContent = 
-                document.getElementById('devotional-id').value ? 'Edit Devotional' : 'Add New Devotional';
-        }
+            resourceCards.forEach(card => {
+                const title = card.querySelector('.resource-title').textContent.toLowerCase();
+                const description = card.querySelector('.resource-description').textContent.toLowerCase();
 
-        function hideDevotionalForm() {
-            document.getElementById('edit-devotional-page').classList.remove('active');
-            document.getElementById('devotionals-page').classList.add('active');
-        }
-
-        // Prayer request functionality
-        function setupPrayerRequestFunctionality() {
-            // Add prayer request button
-            document.getElementById('add-prayer-request-btn').addEventListener('click', function(e) {
-                e.preventDefault();
-                showPrayerForm();
-            });
-
-            // Back to prayer requests
-            document.getElementById('back-to-prayers').addEventListener('click', function(e) {
-                e.preventDefault();
-                hidePrayerForm();
-            });
-
-            // View prayer request buttons
-            document.querySelectorAll('.view-prayer').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const prayerId = this.getAttribute('data-id');
-                    viewPrayerRequest(prayerId);
-                });
-            });
-
-            // Update prayer status buttons
-            document.querySelectorAll('.update-prayer-status').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const prayerId = this.getAttribute('data-id');
-                    editPrayerRequest(prayerId);
-                });
-            });
-
-            // Edit prayer request buttons
-            document.querySelectorAll('.edit-prayer').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const prayerId = this.getAttribute('data-id');
-                    editPrayerRequest(prayerId);
-                });
-            });
-
-            // Form submission
-            document.getElementById('prayer-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const isNew = document.getElementById('prayer-id').value === '';
-                const action = isNew ? 'added' : 'updated';
-                
-                alert(`Prayer request ${action} successfully!`);
-                hidePrayerForm();
-            });
-
-            // Update prayer status button in modal
-            document.getElementById('update-prayer-status-btn').addEventListener('click', function() {
-                viewPrayerModal.hide();
-                editPrayerRequest(currentItemId);
-            });
-        }
-
-        function showPrayerForm() {
-            resetPrayerForm();
-            document.getElementById('prayer-requests-page').classList.remove('active');
-            document.getElementById('edit-prayer-page').classList.add('active');
-            document.getElementById('prayer-form-title').textContent = 'Add New Prayer Request';
-        }
-
-        function hidePrayerForm() {
-            document.getElementById('edit-prayer-page').classList.remove('active');
-            document.getElementById('prayer-requests-page').classList.add('active');
-        }
-
-        function resetPrayerForm() {
-            document.getElementById('prayer-form').reset();
-            document.getElementById('prayer-id').value = '';
-        }
-
-        function viewPrayerRequest(id) {
-            const prayer = prayerRequests.find(p => p.id == id);
-            if (prayer) {
-                document.getElementById('prayerModalTitle').textContent = `Prayer Request from ${prayer.name}`;
-                document.getElementById('prayer-view-name').textContent = prayer.name;
-                document.getElementById('prayer-view-email').textContent = prayer.email;
-                document.getElementById('prayer-view-date').textContent = new Date(prayer.date).toLocaleDateString();
-                document.getElementById('prayer-view-category').textContent = prayer.category;
-                document.getElementById('prayer-view-content').textContent = prayer.request;
-                document.getElementById('prayer-view-notes').textContent = prayer.notes || 'No notes available.';
-                
-                currentItemId = id;
-                currentItemType = 'prayer';
-                viewPrayerModal.show();
-            }
-        }
-
-        function editPrayerRequest(id) {
-            const prayer = prayerRequests.find(p => p.id == id);
-            if (prayer) {
-                document.getElementById('prayer-id').value = prayer.id;
-                document.getElementById('prayer-name').value = prayer.name;
-                document.getElementById('prayer-email').value = prayer.email;
-                document.getElementById('prayer-phone').value = prayer.phone;
-                document.getElementById('prayer-category').value = prayer.category.toLowerCase().replace(' ', '-');
-                document.getElementById('prayer-request').value = prayer.request;
-                document.getElementById('prayer-status').value = prayer.status;
-                document.getElementById('prayer-notes').value = prayer.notes;
-                
-                document.getElementById('prayer-form-title').textContent = 'Edit Prayer Request';
-                document.getElementById('prayer-requests-page').classList.remove('active');
-                document.getElementById('edit-prayer-page').classList.add('active');
-            }
-        }
-
-        // Testimony functionality
-        function setupTestimonyFunctionality() {
-            // Add testimony button
-            document.getElementById('add-testimony-btn').addEventListener('click', function(e) {
-                e.preventDefault();
-                showTestimonyForm();
-            });
-
-            // Back to testimonies
-            document.getElementById('back-to-testimonies').addEventListener('click', function(e) {
-                e.preventDefault();
-                hideTestimonyForm();
-            });
-
-            // View testimony buttons
-            document.querySelectorAll('.view-testimony').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const testimonyId = this.getAttribute('data-id');
-                    viewTestimony(testimonyId);
-                });
-            });
-
-            // Edit testimony buttons
-            document.querySelectorAll('.edit-testimony').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const testimonyId = this.getAttribute('data-id');
-                    editTestimony(testimonyId);
-                });
-            });
-
-            // Form submission
-            document.getElementById('testimony-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const isNew = document.getElementById('testimony-id').value === '';
-                const action = isNew ? 'added' : 'updated';
-                
-                alert(`Testimony ${action} successfully!`);
-                hideTestimonyForm();
-            });
-        }
-
-        function showTestimonyForm() {
-            resetTestimonyForm();
-            document.getElementById('testimonies-page').classList.remove('active');
-            document.getElementById('edit-testimony-page').classList.add('active');
-            document.getElementById('testimony-form-title').textContent = 'Add New Testimony';
-        }
-
-        function hideTestimonyForm() {
-            document.getElementById('edit-testimony-page').classList.remove('active');
-            document.getElementById('testimonies-page').classList.add('active');
-        }
-
-        function resetTestimonyForm() {
-            document.getElementById('testimony-form').reset();
-            document.getElementById('testimony-id').value = '';
-        }
-
-        function viewTestimony(id) {
-            const testimony = testimonies.find(t => t.id == id);
-            if (testimony) {
-                document.getElementById('testimonyModalTitle').textContent = testimony.title;
-                document.getElementById('testimony-view-name').textContent = testimony.name;
-                document.getElementById('testimony-view-email').textContent = testimony.email;
-                document.getElementById('testimony-view-date').textContent = new Date(testimony.date).toLocaleDateString();
-                document.getElementById('testimony-view-category').textContent = testimony.category;
-                document.getElementById('testimony-view-title').textContent = testimony.title;
-                document.getElementById('testimony-view-content').textContent = testimony.content;
-                document.getElementById('testimony-view-notes').textContent = testimony.notes || 'No notes available.';
-                
-                currentItemId = id;
-                currentItemType = 'testimony';
-                viewTestimonyModal.show();
-            }
-        }
-
-        function editTestimony(id) {
-            const testimony = testimonies.find(t => t.id == id);
-            if (testimony) {
-                document.getElementById('testimony-id').value = testimony.id;
-                document.getElementById('testimony-name').value = testimony.name;
-                document.getElementById('testimony-email').value = testimony.email;
-                document.getElementById('testimony-location').value = testimony.location || '';
-                document.getElementById('testimony-category').value = testimony.category.toLowerCase();
-                document.getElementById('testimony-title').value = testimony.title;
-                document.getElementById('testimony-content').value = testimony.content;
-                document.getElementById('testimony-status').value = testimony.status;
-                document.getElementById('testimony-notes').value = testimony.notes || '';
-                
-                document.getElementById('testimony-form-title').textContent = 'Edit Testimony';
-                document.getElementById('testimonies-page').classList.remove('active');
-                document.getElementById('edit-testimony-page').classList.add('active');
-            }
-        }
-
-        // Subscriber functionality
-        function setupSubscriberFunctionality() {
-            // Add subscriber button
-            document.getElementById('add-subscriber-btn').addEventListener('click', function(e) {
-                e.preventDefault();
-                showSubscriberForm();
-            });
-
-            // Back to subscribers
-            document.getElementById('back-to-subscribers').addEventListener('click', function(e) {
-                e.preventDefault();
-                hideSubscriberForm();
-            });
-
-            // View subscriber buttons
-            document.querySelectorAll('.view-subscriber').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const subscriberId = this.getAttribute('data-id');
-                    viewSubscriber(subscriberId);
-                });
-            });
-
-            // Edit subscriber buttons
-            document.querySelectorAll('.edit-subscriber').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const subscriberId = this.getAttribute('data-id');
-                    editSubscriber(subscriberId);
-                });
-            });
-
-            // Form submission
-            document.getElementById('subscriber-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const isNew = document.getElementById('subscriber-id').value === '';
-                const action = isNew ? 'added' : 'updated';
-                
-                alert(`Subscriber ${action} successfully!`);
-                hideSubscriberForm();
-            });
-        }
-
-        function showSubscriberForm() {
-            resetSubscriberForm();
-            document.getElementById('subscribers-page').classList.remove('active');
-            document.getElementById('edit-subscriber-page').classList.add('active');
-            document.getElementById('subscriber-form-title').textContent = 'Add New Subscriber';
-        }
-
-        function hideSubscriberForm() {
-            document.getElementById('edit-subscriber-page').classList.remove('active');
-            document.getElementById('subscribers-page').classList.add('active');
-        }
-
-        function resetSubscriberForm() {
-            document.getElementById('subscriber-form').reset();
-            document.getElementById('subscriber-id').value = '';
-            document.getElementById('subscriber-join-date').value = new Date().toISOString().split('T')[0];
-        }
-
-        function viewSubscriber(id) {
-            const subscriber = subscribers.find(s => s.id == id);
-            if (subscriber) {
-                document.getElementById('subscriberModalTitle').textContent = `Subscriber: ${subscriber.name}`;
-                document.getElementById('subscriber-view-name').textContent = subscriber.name;
-                document.getElementById('subscriber-view-email').textContent = subscriber.email;
-                document.getElementById('subscriber-view-phone').textContent = subscriber.phone;
-                document.getElementById('subscriber-view-join-date').textContent = new Date(subscriber.joinDate).toLocaleDateString();
-                document.getElementById('subscriber-view-type').textContent = subscriber.type;
-                
-                const statusBadge = document.getElementById('subscriber-view-status');
-                statusBadge.textContent = subscriber.status.charAt(0).toUpperCase() + subscriber.status.slice(1);
-                statusBadge.className = 'badge ' + 
-                    (subscriber.status === 'active' ? 'bg-success' : 
-                     subscriber.status === 'inactive' ? 'bg-warning' : 'bg-secondary');
-                
-                document.getElementById('subscriber-view-notes').textContent = subscriber.notes || 'No notes available.';
-                
-                currentItemId = id;
-                currentItemType = 'subscriber';
-                viewSubscriberModal.show();
-            }
-        }
-
-        function editSubscriber(id) {
-            const subscriber = subscribers.find(s => s.id == id);
-            if (subscriber) {
-                document.getElementById('subscriber-id').value = subscriber.id;
-                document.getElementById('subscriber-name').value = subscriber.name;
-                document.getElementById('subscriber-email').value = subscriber.email;
-                document.getElementById('subscriber-phone').value = subscriber.phone;
-                document.getElementById('subscriber-type').value = subscriber.type;
-                document.getElementById('subscriber-join-date').value = subscriber.joinDate;
-                document.getElementById('subscriber-status').value = subscriber.status;
-                document.getElementById('subscriber-notes').value = subscriber.notes || '';
-                
-                document.getElementById('subscriber-form-title').textContent = 'Edit Subscriber';
-                document.getElementById('subscribers-page').classList.remove('active');
-                document.getElementById('edit-subscriber-page').classList.add('active');
-            }
-        }
-
-        // Delete confirmation functionality
-        function setupDeleteConfirmation() {
-            // Delete devotional buttons
-            document.querySelectorAll('.delete-devotional').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    currentItemId = this.getAttribute('data-id');
-                    currentItemType = 'devotional';
-                    deleteModal.show();
-                });
-            });
-
-            // Delete prayer request buttons
-            document.querySelectorAll('.delete-prayer').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    currentItemId = this.getAttribute('data-id');
-                    currentItemType = 'prayer';
-                    deleteModal.show();
-                });
-            });
-
-            // Delete testimony buttons
-            document.querySelectorAll('.delete-testimony').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    currentItemId = this.getAttribute('data-id');
-                    currentItemType = 'testimony';
-                    deleteModal.show();
-                });
-            });
-
-            // Delete subscriber buttons
-            document.querySelectorAll('.delete-subscriber').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    currentItemId = this.getAttribute('data-id');
-                    currentItemType = 'subscriber';
-                    deleteModal.show();
-                });
-            });
-
-            // Confirm delete button
-            document.getElementById('confirm-delete').addEventListener('click', function() {
-                if (currentItemId && currentItemType) {
-                    // In a real app, you would send a request to your backend to delete the item
-                    alert(`Deleting ${currentItemType} with ID: ${currentItemId}`);
-                    deleteModal.hide();
-                    
-                    // Reload the data or remove the item from the UI
-                    setTimeout(() => {
-                        alert(`${currentItemType} deleted successfully`);
-                    }, 500);
+                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
                 }
             });
-        }
-
-        // Helper functions
-        function getDevotionalById(id) {
-            const devotionals = {
-                '1': {
-                    title: 'Surviving the HEAT',
-                    topic: 'Faith in Trials',
-                    verse: 'Jeremiah 17:7-8',
-                    date: '2023-06-05',
-                    content: 'Blessed is the man that trusteth in the Lord, and whose hope the Lord is. For he shall be as a tree planted by the waters, and that spreadeth out her roots by the river, and shall not see (FEAR) when heat cometh, but her leaf shall be green; and shall not be careful (WORRIED) in the year of drought, neither shall cease from yielding fruit. - Jeremiah 17:7-8\n\nHeat in the Bible and in life generally signifies trouble, hardship, suffering, adversity, and trails.\n\nIn life, we all encounter different levels, dissensions and intensity of heat. However, we should be encouraged that God has also made a way of escape for those who trust and hope in him.',
-                    author: 'Maj Gen (Dr) Ezra Jahadi Jakko (Rtd)',
-                    status: 'published',
-                    coverImage: 'https://via.placeholder.com/800x400'
-                },
-                '2': {
-                    title: 'Peace in the Storm',
-                    topic: 'Peace',
-                    verse: 'Philippians 4:6-7',
-                    date: '2023-06-04',
-                    content: 'Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God. And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus.\n\nIn a world filled with anxiety and uncertainty, God offers us a peace that surpasses all understanding. This peace comes not from positive thinking or denial of reality, but from a deep trust in God\'s character and promises.',
-                    author: 'Maj Gen (Dr) Ezra Jahadi Jakko (Rtd)',
-                    status: 'published',
-                    coverImage: 'https://via.placeholder.com/800x400'
-                },
-                '3': {
-                    title: 'Walking in Faith',
-                    topic: 'Faith',
-                    verse: 'Hebrews 11:1',
-                    date: '2023-06-03',
-                    content: 'Now faith is confidence in what we hope for and assurance about what we do not see.\n\nFaith is not the absence of doubt, but the decision to trust God even when circumstances seem impossible. Like Abraham, we are called to walk by faith, not by sight, believing that God who promised is faithful.',
-                    author: 'Pastor John Smith',
-                    status: 'published',
-                    coverImage: 'https://via.placeholder.com/800x400'
-                }
-            };
-            
-            return devotionals[id] || null;
-        }
+        });
     </script>
 </body>
+
 </html>
