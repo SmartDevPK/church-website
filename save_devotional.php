@@ -5,55 +5,106 @@ ini_set("display_errors", 1);
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Database connection settings
-    $host = "localhost";
-    $port = 3307;
-    $username = "root";
-    $password = "";
-    $database = "prayer_db";
+    try {
+        // Validate required fields
+        $required = ['title', 'excerpt', 'devotional_date'];
+        $errors = [];
 
-    // Connect to MySQL
-    $conn = new mysqli($host, $username, $password, $database, $port);
-    if ($conn->connect_error) {
-        die("Connection failed: {$conn->connect_error}");
-    }
-
-    // Escape user inputs
-    $title = $conn->real_escape_string($_POST["title"]);
-    $excerpt = $conn->real_escape_string($_POST["excerpt"]);
-    $devotional_date = $conn->real_escape_string($_POST["devotional_date"]);
-
-    // Handle image upload
-    $image_path = "";
-    if (isset($_FILES["image"]) && $_FILES["image"]["error"] === UPLOAD_ERR_OK) {
-        $target_dir = "uploads/";
-        if (!is_dir($target_dir)) {
-            mkdir($target_dir, 0777, true);
+        foreach ($required as $field) {
+            if (empty(trim($_POST[$field]))) {
+                $errors[] = ucfirst($field) . " is required";
+            }
         }
 
-        $image_name = basename($_FILES["image"]["name"]);
-        $new_image_name = time() . "_" . $image_name;
-        $target_file = "{$target_dir}{$new_image_name}";
+        // Check if image was uploaded
+        if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+            $errors[] = "Image is required";
+        }
 
-        if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-            $image_path = $conn->real_escape_string($target_file);
-        } else {
-            echo "<div style='color: red;'>Image upload failed.</div>";
+        // If errors exist, redirect back with errors
+        if (!empty($errors)) {
+            header("Location: devotional_form.php?error=" . urlencode(implode(", ", $errors)));
             exit;
         }
-    }
 
-    // Insert into database
-    $sql = "INSERT INTO devotions (title, excerpt, devotion_date, image) 
-            VALUES ('$title', '$excerpt', '$devotional_date', '$image_path')";
+        // Database connection settings
+        $host = "localhost";
+        $port = 3307;
+        $username = "root";
+        $password = "";
+        $database = "prayer_db";
 
-    if ($conn->query($sql) === TRUE) {
+        // Connect to MySQL
+        $conn = new mysqli($host, $username, $password, $database, $port);
+        if ($conn->connect_error) {
+            throw new Exception("Connection failed: {$conn->connect_error}");
+        }
+
+        // Process image upload
+        $image_path = "";
+        if ($_FILES["image"]["error"] === UPLOAD_ERR_OK) {
+            // Validate image
+            $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+            $file_type = $_FILES['image']['type'];
+
+            if (!in_array($file_type, $allowed_types)) {
+                throw new Exception("Only JPG, PNG, and GIF files are allowed.");
+            }
+
+            $target_dir = "uploads/";
+            if (!is_dir($target_dir)) {
+                if (!mkdir($target_dir, 0777, true)) {
+                    throw new Exception("Failed to create upload directory.");
+                }
+            }
+
+            $image_name = basename($_FILES["image"]["name"]);
+            $new_image_name = time() . "_" . preg_replace("/[^a-zA-Z0-9\.]/", "_", $image_name);
+            $target_file = $target_dir . $new_image_name;
+
+            if (!move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                throw new Exception("Failed to move uploaded file.");
+            }
+            $image_path = $target_file;
+        }
+
+        // Prepare and execute SQL using prepared statements
+        $stmt = $conn->prepare("INSERT INTO devotions (title, excerpt, devotion_date, image) VALUES (?, ?, ?, ?)");
+        if (!$stmt) {
+            throw new Exception("Prepare failed: {$conn->error}");
+        }
+
+        $stmt->bind_param(
+            "ssss",
+            $_POST['title'],
+            $_POST['excerpt'],
+            $_POST['devotional_date'],
+            $image_path
+        );
+
+        if (!$stmt->execute()) {
+            throw new Exception("Execute failed: {$stmt->error}");
+        }
+
+        // Success - redirect with success message
         header("Location: dashboard.php?message=updated");
+        ;
         exit;
-    } else {
-        echo "<div style='color: red;'>Error: {$conn->error}</div>";
-    }
 
-    $conn->close();
+    } catch (Exception $e) {
+        // Handle any errors that occurred
+        header("Location: dashboard.php" . urlencode($e->getMessage()));
+        exit;
+    } finally {
+        // Close connections if they exist
+        if (isset($stmt))
+            $stmt->close();
+        if (isset($conn))
+            $conn->close();
+    }
+} else {
+    // Not a POST request, redirect
+    header("Location: dashboard.php");
+    exit;
 }
 ?>

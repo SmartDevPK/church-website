@@ -56,23 +56,19 @@ $result = $mysqli->query($sql);
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
             </li>
-
             <li>
                 <a href="#" data-page="devotionals">
                     <i class="fas fa-book-open"></i> Devotionals
                     <span class="badge bg-primary">
-                        <?php echo $counts['devotions']; ?>
+                        <?php echo isset($counts['devotions']) ? $counts['devotions'] : 0; ?>
                     </span>
                 </a>
             </li>
-
             <li>
                 <a href="#" data-page="prayer-requests">
-
                     <i class="fas fa-pray"></i> Prayer Requests
                     <span class="badge bg-danger">
-                        <?php echo $counts['prayer_requests']; ?>
-
+                        <?php echo isset($counts['prayer_requests']) ? $counts['prayer_requests'] : 0; ?>
                     </span>
                 </a>
             </li>
@@ -80,7 +76,7 @@ $result = $mysqli->query($sql);
                 <a href="#" data-page="testimonies">
                     <i class="fas fa-comment-alt"></i> Testimonies
                     <span class="badge bg-success">
-                        <?php echo $counts['testimonies']; ?>
+                        <?php echo isset($counts['testimonies']) ? $counts['testimonies'] : 0; ?>
                     </span>
                 </a>
             </li>
@@ -88,11 +84,10 @@ $result = $mysqli->query($sql);
                 <a href="#" data-page="subscribers">
                     <i class="fas fa-users"></i> Subscribers
                     <span class="badge bg-success">
-                        <?php echo $counts['subscribers']; ?>
+                        <?php echo isset($counts['subscribers']) ? $counts['subscribers'] : 0; ?>
                     </span>
                 </a>
             </li>
-
             <li>
                 <a href="logout.php">
                     <i class="fas fa-sign-out-alt"></i> Logout
@@ -108,15 +103,12 @@ $result = $mysqli->query($sql);
             <button class="btn btn-outline-secondary d-md-none" id="sidebarToggle">
                 <i class="fas fa-bars"></i>
             </button>
-
-
         </div>
 
         <!-- Dashboard Page -->
-        <div class="page-content active " id="dashboard-page">
+        <div class="page-content active" id="dashboard-page">
             <div class="container-fluid mt-4">
                 <h4 class="mb-4">Dashboard Overview</h4>
-
 
                 <!-- Stats Cards -->
                 <div class="row">
@@ -124,16 +116,7 @@ $result = $mysqli->query($sql);
                         <div class="dashboard-card">
                             <div class="stat-card">
                                 <i class="fas fa-book-open text-primary"></i>
-                                <h2><?php echo $counts['devotion']; ?></h2>
-                                <p>Devotionals</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="dashboard-card">
-                            <div class="stat-card">
-                                <i class="fas fa-book-open text-primary"></i>
-                                <h2><?php echo $counts['devotions']; ?></h2>
+                                <h2><?php echo isset($counts['devotions']) ? $counts['devotions'] : 0; ?></h2>
                                 <p>Devotionals</p>
                             </div>
                         </div>
@@ -142,7 +125,8 @@ $result = $mysqli->query($sql);
                         <div class="dashboard-card">
                             <div class="stat-card">
                                 <i class="fas fa-pray text-danger"></i>
-                                <h2><?php echo $counts['prayer_requests']; ?></h2>
+                                <h2><?php echo isset($counts['prayer_requests']) ? $counts['prayer_requests'] : 0; ?>
+                                </h2>
                                 <p>Prayer Requests</p>
                             </div>
                         </div>
@@ -151,7 +135,7 @@ $result = $mysqli->query($sql);
                         <div class="dashboard-card">
                             <div class="stat-card">
                                 <i class="fas fa-comment-alt text-warning"></i>
-                                <h2><?php echo $counts['comments']; ?></h2>
+                                <h2><?php echo isset($counts['comments']) ? $counts['comments'] : 0; ?></h2>
                                 <p>Testimonies</p>
                             </div>
                         </div>
@@ -160,7 +144,7 @@ $result = $mysqli->query($sql);
                         <div class="dashboard-card">
                             <div class="stat-card">
                                 <i class="fas fa-users text-success"></i>
-                                <h2><?php echo $counts['subscribers']; ?></h2>
+                                <h2><?php echo isset($counts['subscribers']) ? $counts['subscribers'] : 0; ?></h2>
                                 <p>Subscribers</p>
                             </div>
                         </div>
@@ -168,20 +152,18 @@ $result = $mysqli->query($sql);
                 </div>
 
                 <!-- Recent Devotionals -->
-                <h1>FRONT PAGE </h1>
-
-                <?php if ($errorMessage): ?>
+                <?php if (isset($errorMessage)): ?>
                     <div class="alert alert-danger"><?= htmlspecialchars($errorMessage) ?></div>
                 <?php endif; ?>
 
-                <?php if ($successMessage): ?>
+                <?php if (isset($successMessage)): ?>
                     <div class="alert alert-success"><?= htmlspecialchars($successMessage) ?></div>
                 <?php endif; ?>
 
                 <!-- Recent devotionals table -->
                 <div class="dashboard-card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Recent FRONT PAGE</span>
+                        <span>Recent Devotionals</span>
                         <a href="AddDevotion.php" class="btn btn-sm btn-primary">Add New Devotional</a>
                     </div>
                     <div class="card-body">
@@ -196,24 +178,24 @@ $result = $mysqli->query($sql);
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php if (count($devotion) > 0): ?>
+                                    <?php if (isset($devotion) && count($devotion) > 0): ?>
                                         <?php foreach ($devotion as $dev): ?>
                                             <tr>
-                                                <td><img src="<?= htmlspecialchars($dev['image_path']) ?>"
+                                                <td><img src="<?= htmlspecialchars($dev['image_path'] ?? '') ?>"
                                                         style="width:50px; height:50px;" /></td>
-                                                <td><?= htmlspecialchars($dev['topic']) ?></td>
-                                                <td><?= date("F j, Y", strtotime($dev['date'])) ?></td>
+                                                <td><?= htmlspecialchars($dev['topic'] ?? '') ?></td>
+                                                <td><?= isset($dev['date']) ? date("F j, Y", strtotime($dev['date'])) : '' ?>
+                                                </td>
                                                 <td>
-                                                    <!-- Actions: edit and delete buttons (not implemented yet) -->
                                                     <button class="btn btn-sm btn-outline-primary">
-                                                        <a href="edit_devotional.php?id=<?php echo $dev['id']; ?>"
+                                                        <a href="edit_devotional.php?id=<?php echo $dev['id'] ?? ''; ?>"
                                                             style="text-decoration:none; color:inherit;">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
                                                     </button>
                                                     <form method="POST" action="delete_devotional.php"
                                                         style="display:inline-block;">
-                                                        <input type="hidden" name="id" value="<?php echo $dev['id']; ?>">
+                                                        <input type="hidden" name="id" value="<?php echo $dev['id'] ?? ''; ?>">
                                                         <button type="submit" class="btn btn-sm btn-outline-danger"
                                                             onclick="return confirm('Are you sure you want to delete this devotional?');">
                                                             <i class="fas fa-trash"></i>
@@ -232,170 +214,149 @@ $result = $mysqli->query($sql);
                         </div>
                     </div>
                 </div>
-
-                <!-- Add devotional form - hidden by default -->
-                <h2>Add New Devotional</h2>
-                <form action="add_devotional.php" method="POST" enctype="multipart/form-data">
-                    <div class="mb-3">
-                        <label for="topic" class="form-label">Title / Topic</label>
-                        <input type="text" class="form-control" name="topic" id="topic" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="date" class="form-label">Date</label>
-                        <input type="date" class="form-control" name="date" id="date" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="image" class="form-label">Cover Image</label>
-                        <input type="file" class="form-control" name="image" id="image" accept="image/*" required />
-                    </div>
-                    <button type="submit" class="btn btn-success">Save Devotional</button>
-                    <button type="button" class="btn btn-secondary" id="cancel-add">Cancel</button>
-                </form>
-            </div>
-
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="col-md-4">
-            <div class="dashboard-card">
-                <div class="card-header">
-
-                </div>
             </div>
         </div>
-    </div>
-    </div>
 
-    <!-- Devotionals Page -->
-    <div class="page-content" id="devotionals-page">
-        <div class="container-fluid mt-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4>Manage Devotionals</h4>
-                <button class="btn btn-primary" id="new-devotional-btn">
-                    <a href="save_devotion.php" class="btn btn-sm btn-primary">Add New Devotional</a>
-            </div>
-
-            <!-- Devotionals Table -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <span>All Devotionals</span>
-                    <div class="input-group" style="width: 300px;">
-
-                    </div>
+        <!-- Devotionals Page -->
+        <div class="page-content" id="devotionals-page">
+            <div class="container-fluid mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4>Manage Devotionals</h4>
+                    <button class="btn btn-primary" id="new-devotional-btn">
+                        <i class="fas fa-plus"></i> Add New Devo
+                    </button>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Cover</th>
-                                    <th>Topic</th>
-                                    <th>Date</th>
-                                    <th>Excerpt</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if ($result && $result->num_rows > 0): ?>
-                                    <?php while ($row = $result->fetch_assoc()): ?>
-                                        <tr>
-                                            <td>
-                                                <?php
-                                                $imagePath = !empty($row['image']) ? $row['image'] : 'default-image.jpg';
-                                                ?>
-                                                <img src="<?= htmlspecialchars($imagePath) ?>" alt="Cover Image"
-                                                    style="width:50px; height:50px;" />
-                                            </td>
-                                            <td><?= htmlspecialchars($row['title'] ?? '') ?></td>
-                                            <td><?= isset($row['devotion_date']) ? date("F j, Y", strtotime($row['devotion_date'])) : '' ?>
-                                            </td>
-                                            <td><?= htmlspecialchars($row['excerpt'] ?? '') ?></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <a href="edit_devotional.php?id=<?= $row['id'] ?? '' ?>"
-                                                        style="text-decoration:none; color:inherit;">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                </button>
-                                                <form method="POST" action="delete_devotional.php"
-                                                    style="display:inline-block;">
-                                                    <input type="hidden" name="id" value="<?= $row['id'] ?? '' ?>">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                        onclick="return confirm('Are you sure you want to delete this devotional?');">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    <?php endwhile; ?>
-                                <?php else: ?>
+
+                <!-- Devotionals Table -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <span>All Devotionals</span>
+                        <div class="input-group" style="width: 300px;">
+                            <input type="text" class="form-control" placeholder="Search devotionals...">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
                                     <tr>
-                                        <td colspan="5">No devotionals found.</td>
+                                        <th>Cover</th>
+                                        <th>Topic</th>
+                                        <th>Date</th>
+                                        <th>Excerpt</th>
+                                        <th>Actions</th>
                                     </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php if (isset($result) && $result->num_rows > 0): ?>
+                                        <?php while ($row = $result->fetch_assoc()): ?>
+                                            <tr>
+                                                <td>
+                                                    <?php $imagePath = !empty($row['image']) ? $row['image'] : 'default-image.jpg'; ?>
+                                                    <img src="<?= htmlspecialchars($imagePath) ?>" alt="Cover Image"
+                                                        style="width:50px; height:50px;" />
+                                                </td>
+                                                <td><?= htmlspecialchars($row['title'] ?? '') ?></td>
+                                                <td><?= isset($row['devotion_date']) ? date("F j, Y", strtotime($row['devotion_date'])) : '' ?>
+                                                </td>
+                                                <td><?= htmlspecialchars($row['excerpt'] ?? '') ?></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">
+                                                        <a href="edit_devotional.php?id=<?= $row['id'] ?? '' ?>"
+                                                            style="text-decoration:none; color:inherit;">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    </button>
+                                                    <form method="POST" action="delete_devotional.php"
+                                                        style="display:inline-block;">
+                                                        <input type="hidden" name="id" value="<?= $row['id'] ?? '' ?>">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                            onclick="return confirm('Are you sure you want to delete this devotional?');">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        <?php endwhile; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="5">No devotionals found.</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        <nav aria-label="Page navigation" class="mt-3">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
-                    <nav aria-label="Page navigation" class="mt-3">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1">Previous</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Add/Edit Devotional Form -->
-    <div class="page-content" id="edit-devotional-page">
-        <div class="container-fluid mt-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 id="devotional-form-title">Add New Devotional</h4>
-                <button class="btn btn-outline-secondary" id="back-to-devotionals">
-                    <i class="fas fa-arrow-left"></i> Back to Devotionals
-                </button>
-            </div>
+        <!-- Add/Edit Devotional Form -->
+        <div class="page-content" id="edit-devotional-page">
+            <div class="container-fluid mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 id="devotional-form-title">Add New Devotional</h4>
+                    <button class="btn btn-outline-secondary" id="back-to-devotionals">
+                        <i class="fas fa-arrow-left"></i> Back to Devotionals
+                    </button>
+                </div>
 
-            <div class="form-container">
-                <form id="devotional-form" action="save_devotional.php" method="POST" enctype="multipart/form-data">
+                <h2 class="mb-4">Add New Devotional</h2>
+
+                <!-- Display error/success messages -->
+                <?php if (isset($_GET['error'])): ?>
+                    <div class="alert alert-danger"><?= htmlspecialchars($_GET['error']) ?></div>
+                <?php endif; ?>
+                <?php if (isset($_GET['success'])): ?>
+                    <div class="alert alert-success">Devotional added successfully!</div>
+                <?php endif; ?>
+
+                <form action="save_devotional.php" method="POST" enctype="multipart/form-data">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label for="title">Title</label>
-                                <input type="text" name="title" class="form-control" required </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="excerpt">Excerpt</label>
-                                    <textarea name="excerpt" class="form-control" rows="3" required></textarea>
-                                </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="title">Title</label>
+                            <input type="text" name="title" id="title" class="form-control" </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="excerpt">Excerpt</label>
+                                <textarea name="excerpt" id="excerpt" class="form-control" rows="3" required></textarea>
                             </div>
                         </div>
-
-                        <div class="form-group mb-3">
+                        <div class="mb-3">
                             <label for="devotional_date">Date</label>
-                            <input type="date" name="devotional_date" class="form-control" required>
+                            <input type="date" name="devotional_date" id="devotional_date" class="form-control"
+                                required>
                         </div>
-
-                        <div class="form-group mb-3">
+                        <div class="mb-3">
                             <label for="image">Cover Image</label>
-                            <input type="file" name="image" class="form-control" accept="image/*" required>
+                            <input type="file" name="image" id="image" class="form-control" accept="image/*" required>
+                            <small class="text-muted">Only JPG, PNG, GIF allowed (Max 2MB)</small>
                         </div>
                         <div class="d-flex justify-content-end gap-2">
-                            <button type="submit" name="submit" class="btn btn-outline-secondary">Submit</button>
-
+                            <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+                        </div>
                 </form>
             </div>
         </div>
+
     </div>
+    </div>
+
 
     <!-- Prayer Requests Page -->
     <div class="page-content" id="prayer-requests-page">
@@ -429,8 +390,8 @@ $result = $mysqli->query($sql);
                                 <tr>
                                     <td>John Doe</td>
                                     <td>john@example.com</td>
-                                    <td class="text-truncate" style="max-width: 200px;">Pray for healing from chronic
-                                        illness...</td>
+                                    <td class="text-truncate" style="max-width: 200px;">Pray for healing from
+                                        chronic illness...</td>
                                     <td>June 5, 2023</td>
                                     <td><span class="badge bg-warning text-dark">Pending</span></td>
                                     <td>
@@ -443,8 +404,8 @@ $result = $mysqli->query($sql);
                                 <tr>
                                     <td>Sarah Smith</td>
                                     <td>sarah@example.com</td>
-                                    <td class="text-truncate" style="max-width: 200px;">Pray for my family's financial
-                                        situation...</td>
+                                    <td class="text-truncate" style="max-width: 200px;">Pray for my family's
+                                        financial situation...</td>
                                     <td>June 4, 2023</td>
                                     <td><span class="badge bg-success">Prayed</span></td>
                                     <td>
@@ -601,82 +562,86 @@ $result = $mysqli->query($sql);
             </div>
         </div>
     </div>
-
-    <!-- Other pages would follow the same pattern -->
     </div>
 
+    <!-- JavaScript Dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('sidebarToggle').addEventListener('click', function () {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('main-content').classList.toggle('active');
-        });
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            // Sidebar toggle functionality
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
 
-        // Page navigation
-        document.querySelectorAll('.sidebar-menu a').forEach(link => {
-            link.addEventListener('click', function (e) {
-
-                // Remove active class from all links
-                document.querySelectorAll('.sidebar-menu a').forEach(item => {
-                    item.classList.remove('active');
+            if (sidebarToggle && sidebar && mainContent) {
+                sidebarToggle.addEventListener('click', function () {
+                    sidebar.classList.toggle('active');
+                    mainContent.classList.toggle('active');
                 });
+            }
 
-                // Add active class to clicked link
-                this.classList.add('active');
+            // Page navigation
+            const menuLinks = document.querySelectorAll('.sidebar-menu a[data-page]');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
 
-                // Hide all pages
-                document.querySelectorAll('.page-content').forEach(page => {
-                    page.classList.remove('active');
+                    // Remove active class from all links
+                    menuLinks.forEach(item => {
+                        item.classList.remove('active');
+                    });
+
+                    // Add active class to clicked link
+                    this.classList.add('active');
+
+                    // Hide all pages
+                    document.querySelectorAll('.page-content').forEach(page => {
+                        page.classList.remove('active');
+                    });
+
+                    // Show selected page
+                    const pageId = this.getAttribute('data-page') + '-page';
+                    const targetPage = document.getElementById(pageId);
+                    if (targetPage) {
+                        targetPage.classList.add('active');
+                    }
                 });
-
-                // Show selected page
-                const pageId = this.getAttribute('data-page') + '-page';
-                document.getElementById(pageId).classList.add('active');
             });
-        });
 
-        // Devotional form navigation
-        document.getElementById('add-devotional-btn').addEventListener('click', function (e) {
-            document.getElementById('devotionals-page').classList.remove('active');
-            document.getElementById('edit-devotional-page').classList.add('active');
-            document.getElementById('devotional-form-title').textContent = 'Add New Devotional';
-        });
+            // Devotional form navigation
+            const newDevotionalBtn = document.getElementById('new-devotional-btn');
+            const backToDevotionals = document.getElementById('back-to-devotionals');
 
-        document.getElementById('new-devotional-btn').addEventListener('click', function (e) {
-            document.getElementById('devotionals-page').classList.remove('active');
-            document.getElementById('edit-devotional-page').classList.add('active');
-            document.getElementById('devotional-form-title').textContent = 'Add New Devotional';
-        });
+            if (newDevotionalBtn) {
+                newDevotionalBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.getElementById('devotionals-page').classList.remove('active');
+                    document.getElementById('edit-devotional-page').classList.add('active');
+                    document.getElementById('devotional-form-title').textContent = 'Add New Devotional';
+                });
+            }
 
-        document.getElementById('back-to-devotionals').addEventListener('click', function (e) {
-            document.getElementById('edit-devotional-page').classList.remove('active');
-            document.getElementById('devotionals-page').classList.add('active');
-        });
+            if (backToDevotionals) {
+                backToDevotionals.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.getElementById('edit-devotional-page').classList.remove('active');
+                    document.getElementById('devotionals-page').classList.add('active');
+                });
+            }
 
-        // Cover image preview
-        document.getElementById('cover-image-upload').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                    const preview = document.getElementById('cover-image-preview');
-                    const placeholder = document.getElementById('cover-placeholder');
-
-                    preview.src = event.target.result;
-                    preview.style.display = 'block';
-                    placeholder.style.display = 'none';
-                };
-                reader.readAsDataURL(file);
+            // Form submission
+            const devotionalForm = document.getElementById('devotional-form');
+            if (devotionalForm) {
+                devotionalForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    alert('Devotional saved successfully!');
+                    document.getElementById('edit-devotional-page').classList.remove('active');
+                    document.getElementById('devotionals-page').classList.add('active');
+                    // In a real application, you would submit the form data to the server here
+                });
             }
         });
-
-        // Form submission (would be connected to backend in production)
-        document.getElementById('devotional-form').addEventListener('submit', function (e) {
-            alert('Devotional saved successfully!');
-            document.getElementById('edit-devotional-page').classList.remove('active');
-            document.getElementById('devotionals-page').classList.add('active');
-        });
-
     </script>
 </body>
 
