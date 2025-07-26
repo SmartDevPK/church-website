@@ -113,6 +113,11 @@ if ($testimonyResult && $testimonyResult->num_rows > 0) {
                 </a>
             </li>
             <li>
+                <a href="admin_dashboard.php">
+                    <i class="fas fa-comment-alt"></i> Approve Testimonies
+                </a>
+            </li>
+            <li>
                 <a href="#" data-page="subscribers">
                     <i class="fas fa-users"></i> Subscribers
                     <span class="badge bg-success">
@@ -255,7 +260,7 @@ if ($testimonyResult && $testimonyResult->num_rows > 0) {
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4>Manage Devotionals</h4>
                     <button class="btn btn-primary" id="new-devotional-btn">
-                        <i class="fas fa-plus"></i> Add New Devo
+                        <i class="fas fa-plus"></i> Add New Devotional
                     </button>
                 </div>
 
@@ -445,7 +450,7 @@ if ($testimonyResult && $testimonyResult->num_rows > 0) {
 
     <!-- Testimonies Page -->
     <div class="page-content" id="testimonies-page">
-        <button>Approve link</button>
+        <button>Approve </button>
         <div class="container-fluid mt-4">
             <h4 class="mb-4">Testimonies</h4>
 
@@ -476,6 +481,8 @@ if ($testimonyResult && $testimonyResult->num_rows > 0) {
                         <table class="table table-hover" id="testimoniesTable">
                             <thead>
                                 <tr>
+
+
                                     <th>Name</th>
                                     <th>Initials</th>
                                     <th>Testimony</th>
@@ -525,6 +532,7 @@ if ($testimonyResult && $testimonyResult->num_rows > 0) {
                                                                 <i class="fas fa-check"></i>
                                                             </button>
                                                         </form>
+
                                                     <?php endif; ?>
                                                 </div>
                                             </td>
