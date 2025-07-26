@@ -21,9 +21,9 @@ if ($conn->connect_error) {
 }
 
 // Query to fetch testimonies
-$sql = "SELECT name, initials, message, DATE_FORMAT(created_at, '%M %d, %Y') AS date 
+$sql = "SELECT name, initials, message, DATE_FORMAT(date, '%M %d, %Y') AS date 
         FROM testimonies 
-        ORDER BY created_at DESC 
+        ORDER BY date DESC 
         LIMIT 6";
 
 $result = $conn->query($sql);

@@ -44,23 +44,20 @@ if ($prayerResult && $prayerResult->num_rows > 0) {
     }
 }
 
+
 $testimonies = [];
 
-$sqlT = "
-    SELECT id, name, created_at, status 
-    FROM testimonies 
-    WHERE status = 'approved' 
-      AND created_at >= NOW() - INTERVAL 1 DAY
-    ORDER BY created_at DESC
-";
+$testimonyQuery = "SELECT * FROM testimonies ORDER BY date DESC";
 
-$result = $mysqli->query($sqlT);
+$testimonyResult = $mysqli->query($testimonyQuery);
 
-if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
+if ($testimonyResult && $testimonyResult->num_rows > 0) {
+    while ($row = $testimonyResult->fetch_assoc()) {
         $testimonies[] = $row;
     }
 }
+
+
 
 ?>
 
@@ -416,7 +413,6 @@ if ($result && $result->num_rows > 0) {
                                     <th>Email</th>
                                     <th>Prayer Request</th>
                                     <th>Date</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -430,12 +426,7 @@ if ($result && $result->num_rows > 0) {
                                                 <?php echo htmlspecialchars($request['title']); ?>
                                             </td>
                                             <td><?php echo date('F j, Y, g:i a', strtotime($request['created_at'])); ?></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary" title="View"><i
-                                                        class="fas fa-eye"></i></button>
-                                                <button class="btn btn-sm btn-outline-success" title="Mark as Prayed"><i
-                                                        class="fas fa-check"></i></button>
-                                            </td>
+
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
@@ -459,7 +450,7 @@ if ($result && $result->num_rows > 0) {
 
             <div class="dashboard-card">
                 <div class="card-header">
-                    <span>All Testimonies</span>
+                    <span>All Recent Testimonies (Last 24 Hours)</span>
                     <div class="input-group" style="width: 300px;">
                         <input type="text" class="form-control" placeholder="Search testimonies...">
                         <button class="btn btn-outline-secondary" type="button">
@@ -473,10 +464,11 @@ if ($result && $result->num_rows > 0) {
                             <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>initials</th>
+                                    <th>Initials</th>
                                     <th>Testimony</th>
                                     <th>Date</th>
                                     <th>Status</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -484,30 +476,27 @@ if ($result && $result->num_rows > 0) {
                                     <?php foreach ($testimonies as $testimony): ?>
                                         <tr>
                                             <td><?= htmlspecialchars($testimony['name']); ?></td>
+                                            <td><?= htmlspecialchars($testimony['initials']); ?></td>
                                             <td class="text-truncate" style="max-width: 300px;">
-                                                <?= htmlspecialchars($testimony['testimony']); ?>
+                                                <?= htmlspecialchars($testimony['message'] ?? ''); ?>
                                             </td>
-                                            <td><?= date('F j, Y', strtotime($testimony['date'])); ?></td>
+                                            <td><?= date('F j, Y, g:i A', strtotime($testimony['date'])); ?></td>
                                             <td>
-                                                <?php if ($testimony['status'] === 'approved'): ?>
-                                                    <span class="badge bg-success">Approved</span>
-                                                <?php else: ?>
-                                                    <span class="badge bg-warning text-dark">
-                                                        <?= htmlspecialchars($testimony['status']); ?>
-                                                    </span>
-                                                <?php endif; ?>
+                                                <span class="badge bg-info text-dark">
+                                                    <?= htmlspecialchars($testimony['status']); ?>
+                                                </span>
                                             </td>
                                             <td>
-                                                <button class="btn btn-sm btn-outline-primary">
+                                                <button class="btn btn-sm btn-outline-primary" title="View">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
-                                                <!-- Additional action buttons can be added here -->
+                                                <!-- Add more actions if needed -->
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="5" class="text-center">No approved testimonies found.</td>
+                                        <td colspan="6" class="text-center">No testimonies found in the last 24 hours.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -517,6 +506,7 @@ if ($result && $result->num_rows > 0) {
             </div>
         </div>
     </div>
+
 
 
     <!-- Subscribers Page -->
@@ -595,7 +585,6 @@ if ($result && $result->num_rows > 0) {
                 </div>
             </div>
         </div>
-    </div>
     </div>
 
     <!-- JavaScript Dependencies -->

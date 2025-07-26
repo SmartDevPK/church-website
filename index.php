@@ -962,11 +962,13 @@
     ini_set('display_errors', 1);
     error_reporting(E_ALL);
 
+    // Database connection parameters
     $host = "localhost";
     $port = 3307;
     $username = "root";
     $password = "";
     $database = "prayer_db";
+
 
     $conn = new mysqli($host, $username, $password, $database, $port);
     if ($conn->connect_error) {
@@ -977,6 +979,27 @@
     $result = $conn->query("SELECT * FROM devotion ORDER BY id DESC LIMIT 1");
     $devotion = $result->fetch_assoc();
     $conn->close();
+
+    // At the top of your index.php
+    if (isset($_GET['success'])) {
+        switch ($_GET['success']) {
+            case 'submitted':
+                $message = "Thank you! Your testimony is pending approval.";
+                break;
+            case 'approved':
+                $message = "Testimony approved successfully!";
+                break;
+        }
+    }
+
+    if (isset($_GET['error'])) {
+        switch ($_GET['error']) {
+            case 'empty_fields':
+                $message = "Please fill all required fields.";
+                break;
+            // Handle other error cases
+        }
+    }
 
     ?>
     <!-- Devotion Content -->
