@@ -445,22 +445,35 @@ if ($testimonyResult && $testimonyResult->num_rows > 0) {
 
     <!-- Testimonies Page -->
     <div class="page-content" id="testimonies-page">
+        <button>Approve link</button>
         <div class="container-fluid mt-4">
             <h4 class="mb-4">Testimonies</h4>
 
             <div class="dashboard-card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <span>All Recent Testimonies (Last 24 Hours)</span>
                     <div class="input-group" style="width: 300px;">
-                        <input type="text" class="form-control" placeholder="Search testimonies...">
-                        <button class="btn btn-outline-secondary" type="button">
+                        <input type="text" class="form-control" placeholder="Search testimonies..."
+                            id="testimonySearch">
+                        <button class="btn btn-outline-secondary" type="button" onclick="searchTestimonies()">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
                 </div>
+
                 <div class="card-body">
+                    <?php if (isset($_GET['delete'])): ?>
+                        <div class="alert alert-<?= $_GET['delete'] === 'success' ? 'success' : 'danger' ?> mb-4">
+                            <?= $_GET['delete'] === 'success' ?
+                                'Testimony deleted successfully.' :
+                                ($_GET['delete'] === 'error' ?
+                                    'Failed to delete testimony.' :
+                                    'Invalid delete request.') ?>
+                        </div>
+                    <?php endif; ?>
+
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover" id="testimoniesTable">
                             <thead>
                                 <tr>
                                     <th>Name</th>
@@ -468,7 +481,7 @@ if ($testimonyResult && $testimonyResult->num_rows > 0) {
                                     <th>Testimony</th>
                                     <th>Date</th>
                                     <th>Status</th>
-                                    <th>Action</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -477,20 +490,43 @@ if ($testimonyResult && $testimonyResult->num_rows > 0) {
                                         <tr>
                                             <td><?= htmlspecialchars($testimony['name']); ?></td>
                                             <td><?= htmlspecialchars($testimony['initials']); ?></td>
-                                            <td class="text-truncate" style="max-width: 300px;">
+                                            <td class="text-truncate" style="max-width: 300px;"
+                                                title="<?= htmlspecialchars($testimony['message'] ?? ''); ?>">
                                                 <?= htmlspecialchars($testimony['message'] ?? ''); ?>
                                             </td>
                                             <td><?= date('F j, Y, g:i A', strtotime($testimony['date'])); ?></td>
                                             <td>
-                                                <span class="badge bg-info text-dark">
+                                                <?php $statusClass = [
+                                                    'pending' => 'bg-warning text-dark',
+                                                    'approved' => 'bg-success',
+                                                    'rejected' => 'bg-danger'
+                                                ][$testimony['status']] ?? 'bg-info text-dark'; ?>
+
+                                                <span class="badge <?= $statusClass ?>">
                                                     <?= htmlspecialchars($testimony['status']); ?>
                                                 </span>
                                             </td>
                                             <td>
-                                                <button class="btn btn-sm btn-outline-primary" title="View">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <!-- Add more actions if needed -->
+                                                <div class="d-flex gap-2">
+                                                    <form action="delete_user.php" method="POST"
+                                                        onsubmit="return confirm('Are you sure you want to delete this testimony?');">
+                                                        <input type="hidden" name="id" value="<?= $testimony['id'] ?>">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                            title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+
+                                                    <?php if ($testimony['status'] === 'pending'): ?>
+                                                        <form action="approve_testimony.php" method="POST">
+                                                            <input type="hidden" name="id" value="<?= $testimony['id'] ?>">
+                                                            <button type="submit" class="btn btn-sm btn-outline-success"
+                                                                title="Approve">
+                                                                <i class="fas fa-check"></i>
+                                                            </button>
+                                                        </form>
+                                                    <?php endif; ?>
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -506,6 +542,32 @@ if ($testimonyResult && $testimonyResult->num_rows > 0) {
             </div>
         </div>
     </div>
+
+    <script>
+        function searchTestimonies() {
+            const input = document.getElementById('testimonySearch');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('testimoniesTable');
+            const tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                let found = false;
+                const td = tr[i].getElementsByTagName('td');
+
+                for (let j = 0; j < td.length - 1; j++) {
+                    if (td[j]) {
+                        const txtValue = td[j].textContent || td[j].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+
+                tr[i].style.display = found ? '' : 'none';
+            }
+        }
+    </script>
 
 
 
