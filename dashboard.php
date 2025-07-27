@@ -57,6 +57,18 @@ if ($testimonyResult && $testimonyResult->num_rows > 0) {
     }
 }
 
+$subscribers = [];
+$subscriberQuery = "SELECT * FROM subscribers ORDER BY 	subscribed_at	 DESC ";
+$subscriberResult = $mysqli->query($subscriberQuery);
+if ($subscriberResult && $subscriberResult->num_rows > 0) {
+    while ($row = $subscriberResult->fetch_assoc()) {
+        $subscribers[] = $row;
+    }
+}
+
+
+
+
 
 
 ?>
@@ -590,72 +602,89 @@ if ($testimonyResult && $testimonyResult->num_rows > 0) {
             </div>
 
             <div class="dashboard-card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <span>All Subscribers</span>
                     <div class="input-group" style="width: 300px;">
-                        <input type="text" class="form-control" placeholder="Search subscribers...">
-                        <button class="btn btn-outline-secondary" type="button">
+                        <input type="text" class="form-control" placeholder="Search subscribers..."
+                            id="subscriber-search">
+                        <button class="btn btn-outline-secondary" type="button" id="search-button">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
                 </div>
+
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>Email</th>
-                                    <th>Name</th>
                                     <th>Join Date</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>user1@example.com</td>
-                                    <td>John Doe</td>
-                                    <td>May 15, 2023</td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-envelope"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger"><i
-                                                class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>user2@example.com</td>
-                                    <td>Sarah Smith</td>
-                                    <td>April 28, 2023</td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-envelope"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger"><i
-                                                class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
+                                <?php if (!empty($subscribers)): ?>
+                                    <?php foreach ($subscribers as $subscriber): ?>
+                                        <tr data-subscriber-id="<?= htmlspecialchars($subscriber['id'] ?? '') ?>">
+                                            <td><?= htmlspecialchars($subscriber['email']) ?></td>
+                                            <td><?= date("F j, Y", strtotime($subscriber['subscribed_at'])) ?></td>
+                                            <td>
+                                                <?php
+                                                $status = $subscriber['status'] ?? 'Active';
+                                                $badgeClass = $status === 'Active' ? 'bg-success' : 'bg-secondary';
+                                                ?>
+                                                <span class="badge <?= $badgeClass ?>">
+                                                    <?= htmlspecialchars($status) ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary send-email-btn"
+                                                    data-email="<?= htmlspecialchars($subscriber['email']) ?>">
+                                                    <i class="fas fa-envelope"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger delete-btn"
+                                                    data-id="<?= htmlspecialchars($subscriber['id'] ?? '') ?>">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4">No subscribers found.</td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
-                    <nav aria-label="Page navigation" class="mt-3">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1">Previous</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
+
+                    <!-- Pagination -->
+                    <?php if (!empty($subscribers) && isset($totalPages) && $totalPages > 1): ?>
+                        <nav aria-label="Page navigation" class="mt-3">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $currentPage - 1 ?>" tabindex="-1">Previous</a>
+                                </li>
+
+                                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                    <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
+                                        <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                                    </li>
+                                <?php endfor; ?>
+
+                                <li class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $currentPage + 1 ?>">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- JavaScript Dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -747,6 +776,34 @@ if ($testimonyResult && $testimonyResult->num_rows > 0) {
                 row.style.display = text.includes(input) ? '' : 'none';
             });
         }
+        document.addEventListener('DOMContentLoaded', function () {
+            // Search functionality
+            document.getElementById('search-button').addEventListener('click', function () {
+                const searchTerm = document.getElementById('subscriber-search').value;
+                // Implement search functionality (AJAX call or form submission)
+                console.log('Searching for:', searchTerm);
+            });
+
+            // Delete button functionality
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const subscriberId = this.getAttribute('data-id');
+                    if (confirm('Are you sure you want to delete this subscriber?')) {
+                        // Implement delete functionality (AJAX call or form submission)
+                        console.log('Deleting subscriber ID:', subscriberId);
+                    }
+                });
+            });
+
+            // Send email button functionality
+            document.querySelectorAll('.send-email-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const email = this.getAttribute('data-email');
+                    // Implement email functionality
+                    console.log('Sending email to:', email);
+                });
+            });
+        });
     </script>
 </body>
 
