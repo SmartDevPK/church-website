@@ -640,10 +640,13 @@ if ($subscriberResult && $subscriberResult->num_rows > 0) {
                                                 </span>
                                             </td>
                                             <td>
-                                                <button class="btn btn-sm btn-outline-primary send-email-btn"
-                                                    data-email="<?= htmlspecialchars($subscriber['email']) ?>">
-                                                    <i class="fas fa-envelope"></i>
-                                                </button>
+                                                <form action="send-email.php" method="POST" style="display:inline;">
+                                                    <input type="hidden" name="email"
+                                                        value="<?= htmlspecialchars($subscriber['email']) ?>">
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-envelope"></i>
+                                                    </button>
+                                                </form>
                                                 <button class="btn btn-sm btn-outline-danger delete-btn"
                                                     data-id="<?= htmlspecialchars($subscriber['id'] ?? '') ?>">
                                                     <i class="fas fa-trash"></i>
