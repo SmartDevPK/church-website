@@ -647,10 +647,19 @@ if ($subscriberResult && $subscriberResult->num_rows > 0) {
                                                         <i class="fas fa-envelope"></i>
                                                     </button>
                                                 </form>
-                                                <button class="btn btn-sm btn-outline-danger delete-btn"
-                                                    data-id="<?= htmlspecialchars($subscriber['id'] ?? '') ?>">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
+                                                <form action="delete_subscriber.php" method="POST" style="display: inline;">
+                                                    <input type="hidden" name="id"
+                                                        value="<?= htmlspecialchars($subscriber['id'] ?? '') ?>">
+                                                    <input type="hidden" name="csrf_token"
+                                                        value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                        title="Delete Subscriber">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+
+
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -687,6 +696,8 @@ if ($subscriberResult && $subscriberResult->num_rows > 0) {
             </div>
         </div>
     </div>
+
+
 
 
     <!-- JavaScript Dependencies -->
@@ -806,6 +817,105 @@ if ($subscriberResult && $subscriberResult->num_rows > 0) {
                     console.log('Sending email to:', email);
                 });
             });
+        });
+
+        $(document).ready(function () {
+            let deleteId = null;
+
+            // Handle delete button click
+            $('.delete-btn').click(function () {
+                deleteId = $(this).data('id');
+                const email = $(this).data('email');
+                $('#deleteEmail').text(email);
+                $('#deleteModal').modal('show');
+            });
+
+            // Handle confirm delete
+            $('#confirmDelete').click(function () {
+                if (!deleteId) return;
+
+                $.ajax({
+                    url: 'delete_subscriber.php',
+                    method: 'POST',
+                    data: { id: deleteId },
+                    dataType: 'json'
+                })
+                    .done(function (response) {
+                        if (response.success) {
+                            // Remove row from table or refresh page
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    })
+                    .fail(function () {
+                        alert('Server error occurred');
+                    })
+                    .always(function () {
+                        $('#deleteModal').modal('hide');
+                    });
+            });
+        });
+
+        $(document).ready(function () {
+            // Delete button click handler
+            $(document).on('click', '.delete-btn', function () {
+                const button = $(this);
+                const id = button.data('id');
+                const email = button.data('email');
+                const url = button.data('url');
+                const csrfToken = button.data('csrf');
+
+                // Show confirmation dialog
+                if (!confirm(`Are you sure you want to delete ${email}?`)) {
+                    return false;
+                }
+
+                // Add loading state
+                button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+
+                // AJAX request
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: {
+                        id: id,
+                        csrf_token: csrfToken
+                    },
+                    dataType: 'json'
+                })
+                    .done(function (response) {
+                        if (response.success) {
+                            // Remove the row from table
+                            button.closest('tr').fadeOut(300, function () {
+                                $(this).remove();
+                            });
+
+                            // Show success message
+                            showAlert('success', response.message);
+                        } else {
+                            showAlert('danger', response.message);
+                            button.prop('disabled', false).html('<i class="fas fa-trash"></i>');
+                        }
+                    })
+                    .fail(function (xhr) {
+                        showAlert('danger', 'Server error: ' + xhr.statusText);
+                        button.prop('disabled', false).html('<i class="fas fa-trash"></i>');
+                    });
+            });
+
+            // Helper function to show alerts
+            function showAlert(type, message) {
+                const alert = $(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>`);
+
+                $('#alerts-container').append(alert);
+                setTimeout(() => alert.alert('close'), 5000);
+            }
         });
     </script>
 </body>
