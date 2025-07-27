@@ -1,6 +1,8 @@
 <?php
 include 'db.php';
 
+
+
 $errorMessage = '';
 $successMessage = '';
 // Create separate queries for each table
@@ -17,7 +19,7 @@ foreach ($tables as $table) {
 
 // Fetch recent devotionals (example: from 'devotion' table, limit 5)
 $devotion = [];
-$devotionQuery = "SELECT * FROM devotion ORDER BY date DESC LIMIT 5";
+$devotionQuery = "SELECT * FROM devotion ORDER BY date";
 $devotionResult = $mysqli->query($devotionQuery);
 if ($devotionResult && $devotionResult->num_rows > 0) {
     while ($row = $devotionResult->fetch_assoc()) {
@@ -25,7 +27,7 @@ if ($devotionResult && $devotionResult->num_rows > 0) {
     }
 }
 
-$sql = "SELECT id, title,  devotion_date, image, excerpt FROM devotions ORDER BY devotion_date DESC LIMIT 5";
+$sql = "SELECT id, title,  devotion_date, image, excerpt FROM devotions ORDER BY devotion_date ";
 $result = $mysqli->query($sql);
 
 $prayerRequests = [];
@@ -65,11 +67,6 @@ if ($subscriberResult && $subscriberResult->num_rows > 0) {
         $subscribers[] = $row;
     }
 }
-
-
-
-
-
 
 ?>
 
@@ -127,6 +124,11 @@ if ($subscriberResult && $subscriberResult->num_rows > 0) {
             <li>
                 <a href="admin_dashboard.php">
                     <i class="fas fa-comment-alt"></i> Approve Testimonies
+                </a>
+            </li>
+            <li>
+                <a href="family_dasborad.php">
+                    <i class="fas fa-comment-alt"></i> Family
                 </a>
             </li>
             <li>

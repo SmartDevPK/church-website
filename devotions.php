@@ -331,91 +331,146 @@
                 </form>
             </div>
 
-            <div class="devotions-grid">
-                <!-- Devotion Card 1 -->
-                <div class="devotion-card">
-                    <img src="Untitled design.png" alt="Devotion Cover" class="devotion-image">
-                    <div class="devotion-content">
-                        <div class="devotion-date">June 5, 2025</div>
-                        <h3 class="devotion-title">Surviving the HEAT</h3>
-                        <p class="devotion-excerpt">Heat in the Bible and in life generally signifies trouble, hardship,
-                            suffering, adversity, and trails...</p>
-                        <a href="todays-devotion.php" class="read-more">
-                            Read More <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
+            <?php
+            // Enable error reporting
+            error_reporting(E_ALL);
+            ini_set("display_errors", 1);
 
-                <!-- Devotion Card 2 -->
-                <div class="devotion-card">
-                    <img src="Untitled design.png" alt="Devotion Cover" class="devotion-image">
-                    <div class="devotion-content">
-                        <div class="devotion-date">June 4, 2025</div>
-                        <h3 class="devotion-title">The Peace of God</h3>
-                        <p class="devotion-excerpt">In a world filled with anxiety and uncertainty, God offers us a
-                            peace that surpasses all understanding...</p>
-                        <a href="#" class="read-more">
-                            Read More <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
+            // Database connection settings
+            $host = "localhost";
+            $port = 3307;
+            $username = "root";
+            $password = "";
+            $database = "prayer_db";
 
-                <!-- Devotion Card 3 -->
-                <div class="devotion-card">
-                    <img src="Untitled design.png" alt="Devotion Cover" class="devotion-image">
-                    <div class="devotion-content">
-                        <div class="devotion-date">June 3, 2025</div>
-                        <h3 class="devotion-title">Walking in Faith</h3>
-                        <p class="devotion-excerpt">Faith is not the absence of doubt, but the decision to trust God
-                            even when circumstances seem impossible...</p>
-                        <a href="#" class="read-more">
-                            Read More <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
+            try {
+                // Connect to MySQL
+                $conn = new mysqli($host, $username, $password, $database, $port);
+                if ($conn->connect_error) {
+                    throw new Exception("Connection failed: {$conn->connect_error}");
+                }
 
-                <!-- Devotion Card 4 -->
-                <div class="devotion-card">
-                    <img src="Untitled design.png" alt="Devotion Cover" class="devotion-image">
-                    <div class="devotion-content">
-                        <div class="devotion-date">June 2, 2025</div>
-                        <h3 class="devotion-title">The Power of Prayer</h3>
-                        <p class="devotion-excerpt">Prayer is not just asking God for things, but aligning our hearts
-                            with His will and purposes...</p>
-                        <a href="#" class="read-more">
-                            Read More <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
+                // Fetch devotions from database, ordered by date (newest first)
+                $sql = "SELECT id, title, excerpt, devotion_date, image FROM devotions ORDER BY devotion_date DESC";
+                $result = $conn->query($sql);
 
-                <!-- Devotion Card 5 -->
-                <div class="devotion-card">
-                    <img src="devotion-5.jpg" alt="Devotion Cover" class="devotion-image">
-                    <div class="devotion-content">
-                        <div class="devotion-date">June 1, 2025</div>
-                        <h3 class="devotion-title">God's Unfailing Love</h3>
-                        <p class="devotion-excerpt">No matter what we've done or where we've been, God's love remains
-                            constant and unchanging...</p>
-                        <a href="#" class="read-more">
-                            Read More <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
+                $devotions = [];
+                if ($result && $result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $devotions[] = $row;
+                    }
+                }
 
-                <!-- Devotion Card 6 -->
-                <div class="devotion-card">
-                    <img src="devotion-6.jpg" alt="Devotion Cover" class="devotion-image">
-                    <div class="devotion-content">
-                        <div class="devotion-date">May 31, 2025</div>
-                        <h3 class="devotion-title">Finding Strength in Weakness</h3>
-                        <p class="devotion-excerpt">When we are weak, then we are strong, because God's power is made
-                            perfect in our weakness...</p>
-                        <a href="#" class="read-more">
-                            Read More <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
+            } catch (Exception $e) {
+                error_log("Database error: " . $e->getMessage());
+                // You might want to show a user-friendly message
+            } finally {
+                if (isset($conn))
+                    $conn->close();
+            }
+            ?>
+
+            <!DOCTYPE html>
+            <html lang="en">
+
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Devotions</title>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                <style>
+                    .devotions-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                        gap: 20px;
+                        padding: 20px;
+                    }
+
+                    .devotion-card {
+                        border: 1px solid #e0e0e0;
+                        border-radius: 8px;
+                        overflow: hidden;
+                        transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    }
+
+                    .devotion-card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .devotion-image {
+                        width: 100%;
+                        height: 200px;
+                        object-fit: cover;
+                    }
+
+                    .devotion-content {
+                        padding: 15px;
+                    }
+
+                    .devotion-date {
+                        color: #666;
+                        font-size: 0.9rem;
+                        margin-bottom: 8px;
+                    }
+
+                    .devotion-title {
+                        margin: 0 0 10px 0;
+                        color: #333;
+                        font-size: 1.2rem;
+                    }
+
+                    .devotion-excerpt {
+                        color: #555;
+                        margin-bottom: 15px;
+                        line-height: 1.5;
+                    }
+
+                    .read-more {
+                        display: inline-flex;
+                        align-items: center;
+                        color: #0066cc;
+                        text-decoration: none;
+                        font-weight: 500;
+                    }
+
+                    .read-more i {
+                        margin-left: 5px;
+                        transition: transform 0.3s ease;
+                    }
+
+                    .read-more:hover i {
+                        transform: translateX(3px);
+                    }
+                </style>
+            </head>
+
+            <body>
+                <div class="devotions-grid">
+                    <?php if (!empty($devotions)): ?>
+                        <?php foreach ($devotions as $devotion): ?>
+                            <div class="devotion-card">
+                                <img src="<?= htmlspecialchars($devotion['image'] ?? 'default-devotion.jpg') ?>"
+                                    alt="<?= htmlspecialchars($devotion['title']) ?>" class="devotion-image">
+                                <div class="devotion-content">
+                                    <div class="devotion-date">
+                                        <?= date('F j, Y', strtotime($devotion['devotion_date'])) ?>
+                                    </div>
+                                    <h3 class="devotion-title"><?= htmlspecialchars($devotion['title']) ?></h3>
+                                    <p class="devotion-excerpt"><?= htmlspecialchars($devotion['excerpt']) ?></p>
+                                    <a href="todays-devotion.php?id=<?= $devotion['id'] ?>" class="read-more">
+                                        Read More <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p>No devotions found. Please check back later.</p>
+                    <?php endif; ?>
                 </div>
-            </div>
+            </body>
+
+            </html>
 
             <div class="pagination">
                 <a href="#" class="page-link"><i class="fas fa-chevron-left"></i></a>
