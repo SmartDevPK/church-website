@@ -522,6 +522,7 @@
         }
 
         .comment-form-btn {
+            text-decoration: none;
             background-color: var(--primary);
             color: white;
             border: none;
@@ -1077,7 +1078,9 @@
                         <div class="comments-header">
                             <h3 class="comments-title">Comments <span class="comment-count">0</span></h3>
                             <button class="comment-form-btn">
-                                <i class="fas fa-comment"></i> Leave a Comment
+                                <a href="comments.php" class="comment-form-btn">
+                                    <i class="fas fa-comment"></i> Leave a Comment
+                                </a>
                             </button>
                         </div>
 
@@ -1250,29 +1253,7 @@
         </div>
     </footer>
 
-    <!-- Comment Modal -->
-    <div class="modal-content">
-        <h2>Leave a Comment</h2>
-        <p>Share your thoughts about this devotion with our community.</p>
 
-        <form action="submit_comment.php" method="POST">
-            <div class="form-group">
-                <label for="commentName">Your Name</label>
-                <input type="text" id="commentName" name="name" class="form-control" required>
-            </div>
-
-            <div class="form-group">
-                <label for="commentText">Your Comment</label>
-                <textarea id="commentText" name="comment" class="form-control" required></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Post Comment</button>
-        </form>
-
-
-        <p style="color: #555; font-style: italic;">Comments will be visible to everyone after submission.</p>
-        <div id="commentList"></div>
-    </div>
 
 
     <!-- Scripts -->

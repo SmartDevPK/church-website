@@ -545,6 +545,7 @@
                     <li><a href="devotions.php">Devotions</a></li>
                     <li><a href="prayer.php">Prayer</a></li>
                     <li><a href="testimonies.php">Testimonies</a></li>
+                    <li><a href="comments.php">Comments</a></li>
                     <li><a href="about.php">About</a></li>
                     <li><a href="#subscribe">Subscribe</a></li>
                 </ul>
@@ -746,6 +747,7 @@
                         <li><a href="devotions.php">Devotions</a></li>
                         <li><a href="prayer.php">Prayer</a></li>
                         <li><a href="testimonies.php">Testimonies</a></li>
+                        <li><a href="comments.php">Comments</a></li>
                         <li><a href="about.php">About</a></li>
                     </ul>
                 </div>
