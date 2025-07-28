@@ -354,6 +354,7 @@ try {
                             </button>
                         </div>
                     </div>
+
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -424,7 +425,6 @@ try {
                         </nav>
                     </div>
                 </div>
-
                 <!-- Add/Edit Devotional Form -->
                 <div class="page-content" id="edit-devotional-page">
                     <div class="container-fluid mt-4">
