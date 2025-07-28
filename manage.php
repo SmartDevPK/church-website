@@ -139,30 +139,18 @@ $stmt->close();
                                 Manage Devotions
                             </a>
                         </li>
-                        <li>
-                            <a href="users.php" class="nav-link">
-                                <i class="fas fa-users me-2"></i>
-                                Manage Users
-                            </a>
-                        </li>
-                        <li>
-                            <a href="settings.php" class="nav-link">
-                                <i class="fas fa-cog me-2"></i>
-                                Settings
-                            </a>
-                        </li>
+
+
                     </ul>
                     <hr>
                     <div class="dropdown">
                         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                             id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-user-circle me-2" style="font-size: 1.5rem;"></i>
-                            <strong><?= htmlspecialchars($_SESSION['username']) ?></strong>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
+
+                            <hr class="dropdown-divider">
                             </li>
                             <li><a class="dropdown-item" href="logout.php">Sign out</a></li>
                         </ul>
