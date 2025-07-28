@@ -1,8 +1,8 @@
 <?php
-// Database connection and data fetching at the top
+// Start session and authentication check
+
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
-
 // Database configuration
 $host = "localhost";
 $port = 3307;
@@ -18,254 +18,305 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch devotion data
-$devotion_id = $_GET['id'] ?? null;
+// Default section headings
+$default_headings = [
+    'understanding_heat' => "Understanding the Nature of Heat",
+    'purpose_of_heat' => "The Purpose of Heat in Our Lives",
+    'biblical_examples' => "Biblical Examples of Surviving Heat",
+    'practical_steps' => "Practical Steps for Surviving Heat",
+    'promise_of_fruitfulness' => "The Promise of Fruitfulness"
+];
 
-if ($devotion_id) {
-    $stmt = $conn->prepare("SELECT * FROM todayDevotions WHERE id = ?");
-    $stmt->bind_param("i", $devotion_id);
-} else {
-    $stmt = $conn->prepare("SELECT * FROM todayDevotions ORDER BY created_at DESC LIMIT 1");
+// Handle form submission
+$success = $error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $verse_text = $conn->real_escape_string($_POST['verse_text'] ?? '');
+    $verse_reference = $conn->real_escape_string($_POST['verse_reference'] ?? '');
+    $introduction_text = $conn->real_escape_string($_POST['introduction_text'] ?? '');
+
+    // Prepare sections as JSON including both headings and content
+    $sections = [];
+    foreach ($default_headings as $key => $default_heading) {
+        $heading = $conn->real_escape_string($_POST[$key . '_heading'] ?? $default_heading);
+        $content = $conn->real_escape_string($_POST[$key] ?? '');
+
+        $sections[$key] = [
+            'heading' => $heading,
+            'content' => $content
+        ];
+    }
+
+    $sections_json = json_encode($sections);
+
+    // Insert into database
+    $stmt = $conn->prepare("INSERT INTO todayDevotions (verse_text, verse_reference, introduction_text, sections) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $verse_text, $verse_reference, $introduction_text, $sections_json);
+
+    if ($stmt->execute()) {
+        $success = "Devotion content added successfully!";
+        // Clear form on successful submission
+        $_POST = [];
+    } else {
+        $error = "Error: " . $stmt->error;
+    }
+    $stmt->close();
 }
-
-$stmt->execute();
-$result = $stmt->get_result();
-$devotion = $result->fetch_assoc();
-$stmt->close();
-
-if (!$devotion) {
-    die("Devotional not found");
-}
-
-// Decode sections
-$sections = json_decode($devotion['sections'], true) ?? [];
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Today's Devotion - The Anchor Devotional</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <title>Devotion Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* CSS styles remain unchanged */
         :root {
             --primary: #ad3128;
             --secondary: #2c3e50;
-            --accent: #2c3e50;
             --light: #f8f9fa;
             --dark: #212529;
             --text: #333;
             --text-light: #6c757d;
-            --success: #28a745;
-            --warning: #ffc107;
-            --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            --font-heading: 'Georgia', serif;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15);
-            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* Rest of your CSS styles... */
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background-color: var(--dark);
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .content-area {
+            padding: 20px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .editor-container {
+            min-height: 200px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-header input {
+            flex-grow: 1;
+            margin-left: 10px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: none;
+            border-bottom: 2px solid #eee;
+            padding: 5px 0;
+        }
+
+        .section-header input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .section-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: #8a2720;
+            border-color: #8a2720;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                min-height: auto;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .section-header input {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
 <body>
-    <!-- Header Section -->
-    <header id="header">
-        <div class="container">
-            <nav>
-                <a href="index.php" class="logo">The <span>Anchor Devotional</span></a>
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <ul class="nav-links" id="navLinks">
-                    <li><a href="index.php">Home</a></li>
-                    <li><a href="devotions.php">Devotions</a></li>
-                    <li><a href="prayer.php">Prayer</a></li>
-                    <li><a href="testimonies.php">Testimonies</a></li>
-                    <li><a href="comments.php">Comments</a></li>
-                    <li><a href="about.php">About</a></li>
-                    <li><a href="#subscribe">Subscribe</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar p-0">
+                <div class="d-flex flex-column flex-shrink-0 p-3">
+                    <a href="#"
+                        class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                        <span class="fs-4">Admin Panel</span>
+                    </a>
+                    <hr>
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        <li class="nav-item">
+                            <a href="admin.php" class="nav-link active">
+                                <i class="fas fa-plus-circle me-2"></i>
+                                Add New Devotion
+                            </a>
+                        </li>
+                        <li>
+                            <a href="manage.php" class="nav-link">
+                                <i class="fas fa-list me-2"></i>
+                                Manage Devotions
+                            </a>
+                        </li>
+                        <li>
+                            <a href="dashboard.php" class="nav-link">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                    </ul>
+                    <hr>
+                    <div class="dropdown">
 
-    <!-- Devotion Header with Image -->
-    <div class="devotion-header" data-aos="fade-in">
-        <img src="<?= htmlspecialchars($devotion['image_path'] ?? 'default-image.jpg') ?>" alt="Today's Devotion"
-            class="devotion-header-image">
-        <div class="devotion-header-content">
-            <h1 class="devotion-header-title">
-                <?= htmlspecialchars($devotion['topic'] ?? 'Daily Devotion') ?>
-            </h1>
-            <div class="devotion-header-date">
-                <i class="fas fa-calendar-alt"></i>
-                <span>
-                    The Anchor - <?= date("F j, Y", strtotime($devotion['date'] ?? 'now')) ?>
-                </span>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="logout.php">Sign out</a></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <a href="download/devotionals.pdf" class="download-btn" download>
-                <i class="fas fa-download"></i> Download PDF
-            </a>
-        </div>
-    </div>
 
-    <!-- Main Devotion Content -->
-    <div class="devotion-content-container">
-        <div class="container">
-            <div class="devotion-content" data-aos="fade-up">
-                <p class="devotion-verse">
-                    <?= nl2br(htmlspecialchars($devotion['verse_text'] ?? '')) ?>
-                    <br><br>
-                    <?= htmlspecialchars($devotion['verse_reference'] ?? '') ?>
-                </p>
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 ms-sm-auto px-md-4 py-4 content-area">
+                <div
+                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Add New Devotion</h1>
+                </div>
 
-                <div class="devotion-text">
-                    <p><?= nl2br(htmlspecialchars($devotion['introduction_text'] ?? '')) ?></p>
+                <?php if ($success): ?>
+                    <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+                <?php endif; ?>
+
+                <?php if ($error): ?>
+                    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+                <?php endif; ?>
+
+                <form method="POST">
+                    <!-- Verse Section -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-bible me-2 section-icon"></i>Verse Section</h4>
+                        <div class="mb-3">
+                            <label for="verse_text" class="form-label">Verse Text</label>
+                            <textarea class="form-control editor-container" id="verse_text" name="verse_text" rows="5"
+                                required><?= htmlspecialchars($_POST['verse_text'] ?? '') ?></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="verse_reference" class="form-label">Verse Reference</label>
+                            <input type="text" class="form-control" id="verse_reference" name="verse_reference"
+                                value="<?= htmlspecialchars($_POST['verse_reference'] ?? '') ?>" required>
+                        </div>
+                    </div>
+
+                    <!-- Introduction -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-paragraph me-2 section-icon"></i>Introduction</h4>
+                        <div class="mb-3">
+                            <textarea class="form-control editor-container" id="introduction_text"
+                                name="introduction_text" rows="8"
+                                required><?= htmlspecialchars($_POST['introduction_text'] ?? '') ?></textarea>
+                        </div>
+                    </div>
 
                     <!-- Dynamic Sections -->
-                    <?php foreach ($sections as $section): ?>
-                        <?php if (!empty($section['heading']) && !empty($section['content'])): ?>
-                            <h3><?= htmlspecialchars($section['heading']) ?></h3>
-                            <p><?= nl2br(htmlspecialchars($section['content'])) ?></p>
-                        <?php endif; ?>
+                    <?php foreach ($default_headings as $key => $heading): ?>
+                        <div class="form-section">
+                            <div class="section-header">
+                                <i class="fas 
+                                    <?= $key === 'understanding_heat' ? 'fa-fire' : '' ?>
+                                    <?= $key === 'purpose_of_heat' ? 'fa-hammer' : '' ?>
+                                    <?= $key === 'biblical_examples' ? 'fa-book-bible' : '' ?>
+                                    <?= $key === 'practical_steps' ? 'fa-footsteps' : '' ?>
+                                    <?= $key === 'promise_of_fruitfulness' ? 'fa-apple-alt' : '' ?>
+                                    me-2 section-icon"></i>
+                                <input type="text" class="form-control" id="<?= $key ?>_heading" name="<?= $key ?>_heading"
+                                    value="<?= htmlspecialchars($_POST[$key . '_heading'] ?? $heading) ?>" required>
+                            </div>
+                            <div class="mb-3">
+                                <textarea class="form-control editor-container" id="<?= $key ?>" name="<?= $key ?>" rows="8"
+                                    required><?= htmlspecialchars($_POST[$key] ?? '') ?></textarea>
+                            </div>
+                        </div>
                     <?php endforeach; ?>
-                </div>
 
-                <!-- Devotion Actions -->
-                <div class="devotion-actions">
-                    <a href="download/devotionals.pdf" class="download-btn">
-                        <i class="fas fa-download"></i> Download Full Devotional
-                    </a>
-                    <div class="social-share">
-                        <span>Share this devotion:</span>
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-whatsapp"></i></a>
-                        <a href="#"><i class="fas fa-envelope"></i></a>
+                    <!-- Submit Buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="reset" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-undo me-1"></i> Reset
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Save Devotion
+                        </button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- More Devotions Section -->
-    <div class="more-devotions">
-        <div class="container">
-            <h2 data-aos="fade-up">Explore More Devotions</h2>
-            <a href="past-devotions.php" class="btn btn-primary" data-aos="fade-up" data-aos-delay="100">
-                <i class="fas fa-book-open"></i> View Past Devotions
-            </a>
-        </div>
-    </div>
-
-    <!-- Footer Section -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column" data-aos="fade-up">
-                    <h3>The Anchor</h3>
-                    <p>A daily devotional ministry committed to helping believers grow in their relationship with God
-                        through Scripture meditation and prayer.</p>
-                    <div class="social-links">
-                        <a href="https://www.facebook.com/share/16qPpevT47/?mibextid=wwXIfr"><i
-                                class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="https://youtube.com/@gospelbelieversmissiongbm856?si=1daf735fcUE6uiao"><i
-                                class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-
-                <div class="footer-column" data-aos="fade-up" data-aos-delay="100">
-                    <h3>Quick Links</h3>
-                    <ul class="footer-links">
-                        <li><a href="index.php">Home</a></li>
-                        <li><a href="devotions.php">Devotions</a></li>
-                        <li><a href="prayer.php">Prayer</a></li>
-                        <li><a href="testimonies.php">Testimonies</a></li>
-                        <li><a href="comments.php">Comments</a></li>
-                        <li><a href="about.php">About</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-column" data-aos="fade-up" data-aos-delay="200">
-                    <h3>Resources</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Bible Reading Plans</a></li>
-                        <li><a href="#">Downloadable Devotionals</a></li>
-                        <li><a href="#">Prayer Guides</a></li>
-                        <li><a href="#">Bible Study Tools</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-column" data-aos="fade-up" data-aos-delay="300">
-                    <h3>Contact Us</h3>
-                    <ul class="footer-links">
-                        <li><i class="fas fa-map-marker-alt"></i> Abuja, Nigeria</li>
-                        <li><i class="fas fa-phone"></i> +234 812 345 6789</li>
-                        <li><i class="fas fa-envelope"></i> info@theanchordevotional.com</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="copyright">
-                &copy; 2025 The Anchor Devotional. All Rights Reserved.
-            </div>
-        </div>
-    </footer>
-
-    <!-- JavaScript Libraries and Scripts -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Initialize AOS animation library
-        AOS.init({
-            duration: 800,
-            easing: 'ease-in-out',
-            once: true
-        });
+        // Enhance textareas with basic functionality
+        document.querySelectorAll('.editor-container').forEach(textarea => {
+            textarea.addEventListener('keydown', function (e) {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
 
-        // Mobile Menu Toggle
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const navLinks = document.getElementById('navLinks');
+                    // Set textarea value to: text before caret + tab + text after caret
+                    this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
 
-        mobileMenuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') ?
-                '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
-        });
-
-        // Close mobile menu when clicking a link
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    // Put caret at right position again
+                    this.selectionStart = this.selectionEnd = start + 1;
+                }
             });
         });
-
-        // Header scroll effect
-        const header = document.getElementById('header');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 100) {
-                header.classList.add('header-scrolled');
-            } else {
-                header.classList.remove('header-scrolled');
-            }
-        });
-
-        // Initialize with header scrolled if page is not at top
-        if (window.scrollY > 100) {
-            header.classList.add('header-scrolled');
-        }
     </script>
 </body>
 
 </html>
 <?php
-// Close database connection
 $conn->close();
 ?>

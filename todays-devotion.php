@@ -609,7 +609,7 @@
     $devotion_id = $_GET['id'] ?? null;
 
     if ($devotion_id) {
-        $stmt = $conn->prepare("SELECT * FROM todayDevotions WHERE id = ?");
+        $stmt = $conn->prepare("SELECT * FROM todayDevotion WHERE id = ?");
         $stmt->bind_param("i", $devotion_id);
     } else {
         $stmt = $conn->prepare("SELECT * FROM todayDevotions ORDER BY created_at DESC LIMIT 1");
