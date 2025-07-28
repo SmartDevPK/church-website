@@ -66,10 +66,25 @@ try {
     $devotionQuery->close();
 
     // 3. Fetch devotions
+    $limit = 10; // Number of items per page
+    $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+    $offset = ($page - 1) * $limit;
+
+    // Get total number of devotionals for pagination
+    $count_sql = $mysqli->prepare("SELECT COUNT(*) as total FROM devotions");
+    $count_sql->execute();
+    $count_result = $count_sql->get_result();
+    $total_rows = $count_result->fetch_assoc()['total'];
+    $total_pages = ceil($total_rows / $limit);
+    $count_sql->close();
+
+    // Fetch devotionals with pagination
     $devotions = [];
-    $sql = $mysqli->prepare("SELECT id, title, devotion_date, image, excerpt FROM devotions ORDER BY devotion_date");
+    $sql = $mysqli->prepare("SELECT id, title, devotion_date, image, excerpt FROM devotions ORDER BY devotion_date DESC LIMIT ? OFFSET ?");
+    $sql->bind_param("ii", $limit, $offset);
     $sql->execute();
     $result = $sql->get_result();
+
     while ($row = $result->fetch_assoc()) {
         $devotions[] = $row;
     }
@@ -79,7 +94,6 @@ try {
     $prayerRequests = [];
     $prayerQuery = $mysqli->prepare("SELECT name, email, prayer AS title, request_date AS created_at 
                                     FROM prayer_requests 
-                                    WHERE request_date >= NOW() - INTERVAL 1 DAY
                                     ORDER BY created_at DESC 
                                     LIMIT 20");
     $prayerQuery->execute();
@@ -353,8 +367,8 @@ try {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php if (isset($result) && $result->num_rows > 0): ?>
-                                        <?php while ($row = $result->fetch_assoc()): ?>
+                                    <?php if (!empty($devotions)): ?>
+                                        <?php foreach ($devotions as $row): ?>
                                             <tr>
                                                 <td>
                                                     <?php $imagePath = !empty($row['image']) ? $row['image'] : 'default-image.jpg'; ?>
@@ -366,12 +380,11 @@ try {
                                                 </td>
                                                 <td><?= htmlspecialchars($row['excerpt'] ?? '') ?></td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-outline-primary">
-                                                        <a href=" Edevotional.php?id=<?= $row['id'] ?>">
-                                                            <i class="fas fa-edit"></i>
-                                                        </a>
-                                                    </button>
-                                                    <form method="POST" action="delete_devotions.php"
+                                                    <a href="Edevotional.php?id=<?= $row['id'] ?>"
+                                                        class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <form method="POST" action="delete_devotional.php"
                                                         style="display:inline-block;">
                                                         <input type="hidden" name="id" value="<?= $row['id'] ?? '' ?>">
                                                         <button type="submit" class="btn btn-sm btn-outline-danger"
@@ -381,7 +394,7 @@ try {
                                                     </form>
                                                 </td>
                                             </tr>
-                                        <?php endwhile; ?>
+                                        <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
                                             <td colspan="5">No devotionals found.</td>
@@ -390,587 +403,594 @@ try {
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Pagination -->
                         <nav aria-label="Page navigation" class="mt-3">
                             <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Add/Edit Devotional Form -->
-        <div class="page-content" id="edit-devotional-page">
-            <div class="container-fluid mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 id="devotional-form-title">Add New Devotional</h4>
-                    <button class="btn btn-outline-secondary" id="back-to-devotionals">
-                        <i class="fas fa-arrow-left"></i> Back to Devotionals
-                    </button>
-                </div>
-
-                <h2 class="mb-4">Add New Devotional</h2>
-
-                <!-- Display error/success messages -->
-                <?php if (isset($_GET['error'])): ?>
-                    <div class="alert alert-danger"><?= htmlspecialchars($_GET['error']) ?></div>
-                <?php endif; ?>
-                <?php if (isset($_GET['success'])): ?>
-                    <div class="alert alert-success">Devotional added successfully!</div>
-                <?php endif; ?>
-
-                <form action="save_devotional.php" method="POST" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="title">Title</label>
-                            <input type="text" name="title" id="title" class="form-control" </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="excerpt">Excerpt</label>
-                                <textarea name="excerpt" id="excerpt" class="form-control" rows="3" required></textarea>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="devotional_date">Date</label>
-                            <input type="date" name="devotional_date" id="devotional_date" class="form-control"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="image">Cover Image</label>
-                            <input type="file" name="image" id="image" class="form-control" accept="image/*" required>
-                            <small class="text-muted">Only JPG, PNG, GIF allowed (Max 2MB)</small>
-                        </div>
-                        <div class="d-flex justify-content-end gap-2">
-                            <button type="submit" name="submit" class="btn btn-primary">Submit</button>
-                        </div>
-                </form>
-            </div>
-        </div>
-
-    </div>
-    </div>
-
-
-    <!-- Prayer Requests Page -->
-    <div class="page-content" id="prayer-requests-page">
-        <div class="container-fluid mt-4">
-            <h4 class="mb-4">Prayer Requests</h4>
-
-            <div class="dashboard-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>All Prayer Requests</span>
-                    <div class="input-group" style="width: 300px;">
-                        <input type="text" class="form-control" placeholder="Search requests..." id="searchInput">
-                        <button class="btn btn-outline-secondary" type="button" onclick="searchRequests()">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover" id="prayerRequestsTable">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Prayer Request</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($prayerRequests)): ?>
-                                    <?php foreach ($prayerRequests as $request): ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($request['name']); ?></td>
-                                            <td><?php echo htmlspecialchars($request['email']); ?></td>
-                                            <td class="text-truncate" style="max-width: 200px;"
-                                                title="<?php echo htmlspecialchars($request['title']); ?>">
-                                                <?php echo htmlspecialchars($request['title']); ?>
-                                            </td>
-                                            <td><?php echo date('F j, Y, g:i a', strtotime($request['created_at'])); ?></td>
-
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="5" class="text-center">No prayer requests found within the last 24
-                                            hours.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Testimonies Page -->
-    <div class="page-content" id="testimonies-page">
-        <button>Approve </button>
-        <div class="container-fluid mt-4">
-            <h4 class="mb-4">Testimonies</h4>
-
-            <div class="dashboard-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>All Recent Testimonies (Last 24 Hours)</span>
-                    <div class="input-group" style="width: 300px;">
-                        <input type="text" class="form-control" placeholder="Search testimonies..."
-                            id="testimonySearch">
-                        <button class="btn btn-outline-secondary" type="button" onclick="searchTestimonies()">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card-body">
-                    <?php if (isset($_GET['delete'])): ?>
-                        <div class="alert alert-<?= $_GET['delete'] === 'success' ? 'success' : 'danger' ?> mb-4">
-                            <?= $_GET['delete'] === 'success' ?
-                                'Testimony deleted successfully.' :
-                                ($_GET['delete'] === 'error' ?
-                                    'Failed to delete testimony.' :
-                                    'Invalid delete request.') ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="table-responsive">
-                        <table class="table table-hover" id="testimoniesTable">
-                            <thead>
-                                <tr>
-
-
-                                    <th>Name</th>
-                                    <th>Initials</th>
-                                    <th>Testimony</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($testimonies)): ?>
-                                    <?php foreach ($testimonies as $testimony): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($testimony['name']); ?></td>
-                                            <td><?= htmlspecialchars($testimony['initials']); ?></td>
-                                            <td class="text-truncate" style="max-width: 300px;"
-                                                title="<?= htmlspecialchars($testimony['message'] ?? ''); ?>">
-                                                <?= htmlspecialchars($testimony['message'] ?? ''); ?>
-                                            </td>
-                                            <td><?= date('F j, Y, g:i A', strtotime($testimony['date'])); ?></td>
-                                            <td>
-                                                <?php $statusClass = [
-                                                    'pending' => 'bg-warning text-dark',
-                                                    'approved' => 'bg-success',
-                                                    'rejected' => 'bg-danger'
-                                                ][$testimony['status']] ?? 'bg-info text-dark'; ?>
-
-                                                <span class="badge <?= $statusClass ?>">
-                                                    <?= htmlspecialchars($testimony['status']); ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex gap-2">
-                                                    <form action="delete_user.php" method="POST"
-                                                        onsubmit="return confirm('Are you sure you want to delete this testimony?');">
-                                                        <input type="hidden" name="id" value="<?= $testimony['id'] ?>">
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                            title="Delete">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
-
-                                                    <?php if ($testimony['status'] === 'pending'): ?>
-                                                        <form action="approve_testimony.php" method="POST">
-                                                            <input type="hidden" name="id" value="<?= $testimony['id'] ?>">
-                                                            <button type="submit" class="btn btn-sm btn-outline-success"
-                                                                title="Approve">
-                                                                <i class="fas fa-check"></i>
-                                                            </button>
-                                                        </form>
-
-                                                    <?php endif; ?>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="6" class="text-center">No testimonies found in the last 24 hours.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function searchTestimonies() {
-            const input = document.getElementById('testimonySearch');
-            const filter = input.value.toUpperCase();
-            const table = document.getElementById('testimoniesTable');
-            const tr = table.getElementsByTagName('tr');
-
-            for (let i = 1; i < tr.length; i++) {
-                let found = false;
-                const td = tr[i].getElementsByTagName('td');
-
-                for (let j = 0; j < td.length - 1; j++) {
-                    if (td[j]) {
-                        const txtValue = td[j].textContent || td[j].innerText;
-                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-
-                tr[i].style.display = found ? '' : 'none';
-            }
-        }
-    </script>
-
-
-
-    <!-- Subscribers Page -->
-    <div class="page-content" id="subscribers-page">
-        <div class="container-fluid mt-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4>Subscribers</h4>
-                <button class="btn btn-primary">
-                    <i class="fas fa-download"></i> Export List
-                </button>
-            </div>
-
-            <div class="dashboard-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>All Subscribers</span>
-                    <div class="input-group" style="width: 300px;">
-                        <input type="text" class="form-control" placeholder="Search subscribers..."
-                            id="subscriber-search">
-                        <button class="btn btn-outline-secondary" type="button" id="search-button">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Email</th>
-                                    <th>Join Date</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($subscribers)): ?>
-                                    <?php foreach ($subscribers as $subscriber): ?>
-                                        <tr data-subscriber-id="<?= htmlspecialchars($subscriber['id'] ?? '') ?>">
-                                            <td><?= htmlspecialchars($subscriber['email']) ?></td>
-                                            <td><?= date("F j, Y", strtotime($subscriber['subscribed_at'])) ?></td>
-                                            <td>
-                                                <?php
-                                                $status = $subscriber['status'] ?? 'Active';
-                                                $badgeClass = $status === 'Active' ? 'bg-success' : 'bg-secondary';
-                                                ?>
-                                                <span class="badge <?= $badgeClass ?>">
-                                                    <?= htmlspecialchars($status) ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <form action="send-email.php" method="POST" style="display:inline;">
-                                                    <input type="hidden" name="email"
-                                                        value="<?= htmlspecialchars($subscriber['email']) ?>">
-                                                    <button type="submit" class="btn btn-sm btn-outline-primary">
-                                                        <i class="fas fa-envelope"></i>
-                                                    </button>
-                                                </form>
-                                                <form action="delete_subscriber.php" method="POST" style="display: inline;">
-                                                    <input type="hidden" name="id"
-                                                        value="<?= htmlspecialchars($subscriber['id'] ?? '') ?>">
-                                                    <input type="hidden" name="csrf_token"
-                                                        value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                        title="Delete Subscriber">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-
-
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="4" class="text-center py-4">No subscribers found.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    <?php if (!empty($subscribers) && isset($totalPages) && $totalPages > 1): ?>
-                        <nav aria-label="Page navigation" class="mt-3">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
-                                    <a class="page-link" href="?page=<?= $currentPage - 1 ?>" tabindex="-1">Previous</a>
+                                <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $page - 1 ?>" tabindex="-1">Previous</a>
                                 </li>
 
-                                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                    <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
+                                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                                    <li class="page-item <?= ($page == $i) ? 'active' : '' ?>">
                                         <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
                                     </li>
                                 <?php endfor; ?>
 
-                                <li class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
-                                    <a class="page-link" href="?page=<?= $currentPage + 1 ?>">Next</a>
+                                <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $page + 1 ?>">Next</a>
                                 </li>
                             </ul>
                         </nav>
-                    <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- Add/Edit Devotional Form -->
+                <div class="page-content" id="edit-devotional-page">
+                    <div class="container-fluid mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 id="devotional-form-title">Add New Devotional</h4>
+                            <button class="btn btn-outline-secondary" id="back-to-devotionals">
+                                <i class="fas fa-arrow-left"></i> Back to Devotionals
+                            </button>
+                        </div>
+
+                        <h2 class="mb-4">Add New Devotional</h2>
+
+                        <!-- Display error/success messages -->
+                        <?php if (isset($_GET['error'])): ?>
+                            <div class="alert alert-danger"><?= htmlspecialchars($_GET['error']) ?></div>
+                        <?php endif; ?>
+                        <?php if (isset($_GET['success'])): ?>
+                            <div class="alert alert-success">Devotional added successfully!</div>
+                        <?php endif; ?>
+
+                        <form action="save_devotional.php" method="POST" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="title">Title</label>
+                                    <input type="text" name="title" id="title" class="form-control" </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="excerpt">Excerpt</label>
+                                        <textarea name="excerpt" id="excerpt" class="form-control" rows="3"
+                                            required></textarea>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="devotional_date">Date</label>
+                                    <input type="date" name="devotional_date" id="devotional_date" class="form-control"
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="image">Cover Image</label>
+                                    <input type="file" name="image" id="image" class="form-control" accept="image/*"
+                                        required>
+                                    <small class="text-muted">Only JPG, PNG, GIF allowed (Max 2MB)</small>
+                                </div>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- Prayer Requests Page -->
+        <div class="page-content" id="prayer-requests-page">
+            <div class="container-fluid mt-4">
+                <h4 class="mb-4">Prayer Requests</h4>
+
+                <div class="dashboard-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>All Prayer Requests</span>
+                        <div class="input-group" style="width: 300px;">
+                            <input type="text" class="form-control" placeholder="Search requests..." id="searchInput">
+                            <button class="btn btn-outline-secondary" type="button" onclick="searchRequests()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="prayerRequestsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Prayer Request</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (!empty($prayerRequests)): ?>
+                                        <?php foreach ($prayerRequests as $request): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($request['name']); ?></td>
+                                                <td><?php echo htmlspecialchars($request['email']); ?></td>
+                                                <td class="text-truncate" style="max-width: 200px;"
+                                                    title="<?php echo htmlspecialchars($request['title']); ?>">
+                                                    <?php echo htmlspecialchars($request['title']); ?>
+                                                </td>
+                                                <td><?php echo date('F j, Y, g:i a', strtotime($request['created_at'])); ?></td>
+
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="5" class="text-center">No prayer requests found within the last 24
+                                                hours.</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- Testimonies Page -->
+        <div class="page-content" id="testimonies-page">
+            <button>Approve </button>
+            <div class="container-fluid mt-4">
+                <h4 class="mb-4">Testimonies</h4>
+
+                <div class="dashboard-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>All Recent Testimonies (Last 24 Hours)</span>
+                        <div class="input-group" style="width: 300px;">
+                            <input type="text" class="form-control" placeholder="Search testimonies..."
+                                id="testimonySearch">
+                            <button class="btn btn-outline-secondary" type="button" onclick="searchTestimonies()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <?php if (isset($_GET['delete'])): ?>
+                            <div class="alert alert-<?= $_GET['delete'] === 'success' ? 'success' : 'danger' ?> mb-4">
+                                <?= $_GET['delete'] === 'success' ?
+                                    'Testimony deleted successfully.' :
+                                    ($_GET['delete'] === 'error' ?
+                                        'Failed to delete testimony.' :
+                                        'Invalid delete request.') ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="testimoniesTable">
+                                <thead>
+                                    <tr>
 
 
+                                        <th>Name</th>
+                                        <th>Initials</th>
+                                        <th>Testimony</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (!empty($testimonies)): ?>
+                                        <?php foreach ($testimonies as $testimony): ?>
+                                            <tr>
+                                                <td><?= htmlspecialchars($testimony['name']); ?></td>
+                                                <td><?= htmlspecialchars($testimony['initials']); ?></td>
+                                                <td class="text-truncate" style="max-width: 300px;"
+                                                    title="<?= htmlspecialchars($testimony['message'] ?? ''); ?>">
+                                                    <?= htmlspecialchars($testimony['message'] ?? ''); ?>
+                                                </td>
+                                                <td><?= date('F j, Y, g:i A', strtotime($testimony['date'])); ?></td>
+                                                <td>
+                                                    <?php $statusClass = [
+                                                        'pending' => 'bg-warning text-dark',
+                                                        'approved' => 'bg-success',
+                                                        'rejected' => 'bg-danger'
+                                                    ][$testimony['status']] ?? 'bg-info text-dark'; ?>
 
+                                                    <span class="badge <?= $statusClass ?>">
+                                                        <?= htmlspecialchars($testimony['status']); ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex gap-2">
+                                                        <form action="delete_user.php" method="POST"
+                                                            onsubmit="return confirm('Are you sure you want to delete this testimony?');">
+                                                            <input type="hidden" name="id" value="<?= $testimony['id'] ?>">
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                                title="Delete">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
 
-    <!-- JavaScript Dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Wait for DOM to be fully loaded
-        document.addEventListener('DOMContentLoaded', function () {
-            // Sidebar toggle functionality
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('main-content');
+                                                        <?php if ($testimony['status'] === 'pending'): ?>
+                                                            <form action="approve_testimony.php" method="POST">
+                                                                <input type="hidden" name="id" value="<?= $testimony['id'] ?>">
+                                                                <button type="submit" class="btn btn-sm btn-outline-success"
+                                                                    title="Approve">
+                                                                    <i class="fas fa-check"></i>
+                                                                </button>
+                                                            </form>
 
-            if (sidebarToggle && sidebar && mainContent) {
-                sidebarToggle.addEventListener('click', function () {
-                    sidebar.classList.toggle('active');
-                    mainContent.classList.toggle('active');
-                });
-            }
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="6" class="text-center">No testimonies found in the last 24 hours.
+                                            </td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            // Page navigation
-            const menuLinks = document.querySelectorAll('.sidebar-menu a[data-page]');
-            menuLinks.forEach(link => {
-                link.addEventListener('click', function (e) {
-                    e.preventDefault();
+        <script>
+            function searchTestimonies() {
+                const input = document.getElementById('testimonySearch');
+                const filter = input.value.toUpperCase();
+                const table = document.getElementById('testimoniesTable');
+                const tr = table.getElementsByTagName('tr');
 
-                    // Remove active class from all links
-                    menuLinks.forEach(item => {
-                        item.classList.remove('active');
-                    });
+                for (let i = 1; i < tr.length; i++) {
+                    let found = false;
+                    const td = tr[i].getElementsByTagName('td');
 
-                    // Add active class to clicked link
-                    this.classList.add('active');
-
-                    // Hide all pages
-                    document.querySelectorAll('.page-content').forEach(page => {
-                        page.classList.remove('active');
-                    });
-
-                    // Show selected page
-                    const pageId = this.getAttribute('data-page') + '-page';
-                    const targetPage = document.getElementById(pageId);
-                    if (targetPage) {
-                        targetPage.classList.add('active');
-                    }
-                });
-            });
-
-            // Devotional form navigation
-            const newDevotionalBtn = document.getElementById('new-devotional-btn');
-            const backToDevotionals = document.getElementById('back-to-devotionals');
-
-            if (newDevotionalBtn) {
-                newDevotionalBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.getElementById('devotionals-page').classList.remove('active');
-                    document.getElementById('edit-devotional-page').classList.add('active');
-                    document.getElementById('devotional-form-title').textContent = 'Add New Devotional';
-                });
-
-            }
-
-            if (backToDevotionals) {
-                backToDevotionals.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.getElementById('edit-devotional-page').classList.remove('active');
-                    document.getElementById('devotionals-page').classList.add('active');
-                });
-            }
-
-            // Form submission
-            const devotionalForm = document.getElementById('devotional-form');
-            if (devotionalForm) {
-                devotionalForm.addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    alert('Devotional saved successfully!');
-                    document.getElementById('edit-devotional-page').classList.remove('active');
-                    document.getElementById('devotionals-page').classList.add('active');
-                    // In a real application, you would submit the form data to the server here
-                });
-            }
-        });
-
-        // Optional: Simple client-side search function
-        function searchRequests() {
-            const input = document.getElementById('searchInput').value.toLowerCase();
-            const rows = document.querySelectorAll('#prayerRequestsTable tbody tr');
-
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(input) ? '' : 'none';
-            });
-        }
-        document.addEventListener('DOMContentLoaded', function () {
-            // Search functionality
-            document.getElementById('search-button').addEventListener('click', function () {
-                const searchTerm = document.getElementById('subscriber-search').value;
-                // Implement search functionality (AJAX call or form submission)
-                console.log('Searching for:', searchTerm);
-            });
-
-            // Delete button functionality
-            document.querySelectorAll('.delete-btn').forEach(button => {
-                button.addEventListener('click', function () {
-                    const subscriberId = this.getAttribute('data-id');
-                    if (confirm('Are you sure you want to delete this subscriber?')) {
-                        // Implement delete functionality (AJAX call or form submission)
-                        console.log('Deleting subscriber ID:', subscriberId);
-                    }
-                });
-            });
-
-            // Send email button functionality
-            document.querySelectorAll('.send-email-btn').forEach(button => {
-                button.addEventListener('click', function () {
-                    const email = this.getAttribute('data-email');
-                    // Implement email functionality
-                    console.log('Sending email to:', email);
-                });
-            });
-        });
-
-        $(document).ready(function () {
-            let deleteId = null;
-
-            // Handle delete button click
-            $('.delete-btn').click(function () {
-                deleteId = $(this).data('id');
-                const email = $(this).data('email');
-                $('#deleteEmail').text(email);
-                $('#deleteModal').modal('show');
-            });
-
-            // Handle confirm delete
-            $('#confirmDelete').click(function () {
-                if (!deleteId) return;
-
-                $.ajax({
-                    url: 'delete_subscriber.php',
-                    method: 'POST',
-                    data: { id: deleteId },
-                    dataType: 'json'
-                })
-                    .done(function (response) {
-                        if (response.success) {
-                            // Remove row from table or refresh page
-                            location.reload();
-                        } else {
-                            alert('Error: ' + response.message);
+                    for (let j = 0; j < td.length - 1; j++) {
+                        if (td[j]) {
+                            const txtValue = td[j].textContent || td[j].innerText;
+                            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                                found = true;
+                                break;
+                            }
                         }
-                    })
-                    .fail(function () {
-                        alert('Server error occurred');
-                    })
-                    .always(function () {
-                        $('#deleteModal').modal('hide');
+                    }
+
+                    tr[i].style.display = found ? '' : 'none';
+                }
+            }
+        </script>
+
+
+
+        <!-- Subscribers Page -->
+        <div class="page-content" id="subscribers-page">
+            <div class="container-fluid mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4>Subscribers</h4>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-download"></i> Export List
+                    </button>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>All Subscribers</span>
+                        <div class="input-group" style="width: 300px;">
+                            <input type="text" class="form-control" placeholder="Search subscribers..."
+                                id="subscriber-search">
+                            <button class="btn btn-outline-secondary" type="button" id="search-button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Email</th>
+                                        <th>Join Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (!empty($subscribers)): ?>
+                                        <?php foreach ($subscribers as $subscriber): ?>
+                                            <tr data-subscriber-id="<?= htmlspecialchars($subscriber['id'] ?? '') ?>">
+                                                <td><?= htmlspecialchars($subscriber['email']) ?></td>
+                                                <td><?= date("F j, Y", strtotime($subscriber['subscribed_at'])) ?></td>
+                                                <td>
+                                                    <?php
+                                                    $status = $subscriber['status'] ?? 'Active';
+                                                    $badgeClass = $status === 'Active' ? 'bg-success' : 'bg-secondary';
+                                                    ?>
+                                                    <span class="badge <?= $badgeClass ?>">
+                                                        <?= htmlspecialchars($status) ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <form action="send-email.php" method="POST" style="display:inline;">
+                                                        <input type="hidden" name="email"
+                                                            value="<?= htmlspecialchars($subscriber['email']) ?>">
+                                                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-envelope"></i>
+                                                        </button>
+                                                    </form>
+                                                    <form action="delete_subscriber.php" method="POST" style="display: inline;">
+                                                        <input type="hidden" name="id"
+                                                            value="<?= htmlspecialchars($subscriber['id'] ?? '') ?>">
+                                                        <input type="hidden" name="csrf_token"
+                                                            value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                            title="Delete Subscriber">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+
+
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4">No subscribers found.</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <?php if (!empty($subscribers) && isset($totalPages) && $totalPages > 1): ?>
+                            <nav aria-label="Page navigation" class="mt-3">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
+                                        <a class="page-link" href="?page=<?= $currentPage - 1 ?>" tabindex="-1">Previous</a>
+                                    </li>
+
+                                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                        <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
+                                            <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                                        </li>
+                                    <?php endfor; ?>
+
+                                    <li class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
+                                        <a class="page-link" href="?page=<?= $currentPage + 1 ?>">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <!-- JavaScript Dependencies -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Wait for DOM to be fully loaded
+            document.addEventListener('DOMContentLoaded', function () {
+                // Sidebar toggle functionality
+                const sidebarToggle = document.getElementById('sidebarToggle');
+                const sidebar = document.getElementById('sidebar');
+                const mainContent = document.getElementById('main-content');
+
+                if (sidebarToggle && sidebar && mainContent) {
+                    sidebarToggle.addEventListener('click', function () {
+                        sidebar.classList.toggle('active');
+                        mainContent.classList.toggle('active');
                     });
-            });
-        });
-
-        $(document).ready(function () {
-            // Delete button click handler
-            $(document).on('click', '.delete-btn', function () {
-                const button = $(this);
-                const id = button.data('id');
-                const email = button.data('email');
-                const url = button.data('url');
-                const csrfToken = button.data('csrf');
-
-                // Show confirmation dialog
-                if (!confirm(`Are you sure you want to delete ${email}?`)) {
-                    return false;
                 }
 
-                // Add loading state
-                button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+                // Page navigation
+                const menuLinks = document.querySelectorAll('.sidebar-menu a[data-page]');
+                menuLinks.forEach(link => {
+                    link.addEventListener('click', function (e) {
+                        e.preventDefault();
 
-                // AJAX request
-                $.ajax({
-                    url: url,
-                    method: 'POST',
-                    data: {
-                        id: id,
-                        csrf_token: csrfToken
-                    },
-                    dataType: 'json'
-                })
-                    .done(function (response) {
-                        if (response.success) {
-                            // Remove the row from table
-                            button.closest('tr').fadeOut(300, function () {
-                                $(this).remove();
-                            });
+                        // Remove active class from all links
+                        menuLinks.forEach(item => {
+                            item.classList.remove('active');
+                        });
 
-                            // Show success message
-                            showAlert('success', response.message);
-                        } else {
-                            showAlert('danger', response.message);
-                            button.prop('disabled', false).html('<i class="fas fa-trash"></i>');
+                        // Add active class to clicked link
+                        this.classList.add('active');
+
+                        // Hide all pages
+                        document.querySelectorAll('.page-content').forEach(page => {
+                            page.classList.remove('active');
+                        });
+
+                        // Show selected page
+                        const pageId = this.getAttribute('data-page') + '-page';
+                        const targetPage = document.getElementById(pageId);
+                        if (targetPage) {
+                            targetPage.classList.add('active');
                         }
-                    })
-                    .fail(function (xhr) {
-                        showAlert('danger', 'Server error: ' + xhr.statusText);
-                        button.prop('disabled', false).html('<i class="fas fa-trash"></i>');
                     });
+                });
+
+                // Devotional form navigation
+                const newDevotionalBtn = document.getElementById('new-devotional-btn');
+                const backToDevotionals = document.getElementById('back-to-devotionals');
+
+                if (newDevotionalBtn) {
+                    newDevotionalBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        document.getElementById('devotionals-page').classList.remove('active');
+                        document.getElementById('edit-devotional-page').classList.add('active');
+                        document.getElementById('devotional-form-title').textContent = 'Add New Devotional';
+                    });
+
+                }
+
+                if (backToDevotionals) {
+                    backToDevotionals.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        document.getElementById('edit-devotional-page').classList.remove('active');
+                        document.getElementById('devotionals-page').classList.add('active');
+                    });
+                }
+
+                // Form submission
+                const devotionalForm = document.getElementById('devotional-form');
+                if (devotionalForm) {
+                    devotionalForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        alert('Devotional saved successfully!');
+                        document.getElementById('edit-devotional-page').classList.remove('active');
+                        document.getElementById('devotionals-page').classList.add('active');
+                        // In a real application, you would submit the form data to the server here
+                    });
+                }
             });
 
-            // Helper function to show alerts
-            function showAlert(type, message) {
-                const alert = $(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            // Optional: Simple client-side search function
+            function searchRequests() {
+                const input = document.getElementById('searchInput').value.toLowerCase();
+                const rows = document.querySelectorAll('#prayerRequestsTable tbody tr');
+
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(input) ? '' : 'none';
+                });
+            }
+            document.addEventListener('DOMContentLoaded', function () {
+                // Search functionality
+                document.getElementById('search-button').addEventListener('click', function () {
+                    const searchTerm = document.getElementById('subscriber-search').value;
+                    // Implement search functionality (AJAX call or form submission)
+                    console.log('Searching for:', searchTerm);
+                });
+
+                // Delete button functionality
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const subscriberId = this.getAttribute('data-id');
+                        if (confirm('Are you sure you want to delete this subscriber?')) {
+                            // Implement delete functionality (AJAX call or form submission)
+                            console.log('Deleting subscriber ID:', subscriberId);
+                        }
+                    });
+                });
+
+                // Send email button functionality
+                document.querySelectorAll('.send-email-btn').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const email = this.getAttribute('data-email');
+                        // Implement email functionality
+                        console.log('Sending email to:', email);
+                    });
+                });
+            });
+
+            $(document).ready(function () {
+                let deleteId = null;
+
+                // Handle delete button click
+                $('.delete-btn').click(function () {
+                    deleteId = $(this).data('id');
+                    const email = $(this).data('email');
+                    $('#deleteEmail').text(email);
+                    $('#deleteModal').modal('show');
+                });
+
+                // Handle confirm delete
+                $('#confirmDelete').click(function () {
+                    if (!deleteId) return;
+
+                    $.ajax({
+                        url: 'delete_subscriber.php',
+                        method: 'POST',
+                        data: { id: deleteId },
+                        dataType: 'json'
+                    })
+                        .done(function (response) {
+                            if (response.success) {
+                                // Remove row from table or refresh page
+                                location.reload();
+                            } else {
+                                alert('Error: ' + response.message);
+                            }
+                        })
+                        .fail(function () {
+                            alert('Server error occurred');
+                        })
+                        .always(function () {
+                            $('#deleteModal').modal('hide');
+                        });
+                });
+            });
+
+            $(document).ready(function () {
+                // Delete button click handler
+                $(document).on('click', '.delete-btn', function () {
+                    const button = $(this);
+                    const id = button.data('id');
+                    const email = button.data('email');
+                    const url = button.data('url');
+                    const csrfToken = button.data('csrf');
+
+                    // Show confirmation dialog
+                    if (!confirm(`Are you sure you want to delete ${email}?`)) {
+                        return false;
+                    }
+
+                    // Add loading state
+                    button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+
+                    // AJAX request
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: {
+                            id: id,
+                            csrf_token: csrfToken
+                        },
+                        dataType: 'json'
+                    })
+                        .done(function (response) {
+                            if (response.success) {
+                                // Remove the row from table
+                                button.closest('tr').fadeOut(300, function () {
+                                    $(this).remove();
+                                });
+
+                                // Show success message
+                                showAlert('success', response.message);
+                            } else {
+                                showAlert('danger', response.message);
+                                button.prop('disabled', false).html('<i class="fas fa-trash"></i>');
+                            }
+                        })
+                        .fail(function (xhr) {
+                            showAlert('danger', 'Server error: ' + xhr.statusText);
+                            button.prop('disabled', false).html('<i class="fas fa-trash"></i>');
+                        });
+                });
+
+                // Helper function to show alerts
+                function showAlert(type, message) {
+                    const alert = $(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">
             ${message}
             <button type="button" class="close" data-dismiss="alert">
                 <span>&times;</span>
             </button>
         </div>`);
 
-                $('#alerts-container').append(alert);
-                setTimeout(() => alert.alert('close'), 5000);
-            }
-        });
-    </script>
+                    $('#alerts-container').append(alert);
+                    setTimeout(() => alert.alert('close'), 5000);
+                }
+            });
+        </script>
 </body>
 
 </html>
