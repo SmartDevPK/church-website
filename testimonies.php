@@ -1168,28 +1168,7 @@
         </div>
     </footer>
 
-    <!-- Comment Modal -->
-    <div class="modal-overlay comment-modal" id="commentModal">
-        <div class="modal-container" data-aos="zoom-in">
-            <button class="modal-close" id="commentModalClose">&times;</button>
-            <div class="modal-content">
-                <h2>Leave a Comment</h2>
-                <p>Share your thoughts about this devotion with our community.</p>
-                <form class="modal-form" id="commentForm">
-                    <div class="form-group">
-                        <label for="commentName">Your Name</label>
-                        <input type="text" id="commentName" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="commentText">Your Comment</label>
-                        <textarea id="commentText" class="form-control" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Post Comment</button>
-                </form>
-                <p class="modal-note">Comments will be visible to everyone after submission.</p>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>

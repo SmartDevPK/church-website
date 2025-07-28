@@ -1,73 +1,119 @@
 <?php
-include 'db.php';
+// MUST BE AT THE VERY TOP - NO WHITESPACE BEFORE THIS
+session_start();
 
+// 1. Check if user is logged in - SIMPLE BUT EFFECTIVE CHECK
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    // Clear any existing session data
+    session_unset();
+    session_destroy();
 
-
-$errorMessage = '';
-$successMessage = '';
-// Create separate queries for each table
-$counts = [];
-
-$tables = ['devotion', 'devotions', 'prayer_requests', 'testimonies', 'subscribers', 'comments'];
-
-foreach ($tables as $table) {
-    $query = "SELECT COUNT(*) AS total FROM $table";
-    $result = $mysqli->query($query);
-    $row = $result->fetch_assoc();
-    $counts[$table] = $row['total'];
+    // Redirect to login page
+    header("Location: login.php");
+    exit();
 }
 
-// Fetch recent devotionals (example: from 'devotion' table, limit 5)
-$devotion = [];
-$devotionQuery = "SELECT * FROM devotion ORDER BY date";
-$devotionResult = $mysqli->query($devotionQuery);
-if ($devotionResult && $devotionResult->num_rows > 0) {
+// 2. Verify IP address (optional but recommended)
+if ($_SESSION['user_ip'] !== $_SERVER['REMOTE_ADDR']) {
+    session_unset();
+    session_destroy();
+    header("Location: login.php");
+    exit();
+}
+
+// 3. Check session timeout (10 minutes)
+if (time() - $_SESSION['last_activity'] > 600) {
+    session_unset();
+    session_destroy();
+    header("Location: login.php?timeout=1");
+    exit();
+}
+
+// Update last activity time
+$_SESSION['last_activity'] = time();
+
+
+// Only now include database connection after all security checks
+include 'db.php';
+
+// Initialize messages
+$errorMessage = '';
+$successMessage = '';
+
+// Fetch all dashboard data in a secure way
+try {
+    // 1. Get counts for all tables
+    $counts = [];
+    $tables = ['devotion', 'devotions', 'prayer_requests', 'testimonies', 'subscribers', 'comments'];
+
+    foreach ($tables as $table) {
+        $query = $mysqli->prepare("SELECT COUNT(*) AS total FROM $table");
+        $query->execute();
+        $result = $query->get_result();
+        $row = $result->fetch_assoc();
+        $counts[$table] = $row['total'] ?? 0;
+        $query->close();
+    }
+
+    // 2. Fetch devotion data
+    $devotion = [];
+    $devotionQuery = $mysqli->prepare("SELECT * FROM devotion ORDER BY date");
+    $devotionQuery->execute();
+    $devotionResult = $devotionQuery->get_result();
     while ($row = $devotionResult->fetch_assoc()) {
         $devotion[] = $row;
     }
-}
+    $devotionQuery->close();
 
-$sql = "SELECT id, title,  devotion_date, image, excerpt FROM devotions ORDER BY devotion_date ";
-$result = $mysqli->query($sql);
+    // 3. Fetch devotions
+    $devotions = [];
+    $sql = $mysqli->prepare("SELECT id, title, devotion_date, image, excerpt FROM devotions ORDER BY devotion_date");
+    $sql->execute();
+    $result = $sql->get_result();
+    while ($row = $result->fetch_assoc()) {
+        $devotions[] = $row;
+    }
+    $sql->close();
 
-$prayerRequests = [];
-
-$prayerQuery = "SELECT name, email, prayer AS title, request_date AS created_at 
-                FROM prayer_requests 
-                WHERE request_date >= NOW() - INTERVAL 1 DAY
-                ORDER BY created_at DESC 
-                LIMIT 20";
-
-$prayerResult = $mysqli->query($prayerQuery);
-
-if ($prayerResult && $prayerResult->num_rows > 0) {
+    // 4. Fetch prayer requests
+    $prayerRequests = [];
+    $prayerQuery = $mysqli->prepare("SELECT name, email, prayer AS title, request_date AS created_at 
+                                    FROM prayer_requests 
+                                    WHERE request_date >= NOW() - INTERVAL 1 DAY
+                                    ORDER BY created_at DESC 
+                                    LIMIT 20");
+    $prayerQuery->execute();
+    $prayerResult = $prayerQuery->get_result();
     while ($row = $prayerResult->fetch_assoc()) {
         $prayerRequests[] = $row;
     }
-}
+    $prayerQuery->close();
 
-
-$testimonies = [];
-
-$testimonyQuery = "SELECT * FROM testimonies ORDER BY date DESC";
-
-$testimonyResult = $mysqli->query($testimonyQuery);
-
-if ($testimonyResult && $testimonyResult->num_rows > 0) {
+    // 5. Fetch testimonies
+    $testimonies = [];
+    $testimonyQuery = $mysqli->prepare("SELECT * FROM testimonies ORDER BY date DESC");
+    $testimonyQuery->execute();
+    $testimonyResult = $testimonyQuery->get_result();
     while ($row = $testimonyResult->fetch_assoc()) {
         $testimonies[] = $row;
     }
-}
+    $testimonyQuery->close();
 
-$subscribers = [];
-$subscriberQuery = "SELECT * FROM subscribers ORDER BY 	subscribed_at	 DESC ";
-$subscriberResult = $mysqli->query($subscriberQuery);
-if ($subscriberResult && $subscriberResult->num_rows > 0) {
+    // 6. Fetch subscribers
+    $subscribers = [];
+    $subscriberQuery = $mysqli->prepare("SELECT * FROM subscribers ORDER BY subscribed_at DESC");
+    $subscriberQuery->execute();
+    $subscriberResult = $subscriberQuery->get_result();
     while ($row = $subscriberResult->fetch_assoc()) {
         $subscribers[] = $row;
     }
+    $subscriberQuery->close();
+
+} catch (Exception $e) {
+    $errorMessage = "Database error: " . htmlspecialchars($e->getMessage());
 }
 
+// HTML output starts here
 ?>
 
 
@@ -129,6 +175,11 @@ if ($subscriberResult && $subscriberResult->num_rows > 0) {
             <li>
                 <a href="family_dasborad.php">
                     <i class="fas fa-comment-alt"></i> Family
+                </a>
+            </li>
+            <li>
+                <a href="today_dasborad.php">
+                    <i class="fas fa-comment-alt"></i> Past Devotionals
                 </a>
             </li>
             <li>

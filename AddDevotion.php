@@ -5,7 +5,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add New Devotional</title>
-    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Container */
+        .container {
+            max-width: 600px;
+            margin: 60px auto;
+            background: #ffffff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header */
+        .form-header h2 {
+            margin-bottom: 5px;
+            font-size: 28px;
+            color: #2c3e50;
+        }
+
+        .form-header p {
+            color: #7f8c8d;
+            font-size: 15px;
+        }
+
+        /* Input Fields */
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        /* Button Styles */
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #219150;
+        }
+
+        .btn-secondary {
+            background-color: #bdc3c7;
+            color: #2c3e50;
+        }
+
+        .btn-secondary:hover {
+            background-color: #a6acaf;
+        }
+
+        /* Success Message */
+        .success-message {
+            display: none;
+            padding: 12px;
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        /* Show success message when form is successfully submitted */
+        .success-message.show {
+            display: block;
+        }
+
+        /* Loading Button */
+        .loading {
+            background-color: #16a085 !important;
+            cursor: wait;
+            opacity: 0.8;
+        }
+    </style>
 </head>
 
 <body>
@@ -63,10 +174,9 @@
         document.getElementById('cancel-add').addEventListener('click', function () {
             if (confirm('Are you sure you want to cancel? All unsaved changes will be lost.')) {
                 document.getElementById('devotionalForm').reset();
-                // You can add redirect logic here
-                // window.location.href = 'dashboard.php';
+                window.location.href = 'dashboard.php';  // Redirect to dashboard.php on cancel
             }
-        });
+        })
 
         // File input preview (optional enhancement)
         document.getElementById('image').addEventListener('change', function (e) {

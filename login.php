@@ -108,10 +108,13 @@
 
 <?php
 session_start();
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
 
-$errorMessage = '';
+// Security headers
+header("X-Frame-Options: DENY");
+header("X-Content-Type-Options: nosniff");
+header("X-XSS-Protection: 1; mode=block");
+
+$error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $validEmail = "emmanuelmichaelpk3@gmail.com";
@@ -121,14 +124,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     if ($email === $validEmail && $password === $validPassword) {
+        // Set session variables
+        $_SESSION['loggedin'] = true;
         $_SESSION['user_email'] = $email;
+        $_SESSION['user_ip'] = $_SERVER['REMOTE_ADDR'];
+        $_SESSION['last_activity'] = time();
+
+        // Redirect to dashboard
         header("Location: dashboard.php");
         exit();
     } else {
-        $errorMessage = "Invalid email or password.";
+        $error = "Invalid credentials";
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
