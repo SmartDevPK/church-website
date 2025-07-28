@@ -918,7 +918,7 @@
 
                 <ul class="nav-links">
                     <li><a href="index.php">Home</a></li>
-                    <li><a href="todays-devotion.php">Devotions</a></li>
+                    <li><a href="devotions.php">Past Devotions</a></li>
                     <li><a href="about.php">About</a></li>
                     <li><a href="family.php">Family</a></li>
                     <li><a href="#subscribe">Subscribe</a></li>

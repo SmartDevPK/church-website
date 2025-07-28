@@ -542,7 +542,7 @@
                 </button>
                 <ul class="nav-links" id="navLinks">
                     <li><a href="index.php">Home</a></li>
-                    <li><a href="devotions.php">Devotions</a></li>
+                    <li><a href="devotions.php">Past Devotions</a></li>
                     <li><a href="prayer.php">Prayer</a></li>
                     <li><a href="testimonies.php">Testimonies</a></li>
                     <li><a href="comments.php">Comments</a></li>
