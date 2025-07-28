@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $id = intval($_POST['id']);
 
     // Delete the devotional from DB
-    $stmt = $conn->prepare("DELETE FROM devotion WHERE id = ?");
+    $stmt = $conn->prepare("DELETE FROM devotions WHERE id = ?");
     if ($stmt === false) {
         echo "Prepare failed: {$conn->error}";
         $conn->close();

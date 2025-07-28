@@ -5,10 +5,7 @@ error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
 // Verify authentication (added security)
-if (!isset($_SESSION['username'])) {
-    header("Location: login.php");
-    exit();
-}
+
 
 // Database connection
 $host = "localhost";
