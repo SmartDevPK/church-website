@@ -18,32 +18,67 @@ if ($conn->connect_error) {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title = $conn->real_escape_string($_POST['title'] ?? '');
-    $verse = $conn->real_escape_string($_POST['verse'] ?? '');
-    $content = $conn->real_escape_string($_POST['content'] ?? '');
+    // Handle delete action
+    if (isset($_POST['delete_id'])) {
+        $delete_id = (int) $_POST['delete_id'];
+        $sql = "DELETE FROM today_Devotion WHERE id = $delete_id";
+        if ($conn->query($sql)) {
+            $_SESSION['message'] = "Devotional deleted successfully!";
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
+        } else {
+            $error = "Error deleting devotional: " . $conn->error;
+        }
+    }
+    // Handle add/edit action
+    else {
+        $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+        $title = $conn->real_escape_string($_POST['title'] ?? '');
+        $verse = $conn->real_escape_string($_POST['verse'] ?? '');
+        $content = $conn->real_escape_string($_POST['content'] ?? '');
 
-    $sql = "INSERT INTO today_Devotion (title, verse, content) VALUES ('$title', '$verse', '$content')";
-    if ($conn->query($sql)) {
-        $success = "Devotional added successfully!";
-        // Refresh to show the new devotional
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
-    } else {
-        $error = "Error: " . $conn->error;
+        if ($id > 0) {
+            // Update existing devotional
+            $sql = "UPDATE today_Devotion SET title='$title', verse='$verse', content='$content' WHERE id=$id";
+            $success_msg = "Devotional updated successfully!";
+        } else {
+            // Add new devotional
+            $sql = "INSERT INTO today_Devotion (title, verse, content) VALUES ('$title', '$verse', '$content')";
+            $success_msg = "Devotional added successfully!";
+        }
+
+        if ($conn->query($sql)) {
+            $_SESSION['message'] = $success_msg;
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
+        } else {
+            $error = "Error: " . $conn->error;
+        }
     }
 }
 
-// Get the latest devotion
-$sql = "SELECT * FROM today_Devotion ORDER BY created_at DESC LIMIT 1";
-$result = $conn->query($sql);
+// Get devotion for editing if ID is provided
+$edit_id = isset($_GET['edit']) ? (int) $_GET['edit'] : 0;
+$edit_devotion = null;
+if ($edit_id > 0) {
+    $result = $conn->query("SELECT * FROM today_Devotion WHERE id = $edit_id");
+    if ($result->num_rows > 0) {
+        $edit_devotion = $result->fetch_assoc();
+    }
+}
 
+// Get all devotions for listing
+$devotions = $conn->query("SELECT * FROM today_Devotion ORDER BY created_at DESC");
+
+// Get the latest devotion for preview
+$result = $conn->query("SELECT * FROM today_Devotion ORDER BY created_at DESC LIMIT 1");
 if ($result->num_rows > 0) {
-    $devotion = $result->fetch_assoc();
+    $latest_devotion = $result->fetch_assoc();
 } else {
-    $devotion = [
+    $latest_devotion = [
         'title' => 'No Devotional Found',
         'verse' => '',
-        'content' => 'Please add today\'s devotional.'
+        'content' => 'Please add a devotional.'
     ];
 }
 ?>
@@ -54,10 +89,11 @@ if ($result->num_rows > 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Today's Devotional</title>
+    <title>Devotional Management</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary: #4a6fa5;
@@ -66,6 +102,7 @@ if ($result->num_rows > 0) {
             --dark: #212529;
             --success: #28a745;
             --danger: #dc3545;
+            --warning: #ffc107;
             --border-radius: 8px;
             --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
@@ -86,7 +123,7 @@ if ($result->num_rows > 0) {
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 40px auto;
             background: white;
             padding: 40px;
@@ -163,7 +200,7 @@ if ($result->num_rows > 0) {
             line-height: 1.8;
         }
 
-        button {
+        .btn {
             background-color: var(--primary);
             color: white;
             border: none;
@@ -172,15 +209,37 @@ if ($result->num_rows > 0) {
             border-radius: var(--border-radius);
             cursor: pointer;
             transition: var(--transition);
-            display: block;
-            width: 100%;
+            display: inline-block;
             font-weight: 600;
-            margin-top: 20px;
+            text-align: center;
+            text-decoration: none;
         }
 
-        button:hover {
+        .btn:hover {
             background-color: var(--secondary);
             transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 14px;
         }
 
         .preview-section {
@@ -210,6 +269,38 @@ if ($result->num_rows > 0) {
             white-space: pre-line;
         }
 
+        .devotion-list {
+            margin-top: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--secondary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 25px;
@@ -219,16 +310,22 @@ if ($result->num_rows > 0) {
             h2 {
                 font-size: 1.8rem;
             }
+
+            .actions {
+                flex-direction: column;
+                gap: 5px;
+            }
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h2>Add Today's Devotional</h2>
+        <h2><?= $edit_devotion ? 'Edit' : 'Add' ?> Devotional</h2>
 
-        <?php if (isset($success)): ?>
-            <div class="alert alert-success"><?= $success ?></div>
+        <?php if (isset($_SESSION['message'])): ?>
+            <div class="alert alert-success"><?= $_SESSION['message'] ?></div>
+            <?php unset($_SESSION['message']); ?>
         <?php endif; ?>
 
         <?php if (isset($error)): ?>
@@ -236,31 +333,94 @@ if ($result->num_rows > 0) {
         <?php endif; ?>
 
         <form method="POST" action="">
+            <?php if ($edit_devotion): ?>
+                <input type="hidden" name="id" value="<?= $edit_devotion['id'] ?>">
+            <?php endif; ?>
+
             <div class="form-group">
                 <label for="title">Title</label>
-                <input type="text" id="title" name="title" required>
+                <input type="text" id="title" name="title"
+                    value="<?= $edit_devotion ? htmlspecialchars($edit_devotion['title']) : '' ?>" required>
             </div>
 
             <div class="form-group">
                 <label for="verse">Bible Verse</label>
-                <textarea id="verse" name="verse" required></textarea>
+                <textarea id="verse" name="verse"
+                    required><?= $edit_devotion ? htmlspecialchars($edit_devotion['verse']) : '' ?></textarea>
             </div>
 
             <div class="form-group">
                 <label for="content">Devotional Content</label>
-                <textarea id="content" name="content" required></textarea>
+                <textarea id="content" name="content"
+                    required><?= $edit_devotion ? htmlspecialchars($edit_devotion['content']) : '' ?></textarea>
             </div>
 
-            <button type="submit">Save Devotional</button>
+            <button type="submit" class="btn"><?= $edit_devotion ? 'Update' : 'Save' ?> Devotional</button>
+            <?php if ($edit_devotion): ?>
+                <a href="?" class="btn btn-warning">Cancel</a>
+            <?php endif; ?>
         </form>
 
         <div class="preview-section">
-            <h3 class="preview-title">Latest Devotional</h3>
-            <h4><?= htmlspecialchars($devotion['title']) ?></h4>
-            <p class="preview-verse"><?= htmlspecialchars($devotion['verse']) ?></p>
-            <div class="preview-content"><?= nl2br(htmlspecialchars($devotion['content'])) ?></div>
+            <h3 class="preview-title">Latest Devotional Preview</h3>
+            <h4><?= htmlspecialchars($latest_devotion['title']) ?></h4>
+            <p class="preview-verse"><?= htmlspecialchars($latest_devotion['verse']) ?></p>
+            <div class="preview-content"><?= nl2br(htmlspecialchars($latest_devotion['content'])) ?></div>
+        </div>
+
+        <div class="devotion-list">
+            <h3>All Devotionals</h3>
+            <?php if ($devotions->num_rows > 0): ?>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Verse</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($row = $devotions->fetch_assoc()): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($row['title']) ?></td>
+                                <td><?= htmlspecialchars(substr($row['verse'], 0, 50)) . (strlen($row['verse']) > 50 ? '...' : '') ?>
+                                </td>
+                                <td><?= date('M j, Y', strtotime($row['created_at'])) ?></td>
+                                <td class="actions">
+                                    <a href="?edit=<?= $row['id'] ?>" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <form method="POST" action="" style="display:inline;">
+                                        <input type="hidden" name="delete_id" value="<?= $row['id'] ?>">
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Are you sure you want to delete this devotional?')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p>No devotionals found.</p>
+            <?php endif; ?>
         </div>
     </div>
+
+    <script>
+        // Confirm before deleting
+        document.querySelectorAll('form[method="POST"]').forEach(form => {
+            form.addEventListener('submit', function (e) {
+                if (this.querySelector('input[name="delete_id"]')) {
+                    if (!confirm('Are you sure you want to delete this devotional?')) {
+                        e.preventDefault();
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
