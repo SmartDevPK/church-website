@@ -283,6 +283,14 @@ try {
                     </span>
                 </a>
             </li>
+
+            <li>
+                <a href="admin_dashboard.php">
+                    <i class="fas fa-comment-alt"></i> Approve Testimonies
+
+                </a>
+            </li>
+
             <li>
                 <a href="#" data-page="subscribers">
                     <i class="fas fa-users"></i> Subscribers

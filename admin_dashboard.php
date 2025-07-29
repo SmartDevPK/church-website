@@ -299,6 +299,7 @@ $result = $conn->query("SELECT * FROM testimonies_pending WHERE status = 'pendin
             <div class="stats-item">
                 <div class="stats-number"><?= $result->num_rows ?></div>
                 <div class="stats-label">Pending Reviews</div>
+                <div class="stats-label"><a href="dashboard.php">Return To DashBoard</a></div>
             </div>
             <div class="stats-item">
                 <div class="stats-number"><?= date('Y-m-d') ?></div>
