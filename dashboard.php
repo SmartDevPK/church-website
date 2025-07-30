@@ -300,6 +300,11 @@ try {
                 </a>
             </li>
             <li>
+                <a href="Today_Devotion.php">
+                    <i class="fas fa-sign-out-alt"></i> Today Devotion
+                </a>
+            </li>
+            <li>
                 <a href="today_dasborad.php">
                     <i class="fas fa-sign-out-alt"></i> Past Devotionals
                 </a>
@@ -605,7 +610,7 @@ try {
                                                             </button>
                                                         </form>
                                                     <?php endif; ?>
-                                                    <form action="delete_testimony.php" method="POST" style="display:inline;">
+                                                    <form action="delete_testimony.php" method="GET" style="display:inline;">
                                                         <input type="hidden" name="id" value="<?= $testimony['id'] ?>">
                                                         <button type="submit" class="btn btn-sm btn-outline-danger"
                                                             onclick="return confirm('Are you sure?')">

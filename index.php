@@ -959,29 +959,36 @@
     </section>
 
     <?php
-    // To display Error in the browser
+    // Display errors for debugging
     ini_set('display_errors', 1);
     error_reporting(E_ALL);
 
-    // Database connection parameters
+    // DB connection params
     $host = "localhost";
     $port = 3307;
     $username = "root";
     $password = "";
     $database = "prayer_db";
 
-
+    // Connect to DB
     $conn = new mysqli($host, $username, $password, $database, $port);
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    // Fetch the latest devotion
+    // Fetch latest devotion
     $result = $conn->query("SELECT * FROM devotion ORDER BY id DESC LIMIT 1");
-    $devotion = $result->fetch_assoc();
+    $devotion = $result ? $result->fetch_assoc() : null;
+
+    // Fetch today's devotion
+    $results = $conn->query("SELECT * FROM today_Devotion ORDER BY id DESC LIMIT 1");
+    $devotions = $results ? $results->fetch_assoc() : null;
+
+    // Now it's safe to close
     $conn->close();
 
-    // At the top of your index.php
+    // Handle success/error messages
+    $message = "";
     if (isset($_GET['success'])) {
         switch ($_GET['success']) {
             case 'submitted':
@@ -998,27 +1005,32 @@
             case 'empty_fields':
                 $message = "Please fill all required fields.";
                 break;
-            // Handle other error cases
+            // Add more error handling here if needed
         }
     }
-
     ?>
-    <!-- Devotion Content -->
+
+
+    <!-- Devotion Content Section -->
     <section class="section" id="devotion">
         <div class="container">
+            <?php if ($message): ?>
+                <div class="alert-message"><?= htmlspecialchars($message) ?></div>
+            <?php endif; ?>
+
             <div class="devotion-page">
+
+                <!-- Main Devotion Content -->
                 <div class="devotion-main">
+
+                    <!-- Devotion Cover -->
                     <div class="devotion-cover">
                         <img src="<?= htmlspecialchars($devotion['image_path']) ?>" alt="Today's Devotion"
-                            class="cover-image">
+                            class="cover-image" />
                         <div class="cover-content">
-                            <h2 class="cover-topic">
-                                <?= htmlspecialchars($devotion['topic']) ?>
-                            </h2>
+                            <h2 class="cover-topic"><?= htmlspecialchars($devotion['topic']) ?></h2>
                             <p class="cover-date">
-                                <span>
-                                    The Anchor - <?= date("F j, Y", strtotime($devotion['date'])) ?>
-                                </span>
+                                <span>The Anchor - <?= date("F j, Y", strtotime($devotion['date'])) ?></span>
                             </p>
                             <a href="download/devotionals.pdf" class="download-btn" download>
                                 <i class="fas fa-download"></i> Download PDF
@@ -1026,62 +1038,27 @@
                         </div>
                     </div>
 
+                    <!-- Devotion Text Content -->
                     <div class="devotion-content">
-                        <h3 class="devotion-title">Surviving the HEAT</h3>
-                        <p class="devotion-verse">Blessed is the man that trusteth in the Lord, and whose hope the Lord
-                            is. [8] For he shall be as a tree planted by the waters, and that spreadeth out her roots by
-                            the river, and shall not see (FEAR) when heat cometh, but her leaf shall be green; and shall
-                            not be careful (WORRIED) in the year of drought, neither shall cease from yielding fruit. -
-                            Jeremiah 17:7-8</p>
+                        <?php if ($devotions): ?>
+                            <h3 class="devotion-title"><?= htmlspecialchars($devotions['title']) ?></h3>
+                            <p class="devotion-verse"><?= nl2br(htmlspecialchars($devotions['verse'])) ?></p>
 
-                        <div class="devotion-text">
-                            <p>Heat in the Bible and in life generally signifies trouble, hardship, suffering,
-                                adversity, and trails.</p>
-                            <p>In life, we all encounter different levels, dissensions and intensity of heat. However,
-                                we should be encouraged that God has also made a way of escape for those who trust and
-                                hope in him.</p>
-                            <p>"Thou shalt be hid from the scourge of the tongue: neither shalt thou be afraid of
-                                destruction when it cometh" (Job 5:21).</p>
-                            <p>Yet, Scripture reminds us that in Christ, we have an anchor for our souls (Hebrews 6:19).
-                                This anchor doesn't prevent the storms from coming, but it does keep us secure when they
-                                do. The peace of God is not the absence of trouble, but the presence of Christ in the
-                                midst of it.</p>
-                            <p>When Paul wrote to the Philippians about "the peace of God," he was in prison, facing
-                                possible execution. His circumstances were anything but peaceful, yet he could testify
-                                to a peace that "surpasses all understanding." This peace comes not from positive
-                                thinking or denial of reality, but from a deep trust in God's character and promises.
-                            </p>
-                            <p>Today, if you're facing a storm, remember that your anchor holds. Take time to meditate
-                                on God's promises in Scripture. Bring your anxieties to Him in prayer (Philippians 4:6).
-                                And rest in the truth that the same power that calmed the storm on the Sea of Galilee is
-                                at work in your life today.</p>
-                            <p>Peace isn't found in the absence of the storm, but in the presence of the Savior who
-                                walks with us through it.</p>
-                        </div>
-
-                        <div class="devotion-actions">
-                            <a href="download/devotionals.pdf" class="download-btn" download>
-                                <i class="fas fa-download"></i>Download Full Devotional
-                            </a>
-
-                            <div class="social-share">
-                                <span>Share this devotion:</span>
-                                <a href="#"><i class="fab fa-facebook-f"></i></a>
-                                <a href="#"><i class="fab fa-twitter"></i></a>
-                                <a href="#"><i class="fab fa-whatsapp"></i></a>
-                                <a href="#"><i class="fas fa-envelope"></i></a>
+                            <div class="devotion-text">
+                                <?= $devotions['content'] ?>
                             </div>
-                        </div>
+                        <?php else: ?>
+                            <p>No devotion found for today.</p>
+                        <?php endif; ?>
                     </div>
 
+                    <!-- Comments Section -->
                     <div class="comments-section">
                         <div class="comments-header">
                             <h3 class="comments-title">Comments <span class="comment-count">0</span></h3>
-                            <button class="comment-form-btn">
-                                <a href="comments.php" class="comment-form-btn">
-                                    <i class="fas fa-comment"></i> Leave a Comment
-                                </a>
-                            </button>
+                            <a href="comments.php" class="comment-form-btn">
+                                <i class="fas fa-comment"></i> Leave a Comment
+                            </a>
                         </div>
 
                         <div class="comments-list" id="commentsList">
@@ -1089,18 +1066,24 @@
                         </div>
                     </div>
 
+                    <!-- See More Devotions Button -->
                     <div class="see-more-devotions">
-                        <a href="past-devotions.php" class="btn btn-primary">
+                        <a href="devotions.php" class="btn btn-primary">
                             <i class="fas fa-book-open"></i> See More Devotions
                         </a>
                     </div>
                 </div>
 
-                <div class="author-column">
+                <!-- Author Info Sidebar -->
+                <aside class="author-column">
                     <div class="author-header">
-                        <img src="PROFILE DADDY 1.png" alt="Author" class="author-avatar">
+                        <img src="PROFILE DADDY 1.png" alt="Maj Gen (Dr) Ezra Jahadi Jakko (Rtd)"
+                            class="author-avatar" />
                         <h3 class="author-name">Maj Gen (Dr) Ezra Jahadi Jakko (Rtd)</h3>
-                        <p class="author-title">Pastor/General Overseer<br>Gospel Believers mission</p>
+                        <p class="author-title">
+                            Pastor/General Overseer<br />
+                            Gospel Believers Mission
+                        </p>
                     </div>
 
                     <div class="author-bio">
@@ -1124,15 +1107,17 @@
                     </div>
 
                     <div class="author-social">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                     </div>
-                </div>
-            </div>
-        </div>
+                </aside>
+
+            </div> <!-- end devotion-page -->
+        </div> <!-- end container -->
     </section>
+
 
     <!-- Prayer Request Section -->
     <section class="section prayer" id="prayer">
@@ -1322,9 +1307,15 @@
         // 5. Subscribe Form Submission
         // ========================
         document.getElementById('subscribeForm').addEventListener('submit', function (e) {
-            e.preventDefault();
+            e.preventDefault(); // Prevent default form submission
 
-            const email = document.querySelector('.subscribe-input').value;
+            const emailInput = document.querySelector('.subscribe-input');
+            const email = emailInput.value.trim();
+
+            if (!email) {
+                alert('Please enter your email.');
+                return;
+            }
 
             fetch('subscribe.php', {
                 method: 'POST',
@@ -1335,13 +1326,15 @@
             })
                 .then(response => response.text())
                 .then(data => {
-                    alert(data); // PHP response
-                    document.querySelector('.subscribe-input').value = '';
+                    alert(data); // Show PHP response message
+                    emailInput.value = ''; // Clear the input field
                 })
                 .catch(error => {
+                    console.error('Error:', error);
                     alert("There was an error. Please try again.");
                 });
         });
+
 
         // ========================
         // 6. Load Testimonies via Fetch
