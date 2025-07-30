@@ -397,10 +397,11 @@ try {
                                                         class="btn btn-sm btn-outline-primary">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-                                                    <form method="POST" action="delete_devotional.php" style="display:inline;">
-                                                        <input type="hidden" name="id" value="<?= $dev['id'] ?>">
+                                                    <form method="POST" action="delete_devotion.php" style="display:inline;">
+                                                        <input type="hidden" name="id"
+                                                            value="<?= htmlspecialchars($dev['id']) ?>">
                                                         <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                            onclick="return confirm('Are you sure?')">
+                                                            onclick="return confirm('Are you sure you want to delete this devotional?')">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
