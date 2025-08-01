@@ -112,10 +112,21 @@ try {
     }
     $subscriberQuery->close();
 
+    // 7. Fetch comments
+    $comments = [];
+    $commentQuery = $mysqli->prepare("SELECT * FROM comments ORDER BY created_at DESC LIMIT 50");
+    $commentQuery->execute();
+    $commentResult = $commentQuery->get_result();
+    while ($row = $commentResult->fetch_assoc()) {
+        $comments[] = $row;
+    }
+    $commentQuery->close();
+
 } catch (Exception $e) {
     $errorMessage = "Database error: " . htmlspecialchars($e->getMessage());
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -288,6 +299,15 @@ try {
                 <a href="admin_dashboard.php">
                     <i class="fas fa-comment-alt"></i> Approve Testimonies
 
+                </a>
+            </li>
+
+            <li>
+                <a href="#" data-page="comments">
+                    <i class="fas fa-comments"></i> Comments
+                    <span class="badge bg-info float-end">
+                        <?= $counts['comments'] ?? 0 ?>
+                    </span>
                 </a>
             </li>
 
@@ -633,6 +653,66 @@ try {
                 </div>
             </div>
         </div>
+        <!-- Comments Page -->
+        <div class="page-content" id="comments-page">
+            <div class="container-fluid">
+                <h4 class="mb-4">Manage Comments</h4>
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <span>All Comments</span>
+                        <div class="input-group" style="width: 300px;">
+                            <input type="text" class="form-control" placeholder="Search..." id="commentSearch">
+                            <button class="btn btn-outline-secondary" type="button" id="searchComment">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="commentTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Comment</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+
+
+                                    <?php if (!empty($comments)): ?>
+                                        <?php foreach ($comments as $comment): ?>
+                                            <tr>
+                                                <td><?= htmlspecialchars($comment['id']) ?></td>
+                                                <td><?= htmlspecialchars($comment['name']) ?></td>
+                                                <td><?= htmlspecialchars($comment['comment']) ?></td>
+                                                <td><?= date('M j, Y g:i a', strtotime($comment['created_at'])) ?></td>
+                                                <td>
+                                                    <form action="delete_comment.php" method="POST" style="display:inline;">
+                                                        <input type="hidden" name="id" value="<?= $comment['id'] ?>">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                            onclick="return confirm('Are you sure you want to delete this comment?')">
+                                                            <i class="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="5" class="text-center py-4">No comments found.</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Subscribers Page -->
         <div class="page-content" id="subscribers-page">
@@ -764,6 +844,8 @@ try {
             setupSearch('testimonySearch', 'testimonyTable');
             setupSearch('subscriberSearch', 'subscriberTable');
         });
+
+        setupSearch('commentSearch', 'commentTable');
     </script>
 </body>
 
