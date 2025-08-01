@@ -1,3 +1,66 @@
+<?php
+// ==============================================
+// PHP CONFIGURATION AND DATABASE CONNECTION
+// ==============================================
+
+// Display errors for debugging
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// Database connection parameters
+$host = "localhost";
+$port = 3307;
+$username = "root";
+$password = "";
+$database = "prayer_db";
+
+// Establish database connection
+$conn = new mysqli($host, $username, $password, $database, $port);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// ==============================================
+// FETCH DEVOTION DATA
+// ==============================================
+
+// Fetch latest devotion from devotion table
+$sql = "SELECT topic, image_path, pdf_path, date FROM devotion ORDER BY date DESC LIMIT 1";
+$result = $conn->query($sql);
+$devotion = $result ? $result->fetch_assoc() : null;
+
+// Get today's date
+$today = date("Y-m-d");
+
+// Prepare and execute query for today's devotion
+$sql = "SELECT title, verse, content, created_at FROM today_Devotion WHERE DATE(created_at) = ?";
+$stmt = $conn->prepare($sql);
+
+if (!$stmt) {
+    die("Prepare failed: " . $conn->error);
+}
+
+$stmt->bind_param("s", $today);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$devotions = null;
+if ($result && $result->num_rows > 0) {
+    $devotions = $result->fetch_assoc();
+
+    // Process content (handle JSON if present)
+    if (!empty($devotions['content'])) {
+        $decodedContent = json_decode($devotions['content'], true);
+        $devotions['content'] = (json_last_error() === JSON_ERROR_NONE) ? $decodedContent : $devotions['content'];
+    }
+}
+
+// Close database connections
+$stmt->close();
+$conn->close();
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -543,128 +606,105 @@
                 <ul class="nav-links" id="navLinks">
                     <li><a href="index.php">Home</a></li>
                     <li><a href="devotions.php">Past Devotions</a></li>
-                    <li><a href="prayer.php">Prayer</a></li>
-                    <li><a href="testimonies.php">Testimonies</a></li>
-                    <li><a href="comments.php">Comments</a></li>
+                    <li><a href="family.php">Family</a></li>
+
                     <li><a href="about.php">About</a></li>
                     <li><a href="#subscribe">Subscribe</a></li>
                 </ul>
             </nav>
         </div>
     </header>
-    <?php
-    $host = "localhost";
-    $port = 3307;
-    $username = "root";
-    $password = "";
-    $database = "prayer_db";
-
-    $conn = new mysqli($host, $username, $password, $database, $port);
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    // Fetch the latest devotion
-    $result = $conn->query("SELECT * FROM devotion ORDER BY id DESC LIMIT 1");
-    $devotion = $result->fetch_assoc();
-    $conn->close();
-    ?>
 
 
-    <div class="devotion-header" data-aos="fade-in">
-        <img src="<?= htmlspecialchars($devotion['image_path']) ?>" alt="Today's Devotion"
-            class="devotion-header-image">
-        <div class="devotion-header-content">
-            <h1 class="devotion-header-title">
-                <?= htmlspecialchars($devotion['topic']) ?>
-            </h1>
-            <div class="devotion-header-date">
-                <i class="fas fa-calendar-alt"></i>
-                <span>
-                    The Anchor - <?= date("F j, Y", strtotime($devotion['date'])) ?>
-                </span>
-            </div>
-            <a href="download/devotionals.pdf" class="download-btn" download>
-                <i class="fas fa-download"></i> Download PDF
-            </a>
-        </div>
-    </div>
-    <?php
-    error_reporting(E_ALL);
-    ini_set("display_errors", 1);
+    <!-- Devotion Header -->
+    <?php if ($devotion): ?>
+        <div class="devotion-header" data-aos="fade-in">
+            <!-- Devotion Image -->
+            <img src="<?php echo htmlspecialchars($devotion['image_path']); ?>" alt="Devotion Image"
+                class="devotion-header-image">
 
-    // Database connection
-    $host = "localhost";
-    $port = 3307;
-    $username = "root";
-    $password = "";
-    $database = "prayer_db";
+            <!-- Devotion Content -->
+            <div class="devotion-header-content">
+                <!-- Topic -->
+                <h1 class="devotion-header-title">
+                    <?php echo htmlspecialchars($devotion['topic']); ?>
+                </h1>
 
-    $conn = new mysqli($host, $username, $password, $database, $port);
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    // Fetch devotion
-    $devotion_id = $_GET['id'] ?? null;
-
-    if ($devotion_id) {
-        $stmt = $conn->prepare("SELECT * FROM 	todayDevotions WHERE id = ?");
-        $stmt->bind_param("i", $devotion_id);
-    } else {
-        $stmt = $conn->prepare("SELECT * FROM todayDevotions ORDER BY created_at DESC LIMIT 1");
-    }
-
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $devotion = $result->fetch_assoc();
-    $stmt->close();
-
-    if (!$devotion) {
-        die("Devotional not found");
-    }
-
-    // Decode sections
-    $sections = json_decode($devotion['sections'], true);
-    if (!is_array($sections)) {
-        $sections = [];
-    }
-    ?>
-
-    <!-- Devotion Content -->
-    <div class="devotion-content-container">
-        <div class="container">
-            <div class="devotion-content" data-aos="fade-up">
-                <p class="devotion-verse">
-                    <?php echo nl2br(htmlspecialchars($devotion['verse_text'])); ?>
-                    <br><br>
-                    <?php echo htmlspecialchars($devotion['verse_reference']); ?>
-                </p>
-
-                <div class="devotion-text">
-                    <p><?php echo nl2br(htmlspecialchars($devotion['introduction_text'])); ?></p>
-
-                    <!-- Dynamic Sections -->
-                    <?php foreach ($sections as $section): ?>
-                        <h3><?php echo htmlspecialchars($section['heading']); ?></h3>
-                        <p><?php echo nl2br(htmlspecialchars($section['content'])); ?></p>
-                    <?php endforeach; ?>
+                <!-- Date -->
+                <div class="devotion-header-date">
+                    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                    <span>
+                        The Anchor - <?php echo date("F j, Y", strtotime($devotion['date'])); ?>
+                    </span>
                 </div>
 
-                <div class="devotion-actions">
-                    <a href="download/devotionals.pdf" class="download-btn">
-                        <i class="fas fa-download"></i> Download Full Devotional
+                <!-- PDF Download -->
+                <?php if (!empty($devotion['pdf_path'])): ?>
+                    <a href="<?php echo htmlspecialchars($devotion['pdf_path']); ?>" class="download-btn" target="_blank"
+                        aria-label="Download PDF">
+                        <i class="fas fa-download" aria-hidden="true"></i> Download PDF
                     </a>
-                    <div class="social-share">
-                        <span>Share this devotion:</span>
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-whatsapp"></i></a>
-                        <a href="#"><i class="fas fa-envelope"></i></a>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php else: ?>
+        <p>No devotion found.</p>
+    <?php endif; ?>
+
+
+
+    <?php if ($devotions): ?>
+        <!-- Devotion Content -->
+        <div class="devotion-content-container">
+            <div class="container">
+                <div class="devotion-content" data-aos="fade-up">
+
+                    <!-- Verse and Reference -->
+                    <p class="devotion-verse">
+                        "<?php echo nl2br(htmlspecialchars($devotions['title'])); ?>"
+                        <br><br>
+                        - <?php echo htmlspecialchars($devotions['verse']); ?>
+                    </p>
+
+                    <!-- Introduction and Sections -->
+                    <div class="devotion-text">
+                        <?php
+                        $content = $devotions['content'] ?? null;
+
+                        if ($content) {
+                            echo nl2br(htmlspecialchars($content));
+                        } else {
+                            echo "No content available.";
+                        }
+                        ?>
+
+                        <!-- Meta -->
+                        <p class="devotion-meta">
+                            <small>
+                                Created: <?php echo date("F j, Y, g:i a", strtotime($devotions['created_at'])); ?><br>
+                            </small>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
+    <?php else: ?>
+        <p style="text-align:center; color: red;"> No devotion found for today (<?php echo $today; ?>)</p>
+    <?php endif; ?>
+    <div class="devotion-actions">
+        <a href="#" class="download-btn">
+            <i class="fas fa-download"></i> Download Full Devotional
+        </a>
+        <div class="social-share">
+            <span>Share this devotion:</span>
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-whatsapp"></i></a>
+            <a href="#"><i class="fas fa-envelope"></i></a>
+        </div>
+    </div>
+    </div>
+    </div>
     </div>
 
     <!-- More Devotions -->
@@ -699,7 +739,6 @@
                         <li><a href="devotions.php">Devotions</a></li>
                         <li><a href="prayer.php">Prayer</a></li>
                         <li><a href="testimonies.php">Testimonies</a></li>
-                        <li><a href="comments.php">Comments</a></li>
                         <li><a href="about.php">About</a></li>
                     </ul>
                 </div>

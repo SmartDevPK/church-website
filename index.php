@@ -1,3 +1,55 @@
+<?php
+// Display errors for debugging
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// DB connection params
+$host = "localhost";
+$port = 3307;
+$username = "root";
+$password = "";
+$database = "prayer_db";
+
+// Connect to DB
+$conn = new mysqli($host, $username, $password, $database, $port);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch latest devotion
+$result = $conn->query("SELECT * FROM devotion ORDER BY id DESC LIMIT 1");
+$devotion = $result ? $result->fetch_assoc() : null;
+
+// Fetch today's devotion
+$results = $conn->query("SELECT * FROM today_Devotion ORDER BY id DESC LIMIT 1");
+$devotions = $results ? $results->fetch_assoc() : null;
+
+// Now it's safe to close
+$conn->close();
+
+// Handle success/error messages
+$message = "";
+if (isset($_GET['success'])) {
+    switch ($_GET['success']) {
+        case 'submitted':
+            $message = "Thank you! Your testimony is pending approval.";
+            break;
+        case 'approved':
+            $message = "Testimony approved successfully!";
+            break;
+    }
+}
+
+if (isset($_GET['error'])) {
+    switch ($_GET['error']) {
+        case 'empty_fields':
+            $message = "Please fill all required fields.";
+            break;
+        // Add more error handling here if needed
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -918,7 +970,7 @@
 
                 <ul class="nav-links">
                     <li><a href="index.php">Home</a></li>
-                    <li><a href="devotions.php">Past Devotions</a></li>
+                    <li><a href="past-devotions.php">Devotions</a></li>
                     <li><a href="about.php">About</a></li>
                     <li><a href="family.php">Family</a></li>
                     <li><a href="#subscribe">Subscribe</a></li>
@@ -958,60 +1010,7 @@
         </div>
     </section>
 
-    <?php
-    // Display errors for debugging
-    ini_set('display_errors', 1);
-    error_reporting(E_ALL);
-
-    // DB connection params
-    $host = "localhost";
-    $port = 3307;
-    $username = "root";
-    $password = "";
-    $database = "prayer_db";
-
-    // Connect to DB
-    $conn = new mysqli($host, $username, $password, $database, $port);
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    // Fetch latest devotion
-    $result = $conn->query("SELECT * FROM devotion ORDER BY id DESC LIMIT 1");
-    $devotion = $result ? $result->fetch_assoc() : null;
-
-    // Fetch today's devotion
-    $results = $conn->query("SELECT * FROM today_Devotion ORDER BY id DESC LIMIT 1");
-    $devotions = $results ? $results->fetch_assoc() : null;
-
-    // Now it's safe to close
-    $conn->close();
-
-    // Handle success/error messages
-    $message = "";
-    if (isset($_GET['success'])) {
-        switch ($_GET['success']) {
-            case 'submitted':
-                $message = "Thank you! Your testimony is pending approval.";
-                break;
-            case 'approved':
-                $message = "Testimony approved successfully!";
-                break;
-        }
-    }
-
-    if (isset($_GET['error'])) {
-        switch ($_GET['error']) {
-            case 'empty_fields':
-                $message = "Please fill all required fields.";
-                break;
-            // Add more error handling here if needed
-        }
-    }
-    ?>
-
-
-    <!-- Devotion Content Section -->
+    <!-- Devotion Content -->
     <section class="section" id="devotion">
         <div class="container">
             <?php if ($message): ?>
@@ -1118,7 +1117,6 @@
         </div> <!-- end container -->
     </section>
 
-
     <!-- Prayer Request Section -->
     <section class="section prayer" id="prayer">
         <div class="container">
@@ -1150,9 +1148,6 @@
     </section>
 
     <!-- Testimonies Section -->
-
-
-
     <section class="section testimonies" id="testimonies">
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">Recent Testimonies</h2>
@@ -1180,13 +1175,13 @@
                 <button type="submit" class="subscribe-btn">Subscribe</button>
             </form>
         </div>
-    </section>
+    </section>>
 
     <!-- Footer -->
     <footer>
         <div class="container">
             <div class="footer-content">
-                <div class="footer-column" data-aos="fade-up">
+                <div class="footer-column">
                     <h3>The Anchor</h3>
                     <p>A daily devotional ministry committed to helping believers anchor their faith in God's Word
                         through daily spiritual nourishment.</p>
@@ -1194,33 +1189,17 @@
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
                         <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
-
-                <div class="footer-column" data-aos="fade-up" data-aos-delay="100">
+                <div class="footer-column">
                     <h3>Quick Links</h3>
                     <ul class="footer-links">
                         <li><a href="index.php">Home</a></li>
                         <li><a href="todays-devotion.php">Today's Devotion</a></li>
-                        <li><a href="past-devotions.php">Past Devotions</a></li>
-                        <li><a href="about.php">About Us</a></li>
-                        <li><a href="prayer.php">Prayer Requests</a></li>
+                        <li><a href="about.php">About</a></li>
                     </ul>
                 </div>
-
-                <div class="footer-column" data-aos="fade-up" data-aos-delay="200">
-                    <h3>Resources</h3>
-                    <ul class="footer-links">
-                        <li><a href="bible-reading-plans.php">Bible Reading Plans</a></li>
-                        <li><a href="downloads.php">Free Downloads</a></li>
-                        <li><a href="books.php">Recommended Books</a></li>
-                        <li><a href="blog.php">Blog</a></li>
-                        <li><a href="faq.php">FAQs</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-column" data-aos="fade-up" data-aos-delay="300">
+                <div class="footer-column">
                     <h3>Contact Us</h3>
                     <ul class="footer-links">
                         <li><i class="fas fa-map-marker-alt"></i> Gospel Believers Mission HQ, Abuja, Nigeria</li>
@@ -1229,46 +1208,32 @@
                     </ul>
                 </div>
             </div>
-
-            <div class="copyright" data-aos="fade-up">
-                <p>&copy; 2023 The Anchor Devotional. All Rights Reserved. | <a href="privacy.php"
-                        style="color: #bbb;">Privacy Policy</a> | <a href="terms.php" style="color: #bbb;">Terms of
-                        Use</a></p>
+            <div class="copyright">
+                <p>&copy; 2023 The Anchor Devotional. All Rights Reserved.</p>
             </div>
         </div>
     </footer>
 
-
-
-
-    <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // ========================
-        // 1. Animate On Scroll Init
-        // ========================
+        // Initialize AOS animations
         AOS.init({
             duration: 800,
             easing: 'ease-in-out',
             once: true
         });
 
-        // ========================
-        // 2. Mobile Menu Toggle
-        // ========================
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const navLinks = document.getElementById('navLinks');
+        // ------------------ Navigation & Scroll Effects ------------------
 
-        mobileMenuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            mobileMenuBtn.innerHTML = navLinks.classList.contains('active')
-                ? '<i class="fas fa-times"></i>'
-                : '<i class="fas fa-bars"></i>';
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        mobileMenuBtn?.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            mobileMenuBtn.innerHTML = mobileMenu.classList.contains('active') ?
+                '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
         });
 
-        // ========================
-        // 3. Header Scroll Effect
-        // ========================
         window.addEventListener('scroll', () => {
             const header = document.getElementById('header');
             if (window.scrollY > 100) {
@@ -1278,24 +1243,125 @@
             }
         });
 
-        // ========================
-        // 4. Prayer Request Form Submission
-        // ========================
-        document.getElementById('prayerRequestForm').addEventListener('submit', function (e) {
-            e.preventDefault();
+        // ------------------ Devotional Fetch & Display ------------------
 
-            const form = e.target;
-            const formData = new FormData(form);
+        async function fetchDevotionals(limit = null, filter = {}) {
+            let url = 'api/index.php/devotionals';
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching devotionals:', error);
+                return [];
+            }
+        }
+
+        function displayDevotionals(devotionals) {
+            const devotionGrid = document.querySelector('.devotions-grid');
+            if (!devotionGrid) return;
+
+            devotionGrid.innerHTML = devotionals.length === 0
+                ? '<p>No devotionals found. Please check back later or adjust your filters.</p>'
+                : '';
+
+            devotionals.forEach(devotional => {
+                const card = document.createElement('div');
+                card.className = 'devotion-card';
+                card.innerHTML = `
+                <img src="${devotional.cover_image_url || 'placeholder.jpg'}" alt="Devotion Cover" class="devotion-image">
+                <div class="devotion-content">
+                    <div class="devotion-date">${new Date(devotional.date).toLocaleDateString()}</div>
+                    <h3 class="devotion-title">${devotional.title}</h3>
+                    <p class="devotion-excerpt">${devotional.content.substring(0, 100)}...</p>
+                    <a href="single-devotion.html?id=${devotional.id}" class="read-more">
+                        Read More <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>`;
+                devotionGrid.appendChild(card);
+            });
+        }
+
+        // ------------------ Comments Section ------------------
+
+        function loadComments() {
+            fetch('fetch_comments.php')
+                .then(res => res.json())
+                .then(data => {
+                    const commentList = document.getElementById("commentsList");
+                    const commentCount = document.getElementById("commentCount");
+                    commentList.innerHTML = "";
+
+                    if (data.length === 0) {
+                        commentList.innerHTML = '<div class="no-comments">No comments yet. Be the first to share your thoughts!</div>';
+                        commentCount.textContent = '0';
+                        return;
+                    }
+
+                    data.forEach(comment => {
+                        commentList.insertAdjacentHTML("beforeend", `
+                        <div class="comment">
+                            <h4>${comment.name}</h4>
+                            <small>${comment.created_at}</small>
+                            <p>${comment.comment}</p>
+                            <hr>
+                        </div>`);
+                    });
+
+                    commentCount.textContent = data.length;
+                })
+                .catch(error => console.error("Error fetching comments:", error));
+        }
+
+        // ------------------ Testimonies Section ------------------
+
+        function loadTestimonies() {
+            fetch('Submit_Testimony.php')
+                .then(res => res.json())
+                .then(data => {
+                    const grid = document.getElementById('testimony-grid');
+                    grid.innerHTML = '';
+
+                    data.forEach(testimony => {
+                        const card = document.createElement('div');
+                        card.className = 'testimony-card';
+                        card.setAttribute('data-aos', 'fade-up');
+                        card.innerHTML = `
+                        <div class="testimony-meta">
+                            <div class="testimony-avatar">${testimony.initials}</div>
+                            <div>
+                                <div class="testimony-name">${testimony.name}</div>
+                                <div class="testimony-date">${testimony.date}</div>
+                            </div>
+                        </div>
+                        <div class="testimony-content">
+                            <p>${testimony.message}</p>
+                        </div>`;
+                        grid.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching testimonies:', error);
+                    document.getElementById('testimony-grid').innerHTML = '<p style="color:red;">Failed to load testimonies.</p>';
+                });
+        }
+
+        // ------------------ Form Submissions ------------------
+
+        // Prayer Request Form
+        document.getElementById('prayerRequestForm')?.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
 
             fetch('submit.php', {
                 method: 'POST',
                 body: formData
             })
-                .then(response => response.text())
+                .then(res => res.text())
                 .then(data => {
                     console.log('Server response:', data);
                     alert('Thank you for your prayer request. Our team will pray for this need.');
-                    form.reset();
+                    this.reset();
                 })
                 .catch(error => {
                     console.error('Submission error:', error);
@@ -1303,12 +1369,9 @@
                 });
         });
 
-        // ========================
-        // 5. Subscribe Form Submission
-        // ========================
-        document.getElementById('subscribeForm').addEventListener('submit', function (e) {
-            e.preventDefault(); // Prevent default form submission
-
+        // Newsletter Subscription Form
+        document.getElementById('subscribeForm')?.addEventListener('submit', function (e) {
+            e.preventDefault();
             const emailInput = document.querySelector('.subscribe-input');
             const email = emailInput.value.trim();
 
@@ -1319,196 +1382,35 @@
 
             fetch('subscribe.php', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'email=' + encodeURIComponent(email),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'email=' + encodeURIComponent(email)
             })
-                .then(response => response.text())
+                .then(res => res.text())
                 .then(data => {
-                    alert(data); // Show PHP response message
-                    emailInput.value = ''; // Clear the input field
+                    alert(data);
+                    emailInput.value = '';
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert("There was an error. Please try again.");
+                    alert('There was an error. Please try again.');
                 });
         });
 
+        // ------------------ On DOM Load ------------------
 
-        // ========================
-        // 6. Load Testimonies via Fetch
-        // ========================
-        document.addEventListener('DOMContentLoaded', () => {
-            // Load comments on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            const devotionals = await fetchDevotionals();
+            displayDevotionals(devotionals);
             loadComments();
+            loadTestimonies();
 
-            // Load testimonies
-            fetch('Submit_Testimony.php')
-                .then(response => response.json())
-                .then(data => {
-                    const grid = document.getElementById('testimony-grid');
-                    grid.innerHTML = ''; // Clear existing content
-
-                    data.forEach(testimony => {
-                        const card = document.createElement('div');
-                        card.className = 'testimony-card';
-                        card.setAttribute('data-aos', 'fade-up');
-                        card.innerHTML = `
-                    <div class="testimony-meta">
-                        <div class="testimony-avatar">${testimony.initials}</div>
-                        <div>
-                            <div class="testimony-name">${testimony.name}</div>
-                            <div class="testimony-date">${testimony.date}</div>
-                        </div>
-                    </div>
-                    <div class="testimony-content">
-                        <p>${testimony.message}</p>
-                    </div>
-                `;
-                        grid.appendChild(card);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching testimonies:', error);
-                    document.getElementById('testimony-grid').innerHTML = '<p style="color:red;">Failed to load testimonies.</p>';
-                });
-        });
-
-        // Remove this duplicate renderComments function to avoid conflicts
-
-        function loadComments() {
-            fetch('fetch_comments.php')
-                .then(res => res.json())
-                .then(data => {
-                    const commentList = document.getElementById("commentsList");
-                    const commentCount = document.getElementById("commentCount");
-
-                    commentList.innerHTML = ""; // clear old comments
-
-                    if (data.length === 0) {
-                        commentList.innerHTML = '<div class="no-comments">No comments yet. Be the first to share your thoughts!</div>';
-                        commentCount.textContent = '0';
-                        return;
-                    }
-
-                    data.forEach(comment => {
-                        const commentHTML = `
-                    <div class="comment">
-                        <h4>${comment.name}</h4>
-                        <small>${comment.created_at}</small>
-                        <p>${comment.comment}</p>
-                        <hr>
-                    </div>
-                `;
-                        commentList.insertAdjacentHTML("beforeend", commentHTML);
-                    });
-
-                    commentCount.textContent = data.length;
-                })
-                .catch(error => {
-                    console.error("Error fetching comments:", error);
-                });
-        }
-
-        // Load comments when the page loads
-        document.addEventListener("DOMContentLoaded", loadComments);
-
-
-
-        // ========================
-        // 7. Comment Modal and Logic
-        // ========================
-        const commentFormBtn = document.getElementById('commentFormBtn');
-        const commentModal = document.getElementById('commentModal');
-        const commentModalClose = document.getElementById('commentModalClose');
-        const commentForm = document.getElementById('commentForm');
-        const commentsList = document.getElementById('commentsList');
-        const commentCount = document.getElementById('commentCount');
-
-        let comments = []; // In-memory array
-
-        // Open modal
-        commentFormBtn.addEventListener('click', () => {
-            commentModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-
-        // Close modal via button
-        commentModalClose.addEventListener('click', () => {
-            commentModal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        });
-
-        // Close modal by clicking outside content
-        commentModal.addEventListener('click', (e) => {
-            if (e.target === commentModal) {
-                commentModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            }
-        });
-
-        // Submit new comment
-        commentForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const name = document.getElementById('commentName').value.trim();
-            const text = document.getElementById('commentText').value.trim();
-
-            if (name && text) {
-                const newComment = {
-                    id: Date.now(),
-                    name: name,
-                    text: text,
-                    date: new Date().toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    })
-                };
-
-                comments.unshift(newComment);
-                renderComments();
-                commentForm.reset();
-                commentModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-                alert('Thank you for your comment! It has been posted.');
-            }
-        });
-
-        // ========================
-        // 8. Render Comments to DOM
-        // ========================
-        function renderComments() {
-            if (comments.length === 0) {
-                commentsList.innerHTML = '<div class="no-comments">No comments yet. Be the first to share your thoughts!</div>';
-                commentCount.textContent = '0';
-                return;
-            }
-
-            commentsList.innerHTML = '';
-            commentCount.textContent = comments.length;
-
-            comments.forEach(comment => {
-                const commentDiv = document.createElement('div');
-                commentDiv.className = 'comment';
-                commentDiv.innerHTML = `
-                <div class="comment-avatar">${comment.name.charAt(0).toUpperCase()}</div>
-                <div class="comment-content">
-                    <div class="comment-meta">
-                        <span class="comment-author">${comment.name}</span>
-                        <span class="comment-date">${comment.date}</span>
-                    </div>
-                    <div class="comment-text">${comment.text}</div>
-                </div>
-            `;
-                commentsList.appendChild(commentDiv);
+            // Filter form listener (demo only)
+            document.querySelector('.filter-form')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                alert('Filtering not fully implemented in this example.');
             });
-        }
+        });
     </script>
-
 
 </body>
 

@@ -623,7 +623,7 @@
                     <li><a href="index.php">Home</a></li>
                     <li><a href="todays-devotion.php">Devotions</a></li>
                     <li><a href="about.php">About</a></li>
-                    <li><a href="prayer.php">Prayer</a></li>
+                    <!-- <li><a href="prayer.php">Prayer</a></li> -->
                     <li><a href="#subscribe">Subscribe</a></li>
                 </ul>
             </nav>
@@ -878,6 +878,8 @@
             alert('Thank you for subscribing to The Anchor Devotional! You will receive your first devotional tomorrow morning.');
             this.reset();
         });
+
+
     </script>
 </body>
 

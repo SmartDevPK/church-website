@@ -637,7 +637,7 @@
                     <li><a href="about.php">About</a></li>
                     <li><a href="family.php" class="active">Family</a></li>
                     <li><a href="#subscribe">Subscribe</a></li>
-                    <li><a href="login.php" class="btn-admin"><i class="fas fa-lock"></i> Admin</a></li>
+                    <li><a href="dashboad.php" class="btn-admin"><i class="fas fa-lock"></i> Admin</a></li>
                 </ul>
             </nav>
         </div>
@@ -650,7 +650,7 @@
                 <li><a href="about.php">About</a></li>
                 <li><a href="family.php" class="active">Family</a></li>
                 <li><a href="#subscribe">Subscribe</a></li>
-                <li><a href="login.php" pclass="btn-admin"><i class="fas fa-lock"></i> Admin Login</a></li>
+                <li><a href="dashboad.php" class="btn-admin"><i class="fas fa-lock"></i> Admin Login</a></li>
             </ul>
         </div>
     </header>
