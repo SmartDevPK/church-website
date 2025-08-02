@@ -533,6 +533,14 @@ try {
         <div class="page-content" id="prayer-requests-page">
             <div class="container-fluid">
                 <h4 class="mb-4">Prayer Requests</h4>
+                <?php if (isset($_SESSION['success_message'])): ?>
+                    <div class="alert alert-success"><?= $_SESSION['success_message'] ?></div>
+                    <?php unset($_SESSION['success_message']); ?>
+                <?php endif; ?>
+                <?php if (isset($_SESSION['error_message'])): ?>
+                    <div class="alert alert-danger"><?= $_SESSION['error_message'] ?></div>
+                    <?php unset($_SESSION['error_message']); ?>
+                <?php endif; ?>
                 <div class="dashboard-card">
                     <div class="card-header">
                         <span>All Prayer Requests</span>
@@ -552,6 +560,7 @@ try {
                                         <th>Email</th>
                                         <th>Request</th>
                                         <th>Date</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -562,11 +571,22 @@ try {
                                                 <td><?= htmlspecialchars($request['email']) ?></td>
                                                 <td><?= htmlspecialchars($request['title']) ?></td>
                                                 <td><?= date('M j, Y g:i a', strtotime($request['created_at'])) ?></td>
+                                                <td>
+                                                    <form action="delete_prayer_request.php" method="POST"
+                                                        style="display:inline;">
+                                                        <input type="hidden" name="id"
+                                                            value="<?= isset($request['id']) ? (int) $request['id'] : '' ?>">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                            onclick="return confirm('Are you sure you want to delete this prayer request?')">
+                                                            <i class="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </form>
+                                                </td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
-                                            <td colspan="4" class="text-center py-4">No prayer requests found.</td>
+                                            <td colspan="5" class="text-center py-4">No prayer requests found.</td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
