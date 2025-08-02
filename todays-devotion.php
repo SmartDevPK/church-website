@@ -1,7 +1,4 @@
 <?php
-// ==============================================
-// PHP CONFIGURATION AND DATABASE CONNECTION
-// ==============================================
 
 // Display errors for debugging
 ini_set('display_errors', 1);
@@ -33,29 +30,35 @@ $devotion = $result ? $result->fetch_assoc() : null;
 $today = date("Y-m-d");
 
 // Prepare and execute query for today's devotion
-$sql = "SELECT title, verse, content, created_at FROM today_Devotion WHERE DATE(created_at) = ?";
+$sql = "SELECT verse_text, verse_reference, introduction_text, sections, created_at, updated_at 
+        FROM todayDevotions 
+        WHERE DATE(created_at) = ?";
+
 $stmt = $conn->prepare($sql);
 
 if (!$stmt) {
     die("Prepare failed: " . $conn->error);
 }
 
+// Bind date parameter and execute query
 $stmt->bind_param("s", $today);
 $stmt->execute();
 $result = $stmt->get_result();
 
 $devotions = null;
+
+// Fetch and process result
 if ($result && $result->num_rows > 0) {
     $devotions = $result->fetch_assoc();
 
-    // Process content (handle JSON if present)
-    if (!empty($devotions['content'])) {
-        $decodedContent = json_decode($devotions['content'], true);
-        $devotions['content'] = (json_last_error() === JSON_ERROR_NONE) ? $decodedContent : $devotions['content'];
+    // Decode `sections` JSON if it's present and valid
+    if (!empty($devotions['sections'])) {
+        $decodedSections = json_decode($devotions['sections'], true);
+        $devotions['sections'] = (json_last_error() === JSON_ERROR_NONE) ? $decodedSections : $devotions['sections'];
     }
 }
 
-// Close database connections
+// Close DB resources
 $stmt->close();
 $conn->close();
 ?>
@@ -616,12 +619,13 @@ $conn->close();
     </header>
 
 
-    <!-- Devotion Header -->
     <?php if ($devotion): ?>
         <div class="devotion-header" data-aos="fade-in">
             <!-- Devotion Image -->
-            <img src="<?php echo htmlspecialchars($devotion['image_path']); ?>" alt="Devotion Image"
-                class="devotion-header-image">
+            <?php if (!empty($devotion['image_path'])): ?>
+                <img src="<?php echo htmlspecialchars($devotion['image_path']); ?>" alt="Devotion Image"
+                    class="devotion-header-image">
+            <?php endif; ?>
 
             <!-- Devotion Content -->
             <div class="devotion-header-content">
@@ -638,13 +642,10 @@ $conn->close();
                     </span>
                 </div>
 
-                <!-- PDF Download -->
-                <?php if (!empty($devotion['pdf_path'])): ?>
-                    <a href="<?php echo htmlspecialchars($devotion['pdf_path']); ?>" class="download-btn" target="_blank"
-                        aria-label="Download PDF">
-                        <i class="fas fa-download" aria-hidden="true"></i> Download PDF
-                    </a>
-                <?php endif; ?>
+                <!-- PDF Download Button -->
+                <a href="download/devotionals.pdf" class="download-btn" download>
+                    <i class="fas fa-download"></i> Download PDF
+                </a>
             </div>
         </div>
     <?php else: ?>
@@ -653,58 +654,47 @@ $conn->close();
 
 
 
-    <?php if ($devotions): ?>
-        <!-- Devotion Content -->
-        <div class="devotion-content-container">
-            <div class="container">
+    <div class="devotion-content-container">
+        <div class="container">
+            <?php if ($devotions): ?>
                 <div class="devotion-content" data-aos="fade-up">
-
-                    <!-- Verse and Reference -->
                     <p class="devotion-verse">
-                        "<?php echo nl2br(htmlspecialchars($devotions['title'])); ?>"
-                        <br><br>
-                        - <?php echo htmlspecialchars($devotions['verse']); ?>
+                        <?= htmlspecialchars($devotions['verse_text']) ?><br><br>
+                        - <?= htmlspecialchars($devotions['verse_reference']) ?>
                     </p>
 
-                    <!-- Introduction and Sections -->
                     <div class="devotion-text">
-                        <?php
-                        $content = $devotions['content'] ?? null;
+                        <p><?= nl2br(htmlspecialchars($devotions['introduction_text'])) ?></p>
 
-                        if ($content) {
-                            echo nl2br(htmlspecialchars($content));
-                        } else {
-                            echo "No content available.";
-                        }
-                        ?>
+                        <?php if (is_array($devotions['sections'])): ?>
+                            <?php foreach ($devotions['sections'] as $section): ?>
+                                <?php if (!empty($section['heading'])): ?>
+                                    <h3><?= htmlspecialchars($section['heading']) ?></h3>
+                                <?php endif; ?>
+                                <?php if (!empty($section['content'])): ?>
+                                    <p><?= nl2br(htmlspecialchars($section['content'])) ?></p>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
 
-                        <!-- Meta -->
-                        <p class="devotion-meta">
-                            <small>
-                                Created: <?php echo date("F j, Y, g:i a", strtotime($devotions['created_at'])); ?><br>
-                            </small>
-                        </p>
+                    <div class="devotion-actions">
+                        <a href="download/devotionals.pdf" class="download-btn" download>
+                            <i class="fas fa-download"></i> Download Full Devotional
+                        </a>
+                        <div class="social-share">
+                            <span>Share this devotion:</span>
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-whatsapp"></i></a>
+                            <a href="#"><i class="fas fa-envelope"></i></a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <?php else: ?>
+                <p>No devotion found for today.</p>
+            <?php endif; ?>
         </div>
-    <?php else: ?>
-        <p style="text-align:center; color: red;"> No devotion found for today (<?php echo $today; ?>)</p>
-    <?php endif; ?>
-    <div class="devotion-actions">
-        <a href="#" class="download-btn">
-            <i class="fas fa-download"></i> Download Full Devotional
-        </a>
-        <div class="social-share">
-            <span>Share this devotion:</span>
-            <a href="#"><i class="fab fa-facebook-f"></i></a>
-            <a href="#"><i class="fab fa-twitter"></i></a>
-            <a href="#"><i class="fab fa-whatsapp"></i></a>
-            <a href="#"><i class="fas fa-envelope"></i></a>
-        </div>
-    </div>
-    </div>
-    </div>
     </div>
 
     <!-- More Devotions -->

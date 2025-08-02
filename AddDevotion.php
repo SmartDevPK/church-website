@@ -151,11 +151,17 @@
                     <input type="file" class="form-control" name="image" id="image" accept="image/*" required />
                 </div>
 
+                <div class="mb-3">
+                    <label for="pdf" class="form-label">Upload PDF (optional)</label>
+                    <input type="file" class="form-control" name="pdf" id="pdf" accept="application/pdf" />
+                </div>
+
                 <div class="button-group">
                     <button type="submit" class="btn btn-success" id="submitBtn">Save Devotional</button>
                     <button type="button" class="btn btn-secondary" id="cancel-add">Cancel</button>
                 </div>
             </form>
+
         </div>
     </div>
 

@@ -128,9 +128,9 @@ $stmt->close();
                     <hr>
                     <ul class="nav nav-pills flex-column mb-auto">
                         <li class="nav-item">
-                            <a href="today_dasborad.php" class="nav-link">
+                            <a href="past_dasborad.php" class="nav-link">
                                 <i class="fas fa-plus-circle me-2"></i>
-                                Add New Devotion
+                                Add Past Devotion
                             </a>
                         </li>
                         <li>
