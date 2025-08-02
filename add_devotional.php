@@ -1,76 +1,194 @@
 <?php
-// Enable error reporting
+// Error reporting
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
 $errorMessage = '';
 $successMessage = '';
 
-// Database connection parameters
-$host = "localhost";
-$port = 3307;
-$username = "root";
-$password = "";
-$database = "prayer_db";
+// DB config
+$config = [
+    'host' => 'localhost',
+    'port' => 3307,
+    'username' => 'root',
+    'password' => '',
+    'database' => 'prayer_db'
+];
 
-// Create connection
-$conn = new mysqli($host, $username, $password, $database, $port);
+$title = $excerpt = $devotion_date = $read_more_link = $current_image = '';
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Process form only when it's submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get form inputs safely
-    $topic = $_POST['topic'] ?? '';
-    $date = $_POST['date'] ?? '';
-
-    // File upload directory
-    $uploadDir = "uploads";
-
-    // Create uploads directory if it doesn't exist
-    if (!file_exists($uploadDir)) {
-        if (!mkdir($uploadDir, 0755, true)) {
-            $errorMessage = "Failed to create upload directory.";
-        }
+// DB connection
+try {
+    $conn = new mysqli($config['host'], $config['username'], $config['password'], $config['database'], $config['port']);
+    if ($conn->connect_error) {
+        throw new Exception("DB connection failed: " . $conn->connect_error);
     }
 
-    if (!$errorMessage) {
-        // Handle file uploads
-        $timestamp = time();
-        $imagePath = "$uploadDir/devotion_cover_" . $timestamp . ".jpg";
+    $id = (int) ($_GET['id'] ?? 0);
+    if (!$id)
+        throw new Exception("Missing or invalid ID");
 
-        if (isset($_FILES['image']) && move_uploaded_file($_FILES['image']['tmp_name'], $imagePath)) {
-            $pdfPath = null;
+    // Fetch current data
+    $stmt = $conn->prepare("SELECT * FROM devotions WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows === 0)
+        throw new Exception("No devotional found with ID = $id");
 
-            $stmt = $conn->prepare("INSERT INTO devotion (image_path, topic, date, pdf_path) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("ssss", $imagePath, $topic, $date, $pdfPath);
+    $devotion = $result->fetch_assoc();
+    $title = $devotion['title'];
+    $excerpt = $devotion['excerpt'];
+    $devotion_date = $devotion['devotion_date'];
+    $read_more_link = $devotion['read_more_link'];
+    $current_image = $devotion['image'];
 
-            if ($stmt->execute()) {
-                $successMessage = "Devotion uploaded successfully!";
-            } else {
-                $errorMessage = "Database error: " . $stmt->error;
+    // Handle update
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+        $title = trim($_POST['title'] ?? '');
+        $excerpt = trim($_POST['excerpt'] ?? '');
+        $devotion_date = $_POST['devotion_date'] ?? '';
+        $read_more_link = trim($_POST['read_more_link'] ?? '');
+
+        if (!$title || !$excerpt || !$devotion_date || !$read_more_link) {
+            throw new Exception("All fields are required");
+        }
+
+        // Handle optional image upload
+        $image_path = $current_image;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+            $file_type = mime_content_type($_FILES['image']['tmp_name']);
+
+            if (!in_array($file_type, $allowed_types)) {
+                throw new Exception("Only JPG, PNG, and GIF allowed");
             }
-            $stmt->close();
-            header("Location: dashboard.php?message=updated");
-            exit;
-        } else {
-            $errorMessage = "Image upload failed.";
+
+            $upload_dir = "uploads";
+            if (!is_dir($upload_dir))
+                mkdir($upload_dir, 0755, true);
+            $new_image = "devotion_" . time() . "_" . basename($_FILES['image']['name']);
+            $image_path = "$upload_dir/$new_image";
+
+            if (!move_uploaded_file($_FILES['image']['tmp_name'], $image_path)) {
+                throw new Exception("Failed to upload image");
+            }
+
+            // Delete old image
+            if ($current_image && file_exists($current_image) && $current_image !== $image_path) {
+                unlink($current_image);
+            }
         }
-    }
-}
 
-// Fetch recent devotionals from DB for the table display
-$devotion = [];
-$result = $conn->query("SELECT id, topic, date, image_path FROM devotion ORDER BY date DESC LIMIT 10");
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $devotion[] = $row;
-    }
-} else {
-    $errorMessage = "Failed to fetch devotionals: " . $conn->error;
-}
+        $stmt = $conn->prepare("UPDATE devotions SET image=?, title=?, devotion_date=?, excerpt=?, read_more_link=? WHERE id=?");
+        $stmt->bind_param("sssssi", $image_path, $title, $devotion_date, $excerpt, $read_more_link, $id);
 
-$conn->close();
+        if (!$stmt->execute()) {
+            throw new Exception("Database update failed: " . $stmt->error);
+        }
+
+        header("Location: dashboard.php?message=Devotional+Updated");
+        exit();
+    }
+
+} catch (Exception $e) {
+    $errorMessage = $e->getMessage();
+} finally {
+    if (isset($conn))
+        $conn->close();
+}
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Devotional</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-title {
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 0.5rem;
+        }
+
+        .preview-image {
+            max-width: 200px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h2 class="form-title text-center">Edit Devotional</h2>
+
+            <?php if ($errorMessage): ?>
+                <div class="alert alert-danger"><?= $errorMessage ?></div>
+            <?php endif; ?>
+
+            <form action="" method="POST" enctype="multipart/form-data">
+                <!-- Image Upload -->
+                <div class="mb-4">
+                    <label for="image" class="form-label">Devotional Image</label>
+                    <?php if ($current_image): ?>
+                        <div>
+                            <img src="<?= htmlspecialchars($current_image) ?>" class="img-thumbnail preview-image"
+                                alt="Current Image">
+                        </div>
+                    <?php endif; ?>
+                    <input type="file" name="image" id="image" class="form-control" accept="image/*">
+                    <small class="text-muted">Leave blank to keep current image</small>
+                </div>
+
+                <!-- Title -->
+                <div class="mb-4">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" name="title" id="title" class="form-control"
+                        value="<?= htmlspecialchars($title) ?>" required>
+                </div>
+
+                <!-- Devotion Date -->
+                <div class="mb-4">
+                    <label for="devotion_date" class="form-label">Date</label>
+                    <input type="date" name="devotion_date" id="devotion_date" class="form-control"
+                        value="<?= htmlspecialchars($devotion_date) ?>" required>
+                </div>
+
+                <!-- Excerpt -->
+                <div class="mb-4">
+                    <label for="excerpt" class="form-label">Excerpt</label>
+                    <textarea name="excerpt" id="excerpt" class="form-control" rows="4"
+                        required><?= htmlspecialchars($excerpt) ?></textarea>
+                </div>
+
+                <!-- Read More Link -->
+                <div class="mb-4">
+                    <label for="read_more_link" class="form-label">Read More Link</label>
+                    <input type="url" name="read_more_link" id="read_more_link" class="form-control"
+                        value="<?= htmlspecialchars($read_more_link) ?>" required>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="dashboard.php" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Update Devotional</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
