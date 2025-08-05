@@ -447,7 +447,7 @@ try {
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4>Manage Devotionals</h4>
                     <a href="add_devotional.php" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Add nnn
+                        <i class="fas fa-plus"></i> Add New
                     </a>
                 </div>
 

@@ -1,31 +1,109 @@
+<?php
+// Display errors for debugging (disable in production)
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// DB Config
+$config = [
+    'host' => 'localhost',
+    'port' => 3307,
+    'username' => 'root',
+    'password' => '',
+    'database' => 'prayer_db'
+];
+
+$successMessage = '';
+$errorMessage = '';
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $topic = trim($_POST['topic'] ?? '');
+    $date = $_POST['date'] ?? '';
+    $image = $_FILES['image'] ?? null;
+    $pdf = $_FILES['pdf'] ?? null;
+
+    try {
+        if (!$topic || !$date || !$image) {
+            throw new Exception("Title, date, and image are required.");
+        }
+
+        // Connect to DB
+        $conn = new mysqli($config['host'], $config['username'], $config['password'], $config['database'], $config['port']);
+        if ($conn->connect_error) {
+            throw new Exception("Database connection failed: " . $conn->connect_error);
+        }
+
+        // Upload image
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        $imageMime = mime_content_type($image['tmp_name']);
+        if (!in_array($imageMime, $allowedTypes)) {
+            throw new Exception("Invalid image format. Only JPG, PNG, and GIF are allowed.");
+        }
+
+        $uploadDir = 'uploads/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $imageName = "devotion_" . time() . "_" . basename($image['name']);
+        $imagePath = $uploadDir . $imageName;
+
+        if (!move_uploaded_file($image['tmp_name'], $imagePath)) {
+            throw new Exception("Failed to upload image.");
+        }
+
+        // Upload PDF (optional)
+        $pdfPath = null;
+        if ($pdf && $pdf['error'] === UPLOAD_ERR_OK) {
+            if (mime_content_type($pdf['tmp_name']) !== 'application/pdf') {
+                throw new Exception("Only PDF files are allowed.");
+            }
+
+            $pdfName = "devotion_" . time() . "_" . basename($pdf['name']);
+            $pdfPath = $uploadDir . $pdfName;
+
+            if (!move_uploaded_file($pdf['tmp_name'], $pdfPath)) {
+                throw new Exception("Failed to upload PDF.");
+            }
+        }
+
+        // Insert into DB
+        $stmt = $conn->prepare("INSERT INTO devotion (topic, date, image_path, pdf_path) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $topic, $date, $imagePath, $pdfPath);
+        if (!$stmt->execute()) {
+            throw new Exception("Database insert failed: " . $stmt->error);
+        }
+
+        $successMessage = "Devotional added successfully!";
+    } catch (Exception $e) {
+        $errorMessage = $e->getMessage();
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add New Devotional</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* General Styles */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background-color: #f4f7f9;
             margin: 0;
             padding: 0;
         }
 
-        /* Container */
         .container {
             max-width: 600px;
             margin: 60px auto;
-            background: #ffffff;
+            background: #fff;
             padding: 30px 40px;
             border-radius: 12px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
-        /* Header */
         .form-header h2 {
             margin-bottom: 5px;
             font-size: 28px;
@@ -37,7 +115,6 @@
             font-size: 15px;
         }
 
-        /* Input Fields */
         .form-label {
             display: block;
             margin-bottom: 8px;
@@ -60,7 +137,6 @@
             outline: none;
         }
 
-        /* Button Styles */
         .button-group {
             display: flex;
             justify-content: space-between;
@@ -94,34 +170,26 @@
             background-color: #a6acaf;
         }
 
-        /* Success Message */
-        .success-message {
-            display: none;
+        .message {
             padding: 12px;
-            background-color: #d4edda;
-            color: #155724;
             border-radius: 6px;
             margin-bottom: 20px;
             font-weight: bold;
         }
 
-        /* Show success message when form is successfully submitted */
-        .success-message.show {
-            display: block;
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
         }
 
-        /* Loading Button */
-        .loading {
-            background-color: #16a085 !important;
-            cursor: wait;
-            opacity: 0.8;
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
         }
     </style>
 </head>
 
 <body>
-    <?php ini_set('display_errors', 1);
-    error_reporting(E_ALL); ?>
 
     <div class="container">
         <div class="form-header">
@@ -129,74 +197,36 @@
             <p>Share your spiritual insights with the community</p>
         </div>
 
-        <div class="form-content">
-            <div class="success-message" id="successMessage">
-                Devotional added successfully!
+        <?php if ($successMessage): ?>
+            <div class="message success"><?= htmlspecialchars($successMessage) ?></div>
+        <?php elseif ($errorMessage): ?>
+            <div class="message error"><?= htmlspecialchars($errorMessage) ?></div>
+        <?php endif; ?>
+
+        <form method="POST" enctype="multipart/form-data">
+            <label for="topic" class="form-label">Title / Topic</label>
+            <input type="text" class="form-control" name="topic" id="topic" required>
+
+            <label for="date" class="form-label">Date</label>
+            <input type="date" class="form-control" name="date" id="date" required>
+
+            <label for="image" class="form-label">Cover Image</label>
+            <input type="file" class="form-control" name="image" id="image" accept="image/*" required>
+
+            <label for="pdf" class="form-label">Upload PDF (optional)</label>
+            <input type="file" class="form-control" name="pdf" id="pdf" accept="application/pdf">
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-success">Save Devotional</button>
+                <a href="dashboard.php" class="btn btn-secondary">Cancel</a>
             </div>
-
-            <form action="add_devotional.php" method="POST" enctype="multipart/form-data" id="devotionalForm">
-                <div class="mb-3">
-                    <label for="topic" class="form-label">Title / Topic</label>
-                    <input type="text" class="form-control" name="topic" id="topic"
-                        placeholder="Enter devotional title..." required />
-                </div>
-
-                <div class="mb-3">
-                    <label for="date" class="form-label">Date</label>
-                    <input type="date" class="form-control" name="date" id="date" required />
-                </div>
-
-                <div class="mb-3">
-                    <label for="image" class="form-label">Cover Image</label>
-                    <input type="file" class="form-control" name="image" id="image" accept="image/*" required />
-                </div>
-
-                <div class="mb-3">
-                    <label for="pdf" class="form-label">Upload PDF (optional)</label>
-                    <input type="file" class="form-control" name="pdf" id="pdf" accept="application/pdf" />
-                </div>
-
-                <div class="button-group">
-                    <button type="submit" class="btn btn-success" id="submitBtn">Save Devotional</button>
-                    <button type="button" class="btn btn-secondary" id="cancel-add">Cancel</button>
-                </div>
-            </form>
-
-        </div>
+        </form>
     </div>
 
     <script>
-        // Set today's date as default
         document.getElementById('date').valueAsDate = new Date();
-
-        // Form submission with loading state
-        document.getElementById('devotionalForm').addEventListener('submit', function (e) {
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.classList.add('loading');
-            submitBtn.disabled = true;
-        });
-
-        // Cancel button functionality
-        document.getElementById('cancel-add').addEventListener('click', function () {
-            if (confirm('Are you sure you want to cancel? All unsaved changes will be lost.')) {
-                document.getElementById('devotionalForm').reset();
-                window.location.href = 'dashboard.php';  // Redirect to dashboard.php on cancel
-            }
-        })
-
-        // File input preview (optional enhancement)
-        document.getElementById('image').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    // You can add image preview functionality here
-                    console.log('Image selected:', file.name);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
     </script>
+
 </body>
 
 </html>

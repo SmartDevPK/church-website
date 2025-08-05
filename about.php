@@ -609,7 +609,7 @@
     <header id="header">
         <div class="container">
             <nav>
-                <a href="index.html" class="logo-container">
+                <a href="index.php" class="logo-container">
                     <img src="the anch logo.png" alt="The Anchor Devotional Logo" class="logo-img">
                     <div class="logo-text">
                         <span class="logo-main">The Anchor</span>
@@ -816,11 +816,11 @@
                 <div class="footer-column" data-aos="fade-up" data-aos-delay="200">
                     <h3>Resources</h3>
                     <ul class="footer-links">
-                        <li><a href="bible-reading-plans.html">Bible Reading Plans</a></li>
-                        <li><a href="downloads.html">Free Downloads</a></li>
-                        <li><a href="books.html">Recommended Books</a></li>
-                        <li><a href="blog.html">Blog</a></li>
-                        <li><a href="faq.html">FAQs</a></li>
+                        <li><a href="bible-reading-plans.php">Bible Reading Plans</a></li>
+                        <li><a href="downloads.php">Free Downloads</a></li>
+                        <li><a href="books.php">Recommended Books</a></li>
+                        <li><a href="blog.php">Blog</a></li>
+                        <li><a href="faq.php">FAQs</a></li>
                     </ul>
                 </div>
 
@@ -835,8 +835,8 @@
             </div>
 
             <div class="copyright" data-aos="fade-up">
-                <p>&copy; 2023 The Anchor Devotional. All Rights Reserved. | <a href="privacy.html"
-                        style="color: #bbb;">Privacy Policy</a> | <a href="terms.html" style="color: #bbb;">Terms of
+                <p>&copy; 2023 The Anchor Devotional. All Rights Reserved. | <a href="privacy.php"
+                        style="color: #bbb;">Privacy Policy</a> | <a href="terms.php" style="color: #bbb;">Terms of
                         Use</a></p>
             </div>
         </div>
